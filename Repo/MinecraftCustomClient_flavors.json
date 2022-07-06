@@ -1,0 +1,17 @@
+{"Flavors":[
+
+  {"TestClient":[
+    {"ID":"84545270-e762-4a6e-8a9b-45df72ed35d8"},
+    {"url":"https://example.com/flavors/testclient.package"},
+    {"fabV":"fabric-loader-0.14.7-1.19"},
+    {"reqJV":""}
+  ]},
+
+  {"TestClient2":[
+    {"ID":"f9063597-c8ae-4077-9335-7b05ced5cdf3"},
+    {"url":"https://example.com/flavors/testclient2.package"},
+    {"fabV":"fabric-loader-0.13.1-1.19"},
+    {"reqJV":""}
+  ]}
+
+]}
