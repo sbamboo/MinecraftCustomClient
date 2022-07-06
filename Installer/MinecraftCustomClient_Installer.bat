@@ -10,6 +10,16 @@ echo ""
 hash pwsh 2>/dev/null || { echo >&2 ""; bash <(curl -s https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/install-powershell.sh); }; clear; pwsh -c "Get-Content $0 | Select -Skip 12 | Invoke-Expression"
 exit
 
-#Bundled Powershell script
-echo "[Debug] Works!"
-pause
+#===================================[Code]===================================
+
+#MinecraftCustomClient installer
+#Author: Simon Kalmi Claesson
+
+#Version:
+$app_version = "1.0"
+$app_vID = "A0122-ae3dc603-abc4-44f5-9f98-43d129e779f9"
+$app_mtd = "8537@ecb93f88d52e"
+
+#Update Section
+  #Get repo lastVer.mt
+  curl -s 
