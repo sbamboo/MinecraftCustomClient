@@ -20,6 +20,13 @@ $app_version = "1.0"
 $app_vID = "A0122-ae3dc603-abc4-44f5-9f98-43d129e779f9"
 $app_mtd = "8537@ecb93f88d52e"
 
+#variables
+$lastver_url = "https://github.com/simonkalmiclaesson/MinecraftCustomClient/raw/main/Installer/lastVer.mt"
+
 #Update Section
+  #Assemble mt tag
+  [string]$mttag = $app_vID + ":" + $app_mtd
   #Get repo lastVer.mt
-  curl -s 
+  $lastVer = curl -s "$lastver_url"
+  #Check
+  if ($mttag -eq $lastVer) {write-host "latest!";pause} else {write-host "old!";pause}
