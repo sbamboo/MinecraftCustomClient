@@ -2,7 +2,7 @@
 
   {"TestClient":[
     {"ID":"84545270-e762-4a6e-8a9b-45df72ed35d8"},
-    {"url":"https://example.com/flavors/testclient.package"},
+    {"url":"https://github.com/simonkalmiclaesson/MinecraftCustomClient/raw/main/Repo/Flavors/testclient.package"},
     {"fabV":"fabric-loader-0.14.8-1.19"},
     {"reqJV":""}
   ]}
