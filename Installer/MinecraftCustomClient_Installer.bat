@@ -21,7 +21,24 @@ $app_vID = "A0122-ae3dc603-abc4-44f5-9f98-43d129e779f9"
 $app_mtd = "8537@ecb93f88d52e"
 
 #variables
-$lastver_url = "https://github.com/simonkalmiclaesson/MinecraftCustomClient/raw/main/Installer/lastVer.mt"
+$lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
+$lastver_name = $lastver_url | split-path -leaf
+$updater_url = "https://github.com/simonkalmiclaesson/MinecraftCustomClient/blob/main/Updater/MinecraftCustomClient_Updater.ps1"
+$updater_name = $updater_url | split-path -leaf
+$tempfolder_path = "$psscriptroot\MinecraftCustomClient_Installer_Temp"
+
+#clear
+cls
+
+#Functions
+function download($adress,$path) {
+  $url = $adress
+  $name = $adress | split-path -leaf
+  curl -s "$adress" | Out-File "$path\$name"
+}
+
+#Create temp folder
+if (test-path $tempfolder_path) {} else {md $tempfolder_path}
 
 #Update Section
   #Assemble mt tag
@@ -29,4 +46,13 @@ $lastver_url = "https://github.com/simonkalmiclaesson/MinecraftCustomClient/raw/
   #Get repo lastVer.mt
   $lastVer = curl -s "$lastver_url"
   #Check
-  if ($mttag -eq $lastVer) {write-host "latest!";pause} else {write-host "old!";pause}
+  if ($mttag -eq $lastVer) {$isLatest = $true} else {$isLatest = $false}
+  #Fix
+  if ($isLatest = $false) {
+    $curdir = get-location
+    cd $tempfolder_path
+    download $updater_name $pwd
+    start pwsh -file $updater_name
+    exit
+    cd $curdir
+  }
