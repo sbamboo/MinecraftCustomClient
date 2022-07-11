@@ -13,9 +13,6 @@ $updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCu
 $updater_name = $updater_url | split-path -leaf
 $tempfolder_path = "$psscriptroot\MinecraftCustomClient_Installer_Temp"
 
-#clear
-cls
-
 #Create temp folder
 if (test-path $tempfolder_path) {} else {md $tempfolder_path}
 
@@ -36,6 +33,10 @@ if (test-path $tempfolder_path) {} else {md $tempfolder_path}
   }
 
 
+
+#clear & Title
+cls
+$host.ui.rawui.windowtitle = "MinecraftCustomClient Installer"
+
 #Rest of the code
-"Updated!"
 pause
