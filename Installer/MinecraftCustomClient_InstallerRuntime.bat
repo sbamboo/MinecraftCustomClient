@@ -13,7 +13,7 @@ exit
 #Bundled Powershell script
 
 #Varibles
-$app_adress = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/MinecraftCustomClient_Installer.bat"
+$app_adress = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/MinecraftCustomClient_Installer.ps1"
 $app_name = $app_adress | split-path -leaf
 
 #Check for vdat file
