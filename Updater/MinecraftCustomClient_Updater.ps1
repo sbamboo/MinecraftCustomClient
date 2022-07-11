@@ -1,5 +1,5 @@
 #vars
-$host.ui.rawui.windowtile = "Updating..."
+$host.ui.rawui.windowtitle = "Updating..."
 $adress = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/MinecraftCustomClient_Installer.ps1"
 $name = $adress | split-path -leaf
 
