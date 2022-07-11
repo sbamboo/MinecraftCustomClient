@@ -11,7 +11,7 @@ $lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCu
 $lastver_name = $lastver_url | split-path -leaf
 $updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
 $updater_name = $updater_url | split-path -leaf
-$tempfolder_path = "$psscriptroot\MinecraftCustomClient_Installer_Temp"
+$tempfolder_path = "MinecraftCustomClient_Installer_Temp"
 
 #Create temp folder
 if (test-path $tempfolder_path) {} else {md $tempfolder_path}
