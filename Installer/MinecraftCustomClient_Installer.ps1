@@ -9,7 +9,11 @@ $app_mtd = "8537@ecb93f88d52e"
 #Param
 param(
   #Update
-  [switch]$HasUpdated
+  [switch]$HasUpdated,
+
+  #Java
+  [switch]$script:customJava,
+  [string]$script:javaPath
 )
 
 #variables
@@ -450,6 +454,82 @@ Function MinecraftLauncherAgent {
     returnPath
 
 }
+#Fabric Installer
+Function FabricInstaller {
+
+    #SYNTAX:
+    #FabricInstaller (-forceBaseJava) -installerName "fabric-installer.jar" -client/-server (-snapshot) -dir <mc_dir> -mcversion <mcver> -loader <fabric_loader_version> (-noprofile)
+
+    param(
+        #Java
+        [switch]$forceBaseJava,
+
+        #Installer
+        [string]$installerName,
+
+        #Modes
+        [switch]$client,
+        [switch]$server,
+
+        #Params
+        [switch]$snapshot,
+        [string]$dir,
+        [string]$mcversion,
+        [string]$loader,
+        [string]$noprofile
+    )
+
+    #Java
+    if ($forceBaseJava) {$java = "java"} else {
+        if ($script:customJava) {
+            if ($script:javapath) {
+                $java = $script:javapath
+            } else {
+                write-host "No custom java path given! When using the -customJava flag a -javaPath parameter must be given and used, will try to continue with default java." -f red
+                $java = "java"
+            }
+        } else {
+            $java = "java"
+        }
+    }
+
+    #Client
+    if ($client) {
+        #Begin StringBuild
+        $command = $java + " -jar "
+        #InstallerName
+        if ($InstallerName) {$command = $command + "$InstallerName "} else {write-host "The script needs a fabric installer to be presented, please provide a filename/path to the -installerName flag, the script will instead try and use 'fabric-installer.jar' as a name." -f red; $command = $command + "fabric-installer.jar "}
+        #Client tag
+        $command = $command + "client "
+        #snapshot
+        if ($snapshot) {$command = $command + "-snapshot "}
+        #dir
+        if ($dir) {
+            $command = $command + "-dir " + "'" + $dir + "'" + " "
+        } else {
+            write-host "A install directory must be provided! (flag -dir is required)" -f red
+            break
+        }
+        #mcversion
+        if ($mcversion) {
+            $command = $command + "-mcversion " + "'" + $mcversion + "'" + " "
+        } else {
+            write-host "A minecraft version must be provided! (flag -mcversion is required)" -f red
+            break
+        }
+        #loader
+        if ($loader) {
+            $command = $command + "-loader " + "'" + $loader + "'" + " "
+        } else {
+            write-host "A fabric-loader version must be provided! (flag -loader is required)" -f red
+            break
+        }
+        #noprofile
+        if ($noprofile) {$command = $command + "-noprofile"}
+
+        iex($command)
+    }
+}
 
 #clear & Title
 cls
@@ -466,3 +546,13 @@ cd $core_path
 $core_path
 $temp_path
 pause
+
+
+#check and get java
+#get fabric-installer
+#get flavorlist
+#display flavorlist
+#get chosen flavors data
+#pass to fabric installer
+#pass to launcherProfile creator
+#^^^ launch mc-launcher (if wanted)
