@@ -38,5 +38,14 @@ if (test-path $tempfolder_path) {} else {md $tempfolder_path}
 cls
 $host.ui.rawui.windowtitle = "MinecraftCustomClient Installer"
 
-#Rest of the code
+#Path setup
+$core_path = Get-Location
+cd $tempfolder_path
+$temp_path = Get-Location
+cd $core_path
+
+
+#Installer code
+$core_path
+$temp_path
 pause
