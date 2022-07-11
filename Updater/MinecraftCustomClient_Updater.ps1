@@ -14,4 +14,4 @@ if (test-path "$name") {} else {
 #fix
 del "$name"
 curl -s "$adress" | Out-File -file $name
-start pwsh "-file $name"
+start pwsh "-file $name -HasUpdated"
