@@ -4,7 +4,7 @@
 #Version:
 $app_version = "1.0"
 $app_vID = "A0122-ae3dc603-abc4-44f5-9f98-43d129e779f9"
-$app_mtd = "857f@ecb93f88d52e"
+$app_mtd = "8537@ecb93f88d52e"
 
 #variables
 $lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
