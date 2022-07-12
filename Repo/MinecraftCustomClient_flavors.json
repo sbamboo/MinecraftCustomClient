@@ -3,7 +3,7 @@
   {"TestClient":[
     {"ID":"84545270-e762-4a6e-8a9b-45df72ed35d8"},
     {"url":"https://github.com/simonkalmiclaesson/MinecraftCustomClient/raw/main/Repo/Flavors/testclient.package"},
-    {"archive_type":"package.zip"},
+    {"archive_type":"package.zip"}, //package.zip, package.7z, package, zip, 7z
     {"fabric_version":"1.19"},
     {"fabric_loader":"0.14.8"},
     {"launcher_icon":"https://st2.depositphotos.com/2398103/5516/v/950/depositphotos_55167265-stock-illustration-vector-test-icon.jpg"},
