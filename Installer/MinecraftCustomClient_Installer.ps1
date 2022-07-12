@@ -547,12 +547,21 @@ $core_path
 $temp_path
 pause
 
+#show menu were to choose install or copyData or more
+#if install
+  #check and get java
+  #get fabric-installer
+  #get flavorlist
+  #display flavorlist
+  #get chosen flavors data
+  #pass to fabric installer
+  #pass to launcherProfile creator
+  #^^^ launch mc-launcher (if wanted)
 
-#check and get java
-#get fabric-installer
-#get flavorlist
-#display flavorlist
-#get chosen flavors data
-#pass to fabric installer
-#pass to launcherProfile creator
-#^^^ launch mc-launcher (if wanted)
+#if copyData
+  #show menu copyData ui
+  #show choice for copy_from and allow custom path/folder or from standard dir
+  #show choice for copy_to and allow custom path/folder or from standard dir
+  #show options (checkboxes) for what to copy:  Saves, modConfig, settins, resourcepacks, servers, shaders
+  #show choice if user want to keep remove files from copy_from
+  #copy data
