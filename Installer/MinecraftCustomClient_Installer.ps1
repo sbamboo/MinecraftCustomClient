@@ -547,6 +547,7 @@ $core_path
 $temp_path
 pause
 
+
 #show menu were to choose install or copyData or more
 #if install
   #check and get java
