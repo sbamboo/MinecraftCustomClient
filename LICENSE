@@ -1,25 +1,23 @@
-No license is provided at this time, this project is in development so please dont reditribute any files without my permission.
-
 This repository contains both a repository for clients aswell as tools, devtools and installers for them.
-Theese parts al have separate uses and thus also diffrent needs for licenses. Because of this every part of this repo falls under diffrent aggrements while this one more or less exists as an overall agreement.
-Note that if a part dosen't have a license file present in it's folder, it automaticly falls under this one.
+These parts al have separate uses and thus also different needs for licenses. Because of this every part of this repository falls under different agreements while this one more or less exists as an overall agreement.
+Note that if a part dosen't have a license-file present in it's folder, it automaticly falls under this one.
 
-Another thing thats neceseary since the nature of this project is that diffrent versions or revisions should be able to have diffrent aggrements and licenses.
-This means that I remain to have the full ability to change/switch or even remove license aggrements from a part of the project or the project as a whole.
-However if you download anything from the repository or a release/(official)ditribution of this repo or any part of it, the license aggrement currently included with your download will still comply for that version.
-As an example if you download a part of the project with no license/aggrement made or connected to it, yout download will still not fall under any license if I would add one in.
-NOTE! If you would download the same part again or an asset from/to it that at the new time of download, falls under a license that license will apply to the downloaded parts.
+Another thing thats necessary with the nature of this project is that different versions or revisions should be able to have different agreements and licenses.
+Altho I still have the full ability to change/switch or even remove license aggrements from a part of the project or the project as a whole.
+However if you download anything from the repository or a release/official-ditribution of this repository or any part of it, the license agreement currently included with your download will still comply for that version, even if it's changed in the future.
+As an example if you download a part of the project with no license/agreement made or connected to it, your download will still not fall under any license if I would add one in later.
+NOTE! If you would download the same part again or an asset from/to it that at the new time of download, falls under a license said license would then apply to the downloaded parts.
 
-By downloading any part or asset of this repository you agree to read and comply with the license given and connected at the time of download, and agknowlege that I may change the license of said part without informing or saying anything before hand.
-You also agknowlege that I may remove this part of the license agrement at any time altho old or previously downloaded assets will still be under the license given at the time of download.
+By downloading any part or asset of this repository you agree to read and comply with the license given and connected at the time of download, and agknowledge that I may change the license of said part without informing or saying anything before hand.
+You also agknowledge that I may remove this part of the license agrement at any time altho old or previously downloaded assets will still be under the license given at the time of download.
 
 
 ==========================================[General license]==========================================
-Any part of the project not licenses separatly will fall under the agrements bellow.
+Any part of the project not licensed separatly will fall under the agreements bellow.
 
 You may download parts of the project or the repository as a whole without strictly asking for permission.
 However you must include al license information avaliable at the time of download with the asset downloaded,
-this includes both this license and anyother license file given.
+this includes both this license and any other license-file given.
 
 You may not redistribute any part of the project as your own!
 Any redistribution of a part of this project must be permitted by me specificly.
@@ -27,7 +25,8 @@ And any redistribution also must point to the original creator/author of the dat
 
 You may use parts of this project for your own project with permission from me.
 
-You are welcomme to download the repository in meaning of helping with development or fixes, or as a source of inspiration. But if so you must as previously specified, point to the original/official repository (this one) aswell as credit the original author and include any readme files and license agrements.
+You are welcomme to download the repository in meaning of helping with development or fixes, or as a source of inspiration.
+But if you do so you must as previously specified, point to the original/official repository (this one) aswell as credit the original author and include any readme files and license agreements.
 
 =====================================================================================================
 
