@@ -32,7 +32,10 @@ function ParamHandle {
     #Other
     [switch]$startLauncher,
     [string]$customDrive,
-    [string]$customInstallLoc
+    [string]$customInstallLoc,
+
+    #Support
+    [switch]$forceLegacyDownload
   )
   #Redir
   $script:HasUpdated = $HasUpdated
@@ -41,6 +44,7 @@ function ParamHandle {
   $script:startLauncher = $startLauncher
   $script:customDrive = $customDrive
   $script:customInstallLoc = $customInstallLoc
+  $script:forceLegacyDownload = $forceLegacyDownload
 }
 $pc = "ParamHandle " + "$env:POWERSHELL_BAT_ARGS"
 iex("$pc")
@@ -819,7 +823,16 @@ if ($menuOption -eq "Install") {
   [string]$url = $choosenFlavor.url
   [string]$url = FlavorObjectFix -in $url
   [string]$name = "$url" | split-path -leaf
-  iwr "$url" -OutFile $name | Out-Null
+  #Use best method
+  if ($forceLegacyDownload) {
+    iwr "$url" -outfile $name | Out-Null
+  } else {
+    if ($IsWindows) {
+      Start-BitsTransfer -source "$url" -destination "$name"
+    } else {
+      iwr "$url" -outfile $name | Out-Null
+    }
+  }
   if ($type -like "*zip*") {
     $ProgressPreference = $old_ProgressPreference
     Expand-Archive $name . -force
