@@ -4,7 +4,7 @@ REM Shell things
 @echo off & setlocal
 set "POWERSHELL_BAT_ARGS=%*"
 REM Install Pwsh and start it
-powershell $old_ErrorActionPreference = $ErrorActionPreference; $ErrorActionPreference = 'SilentlyContinue'; $title = $host.ui.rawui.windowtitle; $host.ui.rawui.windowtitle = 'Pwsh runtime V.3.1 [win_batch]'; $env:path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); if(Get-Command 'pwsh') {} else { $curdir = $pwd; cd $env:temp; if (test-path 'pwsh_runtime_install') {} else {mkdir 'pwsh_runtime_install'}; cd 'pwsh_runtime_install'; $tempLoc = $pwd; cd $curdir; Invoke-RestMethod 'https://aka.ms/install-powershell.ps1' -outfile $tempLoc/inst.ps1; . $tempLoc/inst.ps1 -AddToPath; rmdir $tempLoc -recurse -force }; $ErrorActionPreference = $old_ErrorActionPreference; $env:path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); $host.ui.rawui.windowtitle = $title; cls; write-host '[Runtime]: Installed!' -f green; pwsh -noprofile -NoLogo -Command 'iex (${%~f0} ^| out-string)'
+powershell $old_ErrorActionPreference = $ErrorActionPreference; $ErrorActionPreference = 'SilentlyContinue'; $title = $host.ui.rawui.windowtitle; $host.ui.rawui.windowtitle = 'Pwsh runtime V.3.1 [win_batch]'; if(Get-Command 'pwsh') {} else { $curdir = $pwd; cd $env:temp; if (test-path 'pwsh_runtime_install') {} else {mkdir 'pwsh_runtime_install'}; cd 'pwsh_runtime_install'; $tempLoc = $pwd; cd $curdir; Invoke-RestMethod 'https://aka.ms/install-powershell.ps1' ^>^> $tempLoc/inst.ps1; . $tempLoc/inst.ps1 -AddToPath; rmdir $tempLoc -recurse -force }; $ErrorActionPreference = $old_ErrorActionPreference; $env:path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); $host.ui.rawui.windowtitle = $title; cls; write-host '[Runtime]: Installed!' -f green; pwsh -noprofile -NoLogo -Command 'iex (${%~f0} ^| out-string)'
 REM Exit prompt
 exit /b %errorlevel%
 
@@ -47,10 +47,6 @@ iex("$pc")
 
 
 #variables
-$old_ProgressPreference = $ProgressPreference
-$ProgressPreference = "SilentlyContinue"
-$new_ProgressPreference = $ProgressPreference
-
 $lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
 $lastver_name = $lastver_url | split-path -leaf
 $updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
@@ -124,12 +120,10 @@ Function GetJava {
       #Extract Java
       if ($javaName -like "*.zip*") {
         #Archive Java
-        $ProgressPreference = $old_ProgressPreference
         Expand-Archive $javaName
         cd $javaName.TrimEnd(".zip")
         $script:customJava = $True
         $script:javaPath = Get-Location
-        $ProgressPreference = $new_ProgressPreference
       } else {
         $script:customJava = $True
         $script:javaPath = $pwd + "\java.exe"
@@ -819,11 +813,9 @@ if ($menuOption -eq "Install") {
   [string]$url = $choosenFlavor.url
   [string]$url = FlavorObjectFix -in $url
   [string]$name = "$url" | split-path -leaf
-  iwr "$url" -OutFile $name | Out-Null
+  iwr "$url" -OutFile $name
   if ($type -like "*zip*") {
-    $ProgressPreference = $old_ProgressPreference
     Expand-Archive $name . -force
-    $ProgressPreference = $new_ProgressPreference
   }
   cd $curpath
   #pass to fabric installer
@@ -858,6 +850,3 @@ if ($menuOption -eq "Install") {
   #show options (checkboxes) for what to copy:  Saves, modConfig, settins, resourcepacks, servers, shaders
   #show choice if user want to keep remove files from copy_from
   #copy data
-
-#Refix Progress Pref
-$ProgressPreference = $old_ProgressPreference
