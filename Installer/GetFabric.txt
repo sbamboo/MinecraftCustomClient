@@ -1,0 +1,12 @@
+Function GetFabric {
+  param(
+    #OS
+    [switch]$win,
+
+    #other
+    [string]$workdir,
+    [string]$fabricURI
+  )
+
+  if ($fabricURI) {} else {$fabricURI = ""}
+}
