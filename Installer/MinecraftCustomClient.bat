@@ -115,10 +115,10 @@ Function ShowInfo {
   $WebHelp = (iwr $helpfile_url).content
     cls
     write-host "  Minecraft Custom Client Installer help and info:"
-    write-host "----------------------------------------------------"
+    write-host "--------------------------------------------------------------"
     Write-host "  Version: $app_version  ($app_vid)"
     write-host "  Author: $app_author"
-    write-host "----------------------------------------------------"
+    write-host "--------------------------------------------------------------"
     write-host ""
   if ($WebHelp -like "*$verificationHeader*") {
     iex($WebHelp)
