@@ -22,6 +22,8 @@ $app_mtd = "8537@ecb93f88d52e"
 #Param
 function ParamHandle {
   param(
+    [switch]$help,
+    
     #Update
     [switch]$HasUpdated,
 
@@ -39,6 +41,7 @@ function ParamHandle {
     [switch]$forceLegacyDownload
   )
   #Redir
+  $script:help = $help
   $script:HasUpdated = $HasUpdated
   $script:customJava = $customJava
   $script:javaPath = $javaPath
@@ -66,6 +69,9 @@ $flavorlist_name = $flavorlist_url | split-path -leaf
 $tempfolder_path = "MinecraftCustomClient_Installer_Temp"
 $javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
 $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"
+
+$helpfile_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
+$helpfile_name = $helpfile_url | split-path -leaf
 
 #Create temp folder
 if (test-path $tempfolder_path) {} else {md $tempfolder_path > $null}
@@ -102,6 +108,48 @@ if ($HasUpdated) {
   }
 
 #Functions
+#ShowInfo
+Function ShowInfo {
+  $VerificationHeader = "# Verification Header --918a-- #"
+  $WebHelp = (iwr $helpfile_url).content
+  if ($WebHelp -like "*$verificationHeader*") {
+    iex($WebHelp)
+  } else {
+    cls
+    write-host "  Minecraft Custom Client Installer help and info:"
+    write-host "----------------------------------------------------"
+    write-host "Web help couldn't be downloaded please check it for more information." -f red
+    write-host ""
+    write-host "MCC installer is an app to install my minecraft clients with more simplicity then zipping files here and there"
+    write-host "It needs java but if not found it will download a binary"
+    write-host "MCC installer also installs fabric and other client dependencies."
+    write-host ""
+    write-host "The app can be used from the command line so here is some cli help:"
+    write-host ""
+    write-host "  help: Shows this help menu."
+    write-host ""
+    write-host "  customJava: Flag to allow the use of custom Java paths other then the pathed 'java' command."
+    write-host ""
+    write-host "  javaPath: Path to custom java binary, used with the -customJava flag."
+    write-host ""
+    write-host "  startLauncher: Flag to autostart the minecraft launcher after installation."
+    write-host ""
+    write-host "  customDrive: Overwrite install drive for clients (default: C:\) specify in path format."
+    write-host ""
+    write-host "  customInstallLoc: Overwrite the installlocation for clients."
+    write-host ""
+    write-host "  dontcheckdownloads: Using this flag will diable the download package-id check."
+    write-host ""
+    write-host "  forceLegacyDownload: Forces the app to use InvokeWebRequest istead of Start-BitsTransfer"
+    write-host ""
+    write-host ""
+    write-host "SYNTAX"
+    write-host "MinecraftCustomClient.bat [params/flags]"
+    write-host ""
+    pause
+    exit
+  }
+}
 #GetJava
 Function GetJava {
   param(
@@ -758,6 +806,8 @@ Function FlavorObjectFix {
     }
   }
 
+#=====================================================================================================================================================================================================
+
 #clear & Title
 cls
 $host.ui.rawui.windowtitle = "MinecraftCustomClient Installer"
@@ -770,13 +820,17 @@ cd $core_path
 
 
 #Installer code
-
+if ($help) {ShowInfo}
 
 #show menu were to choose install or copyData or more
 write-host "  Choose an option bellow:"
 write-host "----------------------------"
-$menuarray = "[Install]","[dataCopy]","[UnInstall]","[Exit]"
+$menuarray = "[Install]","[dataCopy]","[UnInstall]","[Help]","[Exit]"
 $menuOption = (def_ui_Menu $menuarray).Trim("[","]")
+#if help
+if ($menuOption -eq "Help") {
+  ShowInfo
+}
 #if install
 if ($menuOption -eq "Install") { 
   #check and get java
