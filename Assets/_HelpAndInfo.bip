@@ -1,4 +1,5 @@
-cls
+# Verification Header --918a-- #
+    cls
     write-host "  Minecraft Custom Client Installer help and info:"
     write-host "----------------------------------------------------"
     write-host "Web help couldn't be downloaded please check it for more information." -f red
