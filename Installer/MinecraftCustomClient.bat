@@ -922,7 +922,7 @@ if ($menuOption -eq "UnInstall") {
       [string]$installpath = FlavorObjectFix -in $installpath
       cd $drive
       cd $installpath
-      del $clientname -force -recurse
+      rmdir "$clientname" -force -recurse
       MinecraftLauncherAgent -remove -name "$clientname"
     }
   }
