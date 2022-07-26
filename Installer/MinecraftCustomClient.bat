@@ -35,6 +35,7 @@ function ParamHandle {
     [string]$customInstallLoc,
 
     #Support
+    [switch]$dontcheckdownloads,
     [switch]$forceLegacyDownload
   )
   #Redir
@@ -44,6 +45,7 @@ function ParamHandle {
   $script:startLauncher = $startLauncher
   $script:customDrive = $customDrive
   $script:customInstallLoc = $customInstallLoc
+  $script:dontcheckdownloads = $dontcheckdownloads
   $script:forceLegacyDownload = $forceLegacyDownload
 }
 $pc = "ParamHandle " + "$env:POWERSHELL_BAT_ARGS"
@@ -788,8 +790,10 @@ if ($menuOption -eq "Install") {
   $menuarray = $null
   foreach ($flavor in $FlavorList.Flavors) {
     [string]$flavorname = (("$($flavor)").trim("@{") -split "=")[0]
+    [string]$flavornameO = $flavorname
     [string]$flavorname = "[" + $flavorname + "]"
-    if ($flavor.Hidden -notlike "*true*") {
+    $hidden = $FlavorList.Flavors.$flavornameO.Hidden
+    if ($hidden -like "*false*") {
       [array]$menuarray = $menuarray + "$flavorname"
     }
   }
@@ -851,6 +855,18 @@ if ($menuOption -eq "Install") {
   if ($type -like "*zip*") {
     $ProgressPreference = $old_ProgressPreference
     Expand-Archive $name . -force
+    del $name -force
+    if ($dontcheckdownloads) {} else {
+      [string]$flavorData_file = $FlavorList.Flavors.$FlavorOption.flavorData_file
+      [string]$flavorData_file = FlavorObjectFix -in $flavorData_file
+      [string]$flavorData_json = get-content "$flavorData_file"
+      $flavorData_data = ConvertFrom-Json "$flavorData_json"
+      [string]$flavorid = $Flavorlist.Flavors.$FlavorOption.ID
+      [string]$flavorid = FlavorObjectFix -in $flavorid
+      [string]$flavordataid = $flavorData_data.data.id
+      write-host "'$flavorid' '$flavordataid'"
+      pause
+    }
     $ProgressPreference = $new_ProgressPreference
   }
   cd $curpath
@@ -879,13 +895,26 @@ if ($menuOption -eq "Install") {
 }
 
 #if copyData
+if ($menuOption -eq "dataCopy") { 
   #show menu copyData ui
+  cls
+  write-host "  Client data copy assistant"
+  write-host "------------------------------"
+  write-host ""
+  write-host "The data copier has not been inplomented yet" -f red
+  write-host ""
+  write-host "(the data copier will allow you to move resourcepacks and saves between clients)" -f blue
+  write-host ""
+  pause
   #show choice for copy_from and allow custom path/folder or from standard dir
   #show choice for copy_to and allow custom path/folder or from standard dir
   #show options (checkboxes) for what to copy:  Saves, modConfig, settins, resourcepacks, servers, shaders
+  $menuarray = $null
+  $menuarray = "saves", "modConfig", "settings", "resourcepacks", "servers", "shaders"
+  #  def_ui_Menu $menuarray -Multiselect
   #show choice if user want to keep remove files from copy_from
   #copy data
-
+}
 
 #EOF
   #Refix Progress Pref
