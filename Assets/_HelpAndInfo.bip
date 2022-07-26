@@ -1,7 +1,4 @@
 # Verification Header --918a-- #
-    cls
-    write-host "  Minecraft Custom Client Installer help and info:"
-    write-host "----------------------------------------------------"
     write-host "MCC installer is an app to install my minecraft clients with more simplicity then zipping files here and there"
     write-host "It needs java but if not found it will download a binary"
     write-host "MCC installer also installs fabric and other client dependencies."
