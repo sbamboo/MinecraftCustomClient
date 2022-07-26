@@ -775,7 +775,7 @@ cd $core_path
 #show menu were to choose install or copyData or more
 write-host "  Choose an option bellow:"
 write-host "----------------------------"
-$menuarray = "[Install]","[dataCopy]","[Exit]"
+$menuarray = "[Install]","[dataCopy]","[UnInstall]","[Exit]"
 $menuOption = (def_ui_Menu $menuarray).Trim("[","]")
 #if install
 if ($menuOption -eq "Install") { 
@@ -903,6 +903,28 @@ if ($menuOption -eq "Install") {
     MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -startLauncher -dontbreak
   } else {
     MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -dontbreak
+  }
+}
+
+#if Uninstall
+if ($menuOption -eq "UnInstall") {
+  cls
+  write-host "  Write name of client to remove (use repository names)"
+  write-host "---------------------------------------------------------"
+  $clientname = Read-Host "client.name"
+  #get flavorlist
+  $Flavors = (iwr $flavorlist_url).content
+  $FlavorList = ConvertFrom-Json "$Flavors"
+  #check name
+  Foreach ($flavor in $FlavorList.Flavors) {
+    if ($flavor -like "*$clientname*") {
+      [string]$installpath = $FlavorList.Flavors.$clientname.install_location
+      [string]$installpath = FlavorObjectFix -in $installpath
+      cd $drive
+      cd $installpath
+      del $clientname -force -recurse
+      MinecraftLauncherAgent -remove -name "$clientname"
+    }
   }
 }
 
