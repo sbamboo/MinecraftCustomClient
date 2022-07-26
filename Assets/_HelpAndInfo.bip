@@ -9,7 +9,7 @@ cls
     write-host ""
     write-host "The app can be used from the command line so here is some cli help:"
     write-host ""
-    write-host "  help: Shows this help menu"
+    write-host "  help: Shows this help menu."
     write-host ""
     write-host "  customJava: Flag to allow the use of custom Java paths other then the pathed 'java' command."
     write-host ""
