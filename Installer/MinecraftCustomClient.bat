@@ -12,9 +12,10 @@ exit /b %errorlevel%
 
 
 #MinecraftCustomClient installer
-#Author: Simon Kalmi Claesson
+#Athor see $app_author bellow:
 
 #Version:
+$app_author = "Simon Kalmi Claesson"
 $app_version = "1.0"
 $app_vID = "A0222-3cfbb7a8-4594-4141-9f49-38e44a2a6a20"
 $app_mtd = "9f49@38e44a2a6a20"
@@ -112,12 +113,17 @@ if ($HasUpdated) {
 Function ShowInfo {
   $VerificationHeader = "# Verification Header --918a-- #"
   $WebHelp = (iwr $helpfile_url).content
-  if ($WebHelp -like "*$verificationHeader*") {
-    iex($WebHelp)
-  } else {
     cls
     write-host "  Minecraft Custom Client Installer help and info:"
     write-host "----------------------------------------------------"
+    Write-host "  Version: $app_version"
+    write-host "  Vid: $app_vid"
+    write-host "  Author: $app_author"
+    write-host "----------------------------------------------------"
+    write-host ""
+  if ($WebHelp -like "*$verificationHeader*") {
+    iex($WebHelp)
+  } else {
     write-host "WebHelp couldn't be downloaded please check it for more information." -f red
     write-host ""
     write-host "MCC installer is an app to install my minecraft clients with more simplicity then zipping files here and there"
