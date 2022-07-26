@@ -116,8 +116,7 @@ Function ShowInfo {
     cls
     write-host "  Minecraft Custom Client Installer help and info:"
     write-host "----------------------------------------------------"
-    Write-host "  Version: $app_version"
-    write-host "  Vid: $app_vid"
+    Write-host "  Version: $app_version  ($app_vid)"
     write-host "  Author: $app_author"
     write-host "----------------------------------------------------"
     write-host ""
