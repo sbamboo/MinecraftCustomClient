@@ -789,7 +789,9 @@ if ($menuOption -eq "Install") {
   foreach ($flavor in $FlavorList.Flavors) {
     [string]$flavorname = (("$($flavor)").trim("@{") -split "=")[0]
     [string]$flavorname = "[" + $flavorname + "]"
-    [array]$menuarray = $menuarray + "$flavorname"
+    if ($flavor.Hidden -notlike "*true*") {
+      [array]$menuarray = $menuarray + "$flavorname"
+    }
   }
   [array]$menuarray = $menuarray + "[Cancel&Exit]"
   cls
