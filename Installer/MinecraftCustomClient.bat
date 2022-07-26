@@ -118,7 +118,7 @@ Function ShowInfo {
     cls
     write-host "  Minecraft Custom Client Installer help and info:"
     write-host "----------------------------------------------------"
-    write-host "Web help couldn't be downloaded please check it for more information." -f red
+    write-host "WebHelp couldn't be downloaded please check it for more information." -f red
     write-host ""
     write-host "MCC installer is an app to install my minecraft clients with more simplicity then zipping files here and there"
     write-host "It needs java but if not found it will download a binary"
@@ -147,6 +147,12 @@ Function ShowInfo {
     write-host "MinecraftCustomClient.bat [params/flags]"
     write-host ""
     pause
+    #Refix Progress Pref
+    $ProgressPreference = $old_ProgressPreference
+    #Remove temp files
+    cd $temp_path
+    cd ..
+    if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
     exit
   }
 }
