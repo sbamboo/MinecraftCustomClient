@@ -1,3 +1,4 @@
+#MinecraftCustomClient_Updater 1.1
 #vars
 $host.ui.rawui.windowtitle = "Updating..."
 $adress = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/MinecraftCustomClient.bat"
