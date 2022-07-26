@@ -66,7 +66,7 @@ $javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
 $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"
 
 #Create temp folder
-if (test-path $tempfolder_path) {} else {md $tempfolder_path}
+if (test-path $tempfolder_path) {} else {md $tempfolder_path > $null}
 
 #Has Updated check
 if ($HasUpdated) {
@@ -200,7 +200,10 @@ Function MinecraftLauncherAgent {
         [string]$versionId,
         [string]$name,
         [string]$overWriteLoc,
-        [string]$overWriteFile
+        [string]$overWriteFile,
+
+        #extraAdditions
+        [switch]$dontbreak
     )
 
 
@@ -208,6 +211,9 @@ Function MinecraftLauncherAgent {
     #Settings
     $doExitOnMsg = $false
     $doPause = $false
+
+    #DontBreak
+    if ($dontbreak) {$doExitOnMsg = $false}
 
     #Presets
     $defa_MCFolderLoc = "$env:appdata\.minecraft\"
@@ -261,7 +267,7 @@ Function MinecraftLauncherAgent {
         if ($paramMissing) {
             if ($suppressMsgs) {} else { write-host $text_MissingParam -f red}
             if ($doPause) {pause}
-            if ($doExitOnMsg) {exit} else {break}
+            if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         }
 
         #OverWrite Fix for file location
@@ -318,7 +324,7 @@ Function MinecraftLauncherAgent {
         if ($suppressMsgs) {} else { write-host "$text_OPhasRun" -f blue}
         returnPath
         if ($doPause) {pause}
-        if ($doExitOnMsg) {exit} else {break}
+        if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         $opHasRun = $true
     }
         
@@ -331,7 +337,7 @@ Function MinecraftLauncherAgent {
         if ($paramMissing) {
             write-host $text_MissingParam -f red
             if ($doPause) {pause}
-            if ($doExitOnMsg) {exit} else {break}
+            if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         }
 
         #OverWrite Fix for file location
@@ -376,7 +382,7 @@ Function MinecraftLauncherAgent {
         if ($suppressMsgs) {} else { write-host "$text_OPhasRun" -f blue}
         returnPath
         if ($doPause) {pause}
-        if ($doExitOnMsg) {exit} else {break}
+        if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         $opHasRun = $true
     }
 
@@ -408,7 +414,7 @@ Function MinecraftLauncherAgent {
         if ($suppressMsgs) {} else { write-host "$text_OPhasRun" -f blue}
         returnPath
         if ($doPause) {pause}
-        if ($doExitOnMsg) {exit} else {break}
+        if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         $opHasRun = $true
     }
 
@@ -440,7 +446,7 @@ Function MinecraftLauncherAgent {
         if ($suppressMsgs) {} else { write-host "$text_OPhasRun" -f blue}
         returnPath
         if ($doPause) {pause}
-        if ($doExitOnMsg) {exit} else {break}
+        if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         $opHasRun = $true
     }
 
@@ -459,7 +465,7 @@ Function MinecraftLauncherAgent {
         if ($paramMissing) {
             write-host $text_MissingParam -f red
             if ($doPause) {pause}
-            if ($doExitOnMsg) {exit} else {break}
+            if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         }
 
         #OverWrite Fix for file location
@@ -516,7 +522,7 @@ Function MinecraftLauncherAgent {
         if ($suppressMsgs) {} else { write-host "$text_OPhasRun" -f blue}
         returnPath
         if ($doPause) {pause}
-        if ($doExitOnMsg) {exit} else {break}
+        if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
         $opHasRun = $true
     }
 
@@ -566,7 +572,7 @@ Function MinecraftLauncherAgent {
         write-host "    Overwrite the filename of the launcher_profiles json file." 
         write-host ""
         if ($doPause) {pause}
-        if ($doExitOnMsg) {exit} else {break}
+        if ($dontbreak) {} else {if ($doExitOnMsg) {exit} else {break}}
     }
 
     #Go return path
@@ -809,7 +815,7 @@ if ($menuOption -eq "Install") {
     foreach ($folder in $folders) {
       $folder = $folder.TrimStart(" ")
       $folder = $folder.TrimEnd(" ")
-      if (test-path $folder) {} else {mkdir $folder}
+      if (test-path $folder) {} else {mkdir $folder > $null}
       cd $folder
     }
     $clientLocation = Get-Location
@@ -823,11 +829,18 @@ if ($menuOption -eq "Install") {
   [string]$url = $choosenFlavor.url
   [string]$url = FlavorObjectFix -in $url
   [string]$name = "$url" | split-path -leaf
+  #non filename ending link fix
+  if ($name -notlike ".zip*") {
+    if ($name -notlike ".package*") {
+      $name = $flavorOption + ".unknownpackage"
+    }
+  }
   #Use best method
   if ($forceLegacyDownload) {
     iwr "$url" -outfile $name | Out-Null
   } else {
     if ($IsWindows) {
+      $ProgressPreference = $old_ProgressPreference
       Start-BitsTransfer -source "$url" -destination "$name"
     } else {
       iwr "$url" -outfile $name | Out-Null
@@ -857,11 +870,10 @@ if ($menuOption -eq "Install") {
   $menuarray = "[Yes]","[No]"
   $startlauncherOption = (def_ui_Menu $menuarray).Trim("[","]")
   if ($startlauncherOption -eq "Yes") {
-    MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -startLauncher
+    MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -startLauncher -dontbreak
   } else {
-    MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption"
+    MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -dontbreak
   }
-  pause
 }
 
 #if copyData
@@ -872,5 +884,11 @@ if ($menuOption -eq "Install") {
   #show choice if user want to keep remove files from copy_from
   #copy data
 
-#Refix Progress Pref
-$ProgressPreference = $old_ProgressPreference
+
+#EOF
+  #Refix Progress Pref
+  $ProgressPreference = $old_ProgressPreference
+  #Remove temp files
+  cd $temp_path
+  cd ..
+  if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
