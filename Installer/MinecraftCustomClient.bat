@@ -159,13 +159,6 @@ Function ShowInfo {
   }
   write-host "--------------------------------------------------------------"
   pause
-  #Refix Progress Pref
-  $ProgressPreference = $old_ProgressPreference
-  #Remove temp files
-  cd $temp_path
-  cd ..
-  if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
-  exit
 }
 #GetJava
 Function GetJava {
@@ -858,225 +851,242 @@ $splitter = "  {"
 [int]$lengthAllow = "73"
 
 #show menu were to choose install or copyData or more
-write-host "  Choose an option bellow:"
-write-host "----------------------------"
-$menuarray = "[Install]","[dataCopy]","[UnInstall]","[Help]","[Exit]"
-$menuOption = (def_ui_Menu $menuarray).Trim("[","]")
-#if help
-if ($menuOption -eq "Help") {
-  ShowInfo
-}
-#if install
-if ($menuOption -eq "Install") { 
-  #check and get java
-  GetJava -win -workdir "$temp_path"
-  #get fabric-installer
-  GetFabric -win -workdir "$temp_path"
-  #get flavorlist
-  $Flavors = (iwr $flavorlist_url).content
-  $FlavorList = ConvertFrom-Json "$Flavors"
-  #display flavorlist
-  $menuarray = $null
-  foreach ($flavor in $FlavorList.Flavors) {
-    [string]$flavorname = (("$($flavor)").trim("@{") -split "=")[0]
-    [string]$flavornameO = $flavorname
-    [string]$flavordesc = $FlavorList.Flavors."$flavornameO".desc
-    [string]$flavordesc = FlavorObjectFix -in $flavordesc
-    if ($flavordesc.length -gt $lengthAllow) {
-      [array]$flavordescA = $flavordesc[0..$lengthAllow]
-      $flavordesc = ""
-      foreach ($a in $flavordescA) {
-        [string]$flavordesc += $a
-      }
-      [string]$flavordesc = "$flavordesc" + "..."
-    } 
-    [string]$flavorname = "[" + $flavorname + "]"
-    $hidden = $FlavorList.Flavors.$flavornameO.Hidden
-    if ($hidden -like "*false*") {
-      [array]$menuarray = $menuarray + "$flavorname  {$flavordesc}"
-    }
-  }
-  #Fix length sync
-    #Get longest itemname
-    $lastLength = 0
-    foreach ($item in $menuarray) {
-      [array]$itemA = $item -split "$splitter"
-      [string]$item_name = $itemA[0]
-      if ("$item_name".length -gt $lastLength) {
-        $lastLength = "$item_name".length
-      }
-    }
-    #Fix items
-    foreach ($item in $menuarray) {
-      [array]$itemA = $item -split "$splitter"
-      [string]$item_name = $itemA[0]
-      [string]$item_desc = $itemA[1]
-      [string]$item_desc = "{" + "$item_desc"
-      if ("$item_name".length -ne "$lastLength") {
-        [int]$tmp_value = $lastLength - "$item_name".length
-        [string]$spaces = " "*$tmp_value
-        [string]$rebuild = "$item_name" + "$spaces" + "$item_desc"
-        [array]$newmenuarray += "$rebuild"
-      }
-    }
-    #Change array
-    $menuarray = $newmenuarray
-
-  [array]$menuarray = $menuarray + "[Cancel&Exit]"
+$MainUI = $true
+while ($MainUI) {
   cls
   write-host "  Choose an option bellow:"
   write-host "----------------------------"
-  $flavorOption = (def_ui_Menu $menuarray).Trim("[","]")
-  if ($flavorOption -like "*  {*") {
-    [array]$flavorOptionA = $flavorOption -split "$splitter"
-    $flavorOption = $flavorOptionA[0]
+  $menuarray = "[Install]","[dataCopy]","[UnInstall]","[Help]","[Exit]"
+  $menuOption = (def_ui_Menu $menuarray).Trim("[","]")
+  #if help
+  if ($menuOption -eq "Help") {
+    ShowInfo
   }
-  if ($flavorOption -eq "Cancel&Exit") {exit}
-  $choosenFlavor = $FlavorList.Flavors."$flavorOption"
-  #Get client location
-  if ($IsWindows) {
-    $drive = "C:/"
-    $InstallLoc = $choosenFlavor.install_location -replace " ",""
-    if ($customDrive -ne "") {$drive = $customDrive}
-    if ($customInstallLoc -ne "") {$InstallLoc = $customInstallLoc}
-    #StringBuild
-    [string]$installpath = "$drive" + "$InstallLoc" + "/" + "$flavorOption"
-    #FolderCreate
-    $folders = $installpath | split-path -NoQualifier
-    $folders = $folders.TrimStart("/").TrimEnd("/")
-    [array]$folders = $folders -split "/"
-    $curpath = Get-Location
-    cd $drive
-    foreach ($folder in $folders) {
-      $folder = $folder.TrimStart(" ")
-      $folder = $folder.TrimEnd(" ")
-      if (test-path $folder) {} else {mkdir $folder > $null}
-      cd $folder
-    }
-    $clientLocation = Get-Location
-    cd $curpath
-  }
-  #Download and extract client
-  $curpath = Get-Location
-  cd $clientLocation
-  [string]$type = $choosenFlavor.archive_type
-  [string]$type = FlavorObjectFix -in $type
-  [string]$url = $choosenFlavor.url
-  [string]$url = FlavorObjectFix -in $url
-  [string]$name = "$url" | split-path -leaf
-  #non filename ending link fix
-  if ($name -notlike ".zip*") {
-    if ($name -notlike ".package*") {
-      $name = $flavorOption + ".unknownpackage"
-    }
-  }
-  #Use best method
-  if ($forceLegacyDownload) {
-    iwr "$url" -outfile $name | Out-Null
-  } else {
-    if ($IsWindows) {
-      $ProgressPreference = $old_ProgressPreference
-      Start-BitsTransfer -source "$url" -destination "$name"
-    } else {
-      iwr "$url" -outfile $name | Out-Null
-    }
-  }
-  if ($type -like "*zip*") {
-    $ProgressPreference = $old_ProgressPreference
-    Expand-Archive $name . -force
-    del $name -force
-    if ($dontcheckdownloads) {} else {
-      [string]$flavorData_file = $FlavorList.Flavors.$FlavorOption.flavorData_file
-      [string]$flavorData_file = FlavorObjectFix -in $flavorData_file
-      if (Test-path "$flavorData_file") {
-        [string]$flavorData_json = get-content "$flavorData_file"
-        $flavorData_data = ConvertFrom-Json "$flavorData_json"
-        [string]$flavorid = $Flavorlist.Flavors.$FlavorOption.ID
-        [string]$flavorid = FlavorObjectFix -in $flavorid
-        [string]$flavordataid = $flavorData_data.data.id
-        [string]$flavordataid = FlavorObjectFix -in $flavordataid
-        #Verify download
-        if ("$flavorid" -ne "$flavordataid") {
-          write-host "Id of downloaded package dosen't match id in repository! Removing Package and aborting. (to continue anyway please use the -dontcheckdownloads flag)" -f red
-          pause
-          cd $temp_path
-          cd ..
-          if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
-          exit
-        } else {
-          write-host "Downloaded package didn't contain flavordata file so download id could not be checked, continuing but errors may happen." -f yellow
+  #if install
+  if ($menuOption -eq "Install") { 
+    #check and get java
+    GetJava -win -workdir "$temp_path"
+    #get fabric-installer
+    GetFabric -win -workdir "$temp_path"
+    #get flavorlist
+    $Flavors = (iwr $flavorlist_url).content
+    $FlavorList = ConvertFrom-Json "$Flavors"
+    #display flavorlist
+    $menuarray = $null
+    foreach ($flavor in $FlavorList.Flavors) {
+      [string]$flavorname = (("$($flavor)").trim("@{") -split "=")[0]
+      [string]$flavornameO = $flavorname
+      [string]$flavordesc = $FlavorList.Flavors."$flavornameO".desc
+      [string]$flavordesc = FlavorObjectFix -in $flavordesc
+      if ($flavordesc.length -gt $lengthAllow) {
+        [array]$flavordescA = $flavordesc[0..$lengthAllow]
+        $flavordesc = ""
+        foreach ($a in $flavordescA) {
+          [string]$flavordesc += $a
         }
+        [string]$flavordesc = "$flavordesc" + "..."
+      } 
+      [string]$flavorname = "[" + $flavorname + "]"
+      $hidden = $FlavorList.Flavors.$flavornameO.Hidden
+      if ($hidden -like "*false*") {
+        [array]$menuarray = $menuarray + "$flavorname  {$flavordesc}"
       }
     }
-    $ProgressPreference = $new_ProgressPreference
-  }
-  cd $curpath
-  #pass to fabric installer
-  [string]$mcversion = $choosenFlavor.minecraft_version
-  [string]$mcversion = FlavorObjectFix -in $mcversion
-  [string]$loader = $choosenFlavor.fabric_loader
-  [string]$loader = FlavorObjectFix -in $loader
-  FabricInstaller -installerName $fabricInstallerPath -client -snapshot -dir "$env:appdata\.minecraft" -mcversion $mcversion -loader $loader -noprofile
-  #pass to launcherProfile creator
-  $fabricversionid = "fabric-loader-" + $choosenFlavor.fabric_loader + "-" + $choosenFlavor.minecraft_version
-  $fabricversionid = $fabricversionid -replace " ",""
-  $icon = $choosenFlavor.launcher_icon -replace " ",""
-  #Should you start lancher?
-  cls
-  write-host "  Start the launcher after adding the profile?"
-  write-host "------------------------------------------------"
-  $menuarray = $null
-  $menuarray = "[Yes]","[No]"
-  $startlauncherOption = (def_ui_Menu $menuarray).Trim("[","]")
-  if ($startlauncherOption -eq "Yes") {
-    MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -startLauncher -dontbreak
-  } else {
-    MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -dontbreak
-  }
-}
+    #Fix length sync
+      #Get longest itemname
+      $lastLength = 0
+      foreach ($item in $menuarray) {
+        [array]$itemA = $item -split "$splitter"
+        [string]$item_name = $itemA[0]
+        if ("$item_name".length -gt $lastLength) {
+          $lastLength = "$item_name".length
+        }
+      }
+      #Fix items
+      foreach ($item in $menuarray) {
+        [array]$itemA = $item -split "$splitter"
+        [string]$item_name = $itemA[0]
+        [string]$item_desc = $itemA[1]
+        [string]$item_desc = "{" + "$item_desc"
+        if ("$item_name".length -ne "$lastLength") {
+          [int]$tmp_value = $lastLength - "$item_name".length
+          [string]$spaces = " "*$tmp_value
+          [string]$rebuild = "$item_name" + "$spaces" + "$item_desc"
+          [array]$newmenuarray += "$rebuild"
+        }
+      }
+      #Change array
+      $menuarray = $newmenuarray
 
-#if Uninstall
-if ($menuOption -eq "UnInstall") {
-  cls
-  write-host "  Write name of client to remove (use repository names)"
-  write-host "---------------------------------------------------------"
-  $clientname = Read-Host "client.name"
-  #get flavorlist
-  $Flavors = (iwr $flavorlist_url).content
-  $FlavorList = ConvertFrom-Json "$Flavors"
-  #check name
-  Foreach ($flavor in $FlavorList.Flavors) {
-    if ($flavor -like "*$clientname*") {
-      [string]$installpath = $FlavorList.Flavors.$clientname.install_location
-      [string]$installpath = FlavorObjectFix -in $installpath
-      cd $drive
-      cd $installpath
-      rmdir "$clientname" -force -recurse
-      MinecraftLauncherAgent -remove -name "$clientname"
+    [array]$menuarray = $menuarray + "[Cancel]"
+    cls
+    write-host "  Choose an option bellow:"
+    write-host "----------------------------"
+    $flavorOption = (def_ui_Menu $menuarray).Trim("[")
+    if ($flavorOption -like "*  {*") {
+      [array]$flavorOptionA = $flavorOption -split "$splitter"
+      $flavorOption = $flavorOptionA[0]
+    }
+    $flavorOption = $flavorOption.TrimEnd(" ")
+    $flavorOption = $flavorOption.TrimEnd("]")
+    if ($flavorOption -eq "Cancel") {} else {
+      $choosenFlavor = $FlavorList.Flavors."$flavorOption"
+      #Get client location
+      if ($IsWindows) {
+        $drive = "C:/"
+        $InstallLoc = $choosenFlavor.install_location -replace " ",""
+        if ($customDrive -ne "") {$drive = $customDrive}
+        if ($customInstallLoc -ne "") {$InstallLoc = $customInstallLoc}
+        #StringBuild
+        [string]$installpath = "$drive" + "$InstallLoc" + "/" + "$flavorOption"
+        #FolderCreate
+        $folders = $installpath | split-path -NoQualifier
+        $folders = $folders.TrimStart("/").TrimEnd("/")
+        [array]$folders = $folders -split "/"
+        $curpath = Get-Location
+        cd $drive
+        foreach ($folder in $folders) {
+          $folder = $folder.TrimStart(" ")
+          $folder = $folder.TrimEnd(" ")
+          if (test-path $folder) {} else {mkdir $folder > $null}
+          cd $folder
+        }
+        $clientLocation = Get-Location
+        cd $curpath
+      }
+      #Download and extract client
+      $curpath = Get-Location
+      cd $clientLocation
+      [string]$type = $choosenFlavor.archive_type
+      [string]$type = FlavorObjectFix -in $type
+      [string]$url = $choosenFlavor.url
+      [string]$url = FlavorObjectFix -in $url
+      [string]$name = "$url" | split-path -leaf
+      #non filename ending link fix
+      if ($name -notlike ".zip*") {
+        if ($name -notlike ".package*") {
+          $name = $flavorOption + ".unknownpackage"
+        }
+      }
+      #Use best method
+      if ($forceLegacyDownload) {
+        iwr "$url" -outfile $name | Out-Null
+      } else {
+        if ($IsWindows) {
+          $ProgressPreference = $old_ProgressPreference
+          Start-BitsTransfer -source "$url" -destination "$name"
+        } else {
+          iwr "$url" -outfile $name | Out-Null
+        }
+      }
+      if ($type -like "*zip*") {
+        $ProgressPreference = $old_ProgressPreference
+        Expand-Archive $name . -force
+        del $name -force
+        if ($dontcheckdownloads) {} else {
+          [string]$flavorData_file = $FlavorList.Flavors.$FlavorOption.flavorData_file
+          [string]$flavorData_file = FlavorObjectFix -in $flavorData_file
+          if (Test-path "$flavorData_file") {
+            [string]$flavorData_json = get-content "$flavorData_file"
+            $flavorData_data = ConvertFrom-Json "$flavorData_json"
+            [string]$flavorid = $Flavorlist.Flavors.$FlavorOption.ID
+            [string]$flavorid = FlavorObjectFix -in $flavorid
+            [string]$flavordataid = $flavorData_data.data.id
+            [string]$flavordataid = FlavorObjectFix -in $flavordataid
+            #Verify download
+            if ("$flavorid" -ne "$flavordataid") {
+              write-host "Id of downloaded package dosen't match id in repository! Removing Package and aborting. (to continue anyway please use the -dontcheckdownloads flag)" -f red
+              pause
+              cd $temp_path
+              cd ..
+              if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
+              exit
+            } else {
+              write-host "Downloaded package didn't contain flavordata file so download id could not be checked, continuing but errors may happen." -f yellow
+            }
+          }
+        }
+        $ProgressPreference = $new_ProgressPreference
+      }
+      cd $curpath
+      #pass to fabric installer
+      [string]$mcversion = $choosenFlavor.minecraft_version
+      [string]$mcversion = FlavorObjectFix -in $mcversion
+      [string]$loader = $choosenFlavor.fabric_loader
+      [string]$loader = FlavorObjectFix -in $loader
+      FabricInstaller -installerName $fabricInstallerPath -client -snapshot -dir "$env:appdata\.minecraft" -mcversion $mcversion -loader $loader -noprofile
+      #pass to launcherProfile creator
+      $fabricversionid = "fabric-loader-" + $choosenFlavor.fabric_loader + "-" + $choosenFlavor.minecraft_version
+      $fabricversionid = $fabricversionid -replace " ",""
+      $icon = $choosenFlavor.launcher_icon -replace " ",""
+      #Should you start lancher?
+      cls
+      write-host "  Start the launcher after adding the profile?"
+      write-host "------------------------------------------------"
+      $menuarray = $null
+      $menuarray = "[Yes]","[No]"
+      $startlauncherOption = (def_ui_Menu $menuarray).Trim("[","]")
+      if ($startlauncherOption -eq "Yes") {
+        MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -startLauncher -dontbreak
+      } else {
+        MinecraftLauncherAgent -add -gameDir "$clientLocation" -icon $icon -versionID "$fabricversionid" -name "$flavorOption" -dontbreak
+      }
     }
   }
-}
 
-#if copyData
-if ($menuOption -eq "dataCopy") { 
-  #show menu copyData ui
-  cls
-  write-host "  Client data copy assistant"
-  write-host "------------------------------"
-  write-host ""
-  write-host "The data copier has not been inplomented yet" -f red
-  write-host ""
-  write-host "(the data copier will allow you to move resourcepacks and saves between clients)" -f blue
-  write-host ""
-  pause
-  #show choice for copy_from and allow custom path/folder or from standard dir
-  #show choice for copy_to and allow custom path/folder or from standard dir
-  #show options (checkboxes) for what to copy:  Saves, modConfig, settins, resourcepacks, servers, shaders
-  $menuarray = $null
-  $menuarray = "saves", "modConfig", "settings", "resourcepacks", "servers", "shaders"
-  #  def_ui_Menu $menuarray -Multiselect
-  #show choice if user want to keep remove files from copy_from
-  #copy data
+  #if Uninstall
+  if ($menuOption -eq "UnInstall") {
+    cls
+    write-host "  Write name of client to remove (use repository names)"
+    write-host "---------------------------------------------------------"
+    $clientname = Read-Host "client.name"
+    #get flavorlist
+    $Flavors = (iwr $flavorlist_url).content
+    $FlavorList = ConvertFrom-Json "$Flavors"
+    #check name
+    Foreach ($flavor in $FlavorList.Flavors) {
+      if ($flavor -like "*$clientname*") {
+        [string]$installpath = $FlavorList.Flavors.$clientname.install_location
+        [string]$installpath = FlavorObjectFix -in $installpath
+        cd $drive
+        cd $installpath
+        rmdir "$clientname" -force -recurse
+        MinecraftLauncherAgent -remove -name "$clientname"
+      }
+    }
+  }
+
+  #if copyData
+  if ($menuOption -eq "dataCopy") { 
+    #show menu copyData ui
+    cls
+    write-host "  Client data copy assistant"
+    write-host "------------------------------"
+    write-host ""
+    write-host "The data copier has not been inplomented yet" -f red
+    write-host ""
+    write-host "(the data copier will allow you to move resourcepacks and saves between clients)" -f blue
+    write-host ""
+    pause
+    #show choice for copy_from and allow custom path/folder or from standard dir
+    #show choice for copy_to and allow custom path/folder or from standard dir
+    #show options (checkboxes) for what to copy:  Saves, modConfig, settins, resourcepacks, servers, shaders
+    $menuarray = $null
+    $menuarray = "saves", "modConfig", "settings", "resourcepacks", "servers", "shaders"
+    #  def_ui_Menu $menuarray -Multiselect
+    #show choice if user want to keep remove files from copy_from
+    #copy data
+  }
+
+  if ($menuOption -eq "Exit") {
+    #Refix Progress Pref
+    $ProgressPreference = $old_ProgressPreference
+    #Remove temp files
+    cd $temp_path
+    cd ..
+    if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
+    exit
+  }
 }
 
 #EOF
