@@ -12,13 +12,13 @@ exit /b %errorlevel%
 
 
 #MinecraftCustomClient installer
-#Author see $app_author bellow:
+#Athor see $app_author bellow:
 
 #Version:
 $app_author = "Simon Kalmi Claesson"
 $app_version = "1.0"
-$app_vID = "A0322-633d0b80-a17e-45a7-8259-fb0481b1d216"
-$app_mtd = "8a28@a0731d47cb66"
+$app_vID = "A0222-3cfbb7a8-4594-4141-9f49-38e44a2a6a20"
+$app_mtd = "9f49@38e44a2a6a20"
 
 #Param
 function ParamHandle {
@@ -57,27 +57,22 @@ iex("$pc")
 
 
 #variables
-  #title
-  $window_title = "MinecraftCustomClient Installer"
-  #sizes
-  $toAdd_width = 3
-  $toAdd_height = 4
-  #progressPref
-  $old_ProgressPreference = $ProgressPreference
-  $ProgressPreference = "SilentlyContinue"
-  $new_ProgressPreference = $ProgressPreference
-  #Url And Names
-  $lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
-  $lastver_name = $lastver_url | split-path -leaf
-  $updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
-  $updater_name = $updater_url | split-path -leaf
-  $flavorlist_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Repo/MinecraftCustomClient_flavors.json"
-  $flavorlist_name = $flavorlist_url | split-path -leaf
-  $tempfolder_path = "MinecraftCustomClient_Installer_Temp"
-  $javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
-  $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"
-  $helpfile_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
-  $helpfile_name = $helpfile_url | split-path -leaf
+$old_ProgressPreference = $ProgressPreference
+$ProgressPreference = "SilentlyContinue"
+$new_ProgressPreference = $ProgressPreference
+
+$lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
+$lastver_name = $lastver_url | split-path -leaf
+$updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
+$updater_name = $updater_url | split-path -leaf
+$flavorlist_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Repo/MinecraftCustomClient_flavors.json"
+$flavorlist_name = $flavorlist_url | split-path -leaf
+$tempfolder_path = "MinecraftCustomClient_Installer_Temp"
+$javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
+$fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"
+
+$helpfile_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
+$helpfile_name = $helpfile_url | split-path -leaf
 
 #Create temp folder
 if (test-path $tempfolder_path) {} else {md $tempfolder_path > $null}
@@ -156,16 +151,15 @@ Function ShowInfo {
     write-host "SYNTAX"
     write-host "MinecraftCustomClient.bat [params/flags]"
     write-host ""
+    pause
+    #Refix Progress Pref
+    $ProgressPreference = $old_ProgressPreference
+    #Remove temp files
+    cd $temp_path
+    cd ..
+    if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
+    exit
   }
-  write-host "--------------------------------------------------------------"
-  pause
-  #Refix Progress Pref
-  $ProgressPreference = $old_ProgressPreference
-  #Remove temp files
-  cd $temp_path
-  cd ..
-  if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
-  exit
 }
 #GetJava
 Function GetJava {
@@ -827,21 +821,7 @@ Function FlavorObjectFix {
 
 #clear & Title
 cls
-$host.ui.rawui.windowtitle = "$window_title"
-
-#terminal size
-  #Get window
-  $pswindow = $host.ui.rawui
-  $newbuffer = $pswindow.buffersize
-  $newsize = $pswindow.windowsize
-  #setnew
-  $newbuffer.width = $newbuffer.width + $toAdd_width
-  $newbuffer.height = $newbuffer.height + $toAdd_height
-  $newsize.width = $newsize.width + $toAdd_width
-  $newsize.height = $newsize.height + $toAdd_height
-  #apply
-  $pswindow.buffersize = $newbuffer
-  $pswindow.windowsize = $newsize
+$host.ui.rawui.windowtitle = "MinecraftCustomClient Installer"
 
 #Path setup
 $core_path = Get-Location
@@ -852,10 +832,6 @@ cd $core_path
 
 #Installer code
 if ($help) {ShowInfo}
-
-#variables
-$splitter = "  {"
-[int]$lengthAllow = "73"
 
 #show menu were to choose install or copyData or more
 write-host "  Choose an option bellow:"
@@ -880,57 +856,17 @@ if ($menuOption -eq "Install") {
   foreach ($flavor in $FlavorList.Flavors) {
     [string]$flavorname = (("$($flavor)").trim("@{") -split "=")[0]
     [string]$flavornameO = $flavorname
-    [string]$flavordesc = $FlavorList.Flavors."$flavornameO".desc
-    [string]$flavordesc = FlavorObjectFix -in $flavordesc
-    if ($flavordesc.length -gt $lengthAllow) {
-      [array]$flavordescA = $flavordesc[0..$lengthAllow]
-      $flavordesc = ""
-      foreach ($a in $flavordescA) {
-        [string]$flavordesc += $a
-      }
-      [string]$flavordesc = "$flavordesc" + "..."
-    } 
     [string]$flavorname = "[" + $flavorname + "]"
     $hidden = $FlavorList.Flavors.$flavornameO.Hidden
     if ($hidden -like "*false*") {
-      [array]$menuarray = $menuarray + "$flavorname  {$flavordesc}"
+      [array]$menuarray = $menuarray + "$flavorname"
     }
   }
-  #Fix length sync
-    #Get longest itemname
-    $lastLength = 0
-    foreach ($item in $menuarray) {
-      [array]$itemA = $item -split "$splitter"
-      [string]$item_name = $itemA[0]
-      if ("$item_name".length -gt $lastLength) {
-        $lastLength = "$item_name".length
-      }
-    }
-    #Fix items
-    foreach ($item in $menuarray) {
-      [array]$itemA = $item -split "$splitter"
-      [string]$item_name = $itemA[0]
-      [string]$item_desc = $itemA[1]
-      [string]$item_desc = "{" + "$item_desc"
-      if ("$item_name".length -ne "$lastLength") {
-        [int]$tmp_value = $lastLength - "$item_name".length
-        [string]$spaces = " "*$tmp_value
-        [string]$rebuild = "$item_name" + "$spaces" + "$item_desc"
-        [array]$newmenuarray += "$rebuild"
-      }
-    }
-    #Change array
-    $menuarray = $newmenuarray
-
   [array]$menuarray = $menuarray + "[Cancel&Exit]"
   cls
   write-host "  Choose an option bellow:"
   write-host "----------------------------"
   $flavorOption = (def_ui_Menu $menuarray).Trim("[","]")
-  if ($flavorOption -like "*  {*") {
-    [array]$flavorOptionA = $flavorOption -split "$splitter"
-    $flavorOption = $flavorOptionA[0]
-  }
   if ($flavorOption -eq "Cancel&Exit") {exit}
   $choosenFlavor = $FlavorList.Flavors."$flavorOption"
   #Get client location

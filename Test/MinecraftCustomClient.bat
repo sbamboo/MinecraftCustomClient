@@ -17,8 +17,8 @@ exit /b %errorlevel%
 #Version:
 $app_author = "Simon Kalmi Claesson"
 $app_version = "1.0"
-$app_vID = "A0322-633d0b80-a17e-45a7-8259-fb0481b1d216"
-$app_mtd = "8a28@a0731d47cb66"
+$app_vID = "A0222-3cfbb7a8-4594-4141-9f49-38e44a2a6a20"
+$app_mtd = "9f49@38e44a2a6a20"
 
 #Param
 function ParamHandle {
@@ -57,27 +57,22 @@ iex("$pc")
 
 
 #variables
-  #title
-  $window_title = "MinecraftCustomClient Installer"
-  #sizes
-  $toAdd_width = 3
-  $toAdd_height = 4
-  #progressPref
-  $old_ProgressPreference = $ProgressPreference
-  $ProgressPreference = "SilentlyContinue"
-  $new_ProgressPreference = $ProgressPreference
-  #Url And Names
-  $lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
-  $lastver_name = $lastver_url | split-path -leaf
-  $updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
-  $updater_name = $updater_url | split-path -leaf
-  $flavorlist_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Repo/MinecraftCustomClient_flavors.json"
-  $flavorlist_name = $flavorlist_url | split-path -leaf
-  $tempfolder_path = "MinecraftCustomClient_Installer_Temp"
-  $javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
-  $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"
-  $helpfile_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
-  $helpfile_name = $helpfile_url | split-path -leaf
+$old_ProgressPreference = $ProgressPreference
+$ProgressPreference = "SilentlyContinue"
+$new_ProgressPreference = $ProgressPreference
+
+$lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
+$lastver_name = $lastver_url | split-path -leaf
+$updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
+$updater_name = $updater_url | split-path -leaf
+$flavorlist_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Repo/MinecraftCustomClient_flavors.json"
+$flavorlist_name = $flavorlist_url | split-path -leaf
+$tempfolder_path = "MinecraftCustomClient_Installer_Temp"
+$javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
+$fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"
+
+$helpfile_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
+$helpfile_name = $helpfile_url | split-path -leaf
 
 #Create temp folder
 if (test-path $tempfolder_path) {} else {md $tempfolder_path > $null}
@@ -156,16 +151,15 @@ Function ShowInfo {
     write-host "SYNTAX"
     write-host "MinecraftCustomClient.bat [params/flags]"
     write-host ""
+    pause
+    #Refix Progress Pref
+    $ProgressPreference = $old_ProgressPreference
+    #Remove temp files
+    cd $temp_path
+    cd ..
+    if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
+    exit
   }
-  write-host "--------------------------------------------------------------"
-  pause
-  #Refix Progress Pref
-  $ProgressPreference = $old_ProgressPreference
-  #Remove temp files
-  cd $temp_path
-  cd ..
-  if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
-  exit
 }
 #GetJava
 Function GetJava {
@@ -827,9 +821,12 @@ Function FlavorObjectFix {
 
 #clear & Title
 cls
-$host.ui.rawui.windowtitle = "$window_title"
+$host.ui.rawui.windowtitle = "MinecraftCustomClient Installer"
 
 #terminal size
+  #sizes
+  $toAdd_width = 3
+  $toAdd_height = 2
   #Get window
   $pswindow = $host.ui.rawui
   $newbuffer = $pswindow.buffersize

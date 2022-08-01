@@ -25,5 +25,3 @@
     write-host "SYNTAX"
     write-host "MinecraftCustomClient.bat [params/flags]"
     write-host ""
-    pause
-    exit
