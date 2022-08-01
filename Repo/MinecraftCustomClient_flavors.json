@@ -3,6 +3,7 @@
   {"TestClient":[
     {"ID":"84545270-e762-4a6e-8a9b-45df72ed35d8"},
     {"url":"https://github.com/simonkalmiclaesson/MinecraftCustomClient/raw/main/Repo/Flavors/testclient.package"},
+    {"desc":"Just a Test"},
     {"archive_type":"package.zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.19"},
@@ -14,9 +15,25 @@
     {"Legacy":"false"}
   ]},
 
-  {"1.19.1_Community-client_4_Beta2e":[
-    {"ID":"bcd572f1-b5bc-4798-822c-f98b81a978c6"},
-    {"url":"https://drive.google.com/u/0/uc?id=1UcahY0iUoClq8Ap3riS4f72JtuR4HlOa&export=download&confirm=t&uuid=7223b0fe-3039-46a2-a669-0187f7d5ef30"},
+  {"1.19.1_Community-client_4_Beta2":[
+    {"ID":"ea241f91-5087-4b88-a052-d8d21d8e7d54"},
+    {"url":"https://drive.google.com/u/1/uc?id=1UU0F-p-73EmDH1Joaux1RyLL6Z8eHm4w&export=download&confirm=t"},
+    {"desc":"My larger version of my community client (containing litematica and more)"},
+    {"archive_type":"zip"},
+    {"install_location":"installs/minecraft-custom-client/custom"},
+    {"minecraft_version":"1.19.1"},
+    {"fabric_loader":"0.14.8"},
+    {"launcher_icon":"data:image/png;base64,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"},
+    {"allowcopy":"true"},
+    {"flavorData_file":"flavor.mta"},
+    {"Hidden":"false"},
+    {"Legacy":"false"}
+  ]},
+
+  {"1.19.1_Community-client_Lite_4_Beta2":[
+    {"ID":"2d3e56ec-9d92-4e3a-b6d5-d7e3c2467519"},
+    {"url":"https://drive.google.com/u/1/uc?id=1J0NxpvRNUvYbOYhjUBf6qdVJXiHCfvU3&export=download&confirm=t"},
+    {"desc":"The light version of my community client (just the basics)"},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.19.1"},
@@ -30,7 +47,8 @@
 
   {"1.19_Community-Client_4_Beta2":[
     {"ID":"7789b8a9-dca1-4309-bdc5-0c164cf5054c"},
-    {"url":"https://drive.google.com/u/0/uc?id=1FpDZO9ZFMXE1Dj_UabF1n_jD_Z4CiTAb&export=download&confirm=t&uuid=13b31c1f-e8d0-43e3-8afa-16d664dd8e69"},
+    {"url":"https://drive.google.com/u/0/uc?id=1FpDZO9ZFMXE1Dj_UabF1n_jD_Z4CiTAb&export=download&confirm=t"},
+    {"desc":"My larger version of my community client (containing litematica and more)"},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.19"},
@@ -49,6 +67,7 @@
   {"legacy_1.18.2_Community-Client_4":[
     {"ID":"6b43f94f-d76d-4583-9c16-be52cff7a3cb"},
     {"url":"https://dl.dropboxusercontent.com/s/lk5gzzh54h45dmk/1.18.2_Community-Client_4.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.18.2"},
@@ -63,6 +82,7 @@
   {"legacy_1.18.1_Community-Client_3":[
     {"ID":"501030c4-ad40-4bf8-a540-db24c065ca46"},
     {"url":"https://dl.dropboxusercontent.com/s/kpc4er5jk2w7rfz/1.18.1_Community-Client_3.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.18.1"},
@@ -77,6 +97,7 @@
   {"legacy_1.17.1_Community-Lite_2_ES_Patch1":[
     {"ID":"cb07c5b9-ec3a-4a7c-91da-65341b7eed87"},
     {"url":"https://dl.dropboxusercontent.com/s/l70ht5hvopecos6/1.17.1_Community-Lite_2_ES_Patch1.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.17.1"},
@@ -91,6 +112,7 @@
   {"legacy_1.17.1_SimpleVoice":[
     {"ID":"419ea627-9984-440e-8df0-b6fd207f9141"},
     {"url":"https://dl.dropboxusercontent.com/s/fb25a5rb9fv1jru/1.17.1_SimpleVoice.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.17.1"},
@@ -105,6 +127,7 @@
   {"legacy_1.17.1_AlotOfMods-Client_4.0":[
     {"ID":"153b3cbc-6d13-4d7d-ad7a-4d8027897aec"},
     {"url":"https://dl.dropboxusercontent.com/s/owr94kqk5jkelpf/1.17.1_AlotOfMods-Client_4.0.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.17.1"},
@@ -119,6 +142,7 @@
   {"legacy_1.17.1_OptiAlt_1.0":[
     {"ID":"59a92e04-2a7a-4f69-b7d5-14919eec2c44"},
     {"url":"https://dl.dropboxusercontent.com/s/9jp9whtw9g1bdgd/1.17.1_OptiAlt_1.0.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.17.1"},
@@ -133,6 +157,7 @@
   {"legacy_1.18.1_Release4_Beta1":[
     {"ID":"af1d51c4-29fa-47e9-9b7c-02204f18bf2d"},
     {"url":"https://dl.dropboxusercontent.com/s/ohl20210zufgqq9/1.18.1_Release4_Beta1.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/profile"},
     {"minecraft_version":"1.18.1"},
@@ -147,6 +172,7 @@
   {"legacy_1.17.1_Survival_And_Sodium":[
     {"ID":"1c60ac9e-131e-462c-a382-e441dc03a015"},
     {"url":"https://dl.dropboxusercontent.com/s/bse8d31407frxpb/1.17.1_Survival_And_Sodium.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.17.1"},
@@ -161,6 +187,7 @@
   {"legacy_1.17.1_MashedBundle":[
     {"ID":"a6b26798-343e-4ff9-8698-2adaac61896f"},
     {"url":"https://dl.dropboxusercontent.com/s/ue0j16omgof7l7u/1.17.1_MashedBundle.zip"},
+    {"desc":"Legacy client, not fully supported."},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.17.1"},
