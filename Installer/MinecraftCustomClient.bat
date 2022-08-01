@@ -872,7 +872,8 @@ while ($MainUI) {
     $Flavors = (iwr $flavorlist_url).content
     $FlavorList = ConvertFrom-Json "$Flavors"
     #display flavorlist
-    $menuarray = $null
+    [array]$menuarray = $null
+    [array]$newmenuarray = $null
     foreach ($flavor in $FlavorList.Flavors) {
       [string]$flavorname = (("$($flavor)").trim("@{") -split "=")[0]
       [string]$flavornameO = $flavorname
