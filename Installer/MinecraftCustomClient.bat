@@ -4,7 +4,7 @@ REM Shell things
 @echo off & setlocal
 set "POWERSHELL_BAT_ARGS=%*"
 REM Install Pwsh and start it
-powershell $old_ErrorActionPreference = $ErrorActionPreference; $ErrorActionPreference = 'SilentlyContinue'; $title = $host.ui.rawui.windowtitle; $host.ui.rawui.windowtitle = 'Pwsh runtime V.3.1 [win_batch]'; $env:path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); if(Get-Command 'pwsh') {} else { $curdir = $pwd; cd $env:temp; if (test-path 'pwsh_runtime_install') {} else {mkdir 'pwsh_runtime_install'}; cd 'pwsh_runtime_install'; $tempLoc = $pwd; cd $curdir; Invoke-RestMethod 'https://aka.ms/install-powershell.ps1' -outfile $tempLoc/inst.ps1; . $tempLoc/inst.ps1 -AddToPath; rmdir $tempLoc -recurse -force }; $ErrorActionPreference = $old_ErrorActionPreference; $env:path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); $host.ui.rawui.windowtitle = $title; cls; write-host '[Runtime]: Installed!' -f green; pwsh -noprofile -NoLogo -Command 'iex (${%~f0} ^| out-string)'
+powershell $old_ErrorActionPreference = $ErrorActionPreference; $ErrorActionPreference = 'SilentlyContinue'; $title = $host.ui.rawui.windowtitle; $host.ui.rawui.windowtitle = 'Pwsh runtime V.3.1 [win_batch]'; $env:path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); if(Get-Command 'pwsh') {} else { $curdir = $pwd; cd $env:temp; if (test-path 'pwsh_runtime_install') {} else {mkdir 'pwsh_runtime_install'}; cd 'pwsh_runtime_install'; $tempLoc = $pwd; cd $curdir; Invoke-RestMethod 'https://aka.ms/install-powershell.ps1' -outfile $tempLoc/inst.ps1; . $tempLoc/inst.ps1 -AddToPath; rmdir $tempLoc -recurse -force; write-host '[Runtime]: Installed!' -f green}; $ErrorActionPreference = $old_ErrorActionPreference; $env:path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); $host.ui.rawui.windowtitle = $title; cls; pwsh -noprofile -NoLogo -Command 'iex (${%~f0} ^| out-string)'
 REM Exit prompt
 exit /b %errorlevel%
 
@@ -84,7 +84,7 @@ if ($install) {
   $host.ui.rawui.windowtitle = "$window_title"
   #sizes
   $toAdd_width = 3
-  $toAdd_height = 4
+  $toAdd_height = 11
   #progressPref
   $old_ProgressPreference = $ProgressPreference
   $ProgressPreference = "SilentlyContinue"
@@ -117,9 +117,15 @@ if ($HasUpdated) {
   #Assemble mt tag
   [string]$mttag = $app_vID + ":" + $app_mtd
   #Get repo lastVer.mt
+  $lastVer = ""
+  $old_lw_ErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = 'SilentlyContinue'
   $lastVer = (iwr $lastver_url).content
+  $ErrorActionPreference = $old_lw_ErrorActionPreference
   #no internet fallback
+  $IsOffline = $false
   if ($lastVer -eq "") {
+    $IsOffline = $true
     write-host "Could not check for an update from the repository, please check your internet connection." -f red
     write-host 'Write "Y" to continue without updates, or press any other key to exit.' -f blue
     $no_internet_or_invalid_lastVer_message_input = Read-Host
@@ -140,7 +146,10 @@ if ($HasUpdated) {
 #ShowInfo
 Function ShowInfo {
   $VerificationHeader = "# Verification Header --918a-- #"
+  $old_lw_ErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = 'SilentlyContinue'
   $WebHelp = (iwr $helpfile_url).content
+  $ErrorActionPreference = $old_lw_ErrorActionPreference
     cls
     write-host "  Minecraft Custom Client Installer help and info:"
     write-host "--------------------------------------------------------------"
@@ -152,7 +161,6 @@ Function ShowInfo {
     iex($WebHelp)
   } else {
     write-host "WebHelp couldn't be downloaded please check it for more information." -f red
-    write-host ""
     write-host "MCC installer is an app to install my minecraft clients with more simplicity then zipping files here and there"
     write-host "It needs java but if not found it will download a binary"
     write-host "MCC installer also installs fabric and other client dependencies."
@@ -209,6 +217,8 @@ Function GetJava {
 
   if($win) {
     #Check Java
+    $old_gj_ErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "silentlycontinue"
     if(Get-Command 'Java') {} else {
       #No Java
       if (test-path $javaName) {} else {
@@ -228,6 +238,7 @@ Function GetJava {
         $script:javaPath = $pwd + "\java.exe"
       }
     }
+    $ErrorActionPreference = $old_gj_ErrorActionPreference
   }
 }
 
@@ -856,8 +867,10 @@ $host.ui.rawui.windowtitle = "$window_title"
   $pswindow = $host.ui.rawui
   $newbuffer = $pswindow.buffersize
   $newsize = $pswindow.windowsize
-  [int]$old_buffersize = $pswindow.buffersize
-  [int]$old_windowsize = $pswindow.windowsize
+  $old_buffersize_width = $pswindow.buffersize.width
+  $old_buffersize_height = $pswindow.buffersize.height
+  $old_windowsize_width = $pswindow.windowsize.width
+  $old_windowsize_height = $pswindow.windowsize.height
   #setnew
   $newbuffer.width = $newbuffer.width + $toAdd_width
   $newbuffer.height = $newbuffer.height + $toAdd_height
@@ -963,8 +976,14 @@ while ($MainUI) {
     if ($client) {
       $flavorOption = "$client"
     } else {
-      write-host "  Choose an option bellow:"
-      write-host "----------------------------"
+      if ($IsOffline) {
+      write-host "Couldn't get flavors from repository [No_Internet_Connection]" -f Red
+      write-host "Please restart the app with internet or use a local flavor file." -f blue
+      write-host ""
+    } else {
+        write-host "  Choose an option bellow:"
+        write-host "----------------------------"
+      }
       $flavorOption = (def_ui_Menu $menuarray).Trim("[")
     }
     if ($flavorOption -like "*  {*") {
@@ -1090,22 +1109,37 @@ while ($MainUI) {
       write-host "---------------------------------------------------------"
       $clientname = Read-Host "client.name"
     }
-    #get flavorlist
-    $Flavors = (iwr $flavorlist_url).content
-    $FlavorList = ConvertFrom-Json "$Flavors"
-    #check name
-    Foreach ($flavor in $FlavorList.Flavors) {
-      if ($flavor -like "*$clientname*") {
-        [string]$installpath = $FlavorList.Flavors.$clientname.install_location
-        [string]$installpath = FlavorObjectFix -in $installpath
-        $drive = "C:/"
-        if ($customDrive -ne "") {$drive = $customDrive}
-        cd $drive
-        cd $installpath
-        rmdir "$clientname" -force -recurse
-        MinecraftLauncherAgent -remove -name "$clientname"
+    #drive
+    $drive = "C:/"
+    if ($customDrive -ne "") {$drive = $customDrive}
+    #get InstallPath
+    if ($IsOffline) {
+      $cp = Get-Location
+      cd $drive
+      if (test-path "installs/minecraft-custom-client/custom") {
+        $installpath = "installs/minecraft-custom-client/custom"
+      }
+      if (test-path "installs/minecraft-custom-client/profile") {
+        $installpath = "installs/minecraft-custom-client/profile"
+      }
+      cd $cp
+    } else {
+      #get flavorlist
+      $Flavors = (iwr $flavorlist_url).content
+      $FlavorList = ConvertFrom-Json "$Flavors"
+      #check name
+      Foreach ($flavor in $FlavorList.Flavors) {
+        if ($flavor -like "*$clientname*") {
+          [string]$installpath = $FlavorList.Flavors.$clientname.install_location
+          [string]$installpath = FlavorObjectFix -in $installpath
+        }
       }
     }
+    #remove
+    cd $drive
+    cd $installpath
+    rmdir "$clientname" -force -recurse
+    MinecraftLauncherAgent -remove -name "$clientname"
   }
 
   #if copyData
@@ -1148,6 +1182,8 @@ while ($MainUI) {
   cd $temp_path
   cd ..
   if (test-path $tempfolder_path) {del $tempfolder_path -recurse -force}
-  $host.ui.rawui.buffersize = $old_buffersize
-  $host.ui.rawui.windowsize = $old_windowsize
+  $host.ui.rawui.buffersize.width = $old_buffersize_width
+  $host.ui.rawui.buffersize.height = $old_buffersize_height
+  $host.ui.rawui.windowsize.width = $old_windowsize_width
+  $host.ui.rawui.windowsize.height = $old_windowsize_height
   $host.ui.rawui.windowtitle = $old_windowtitle
