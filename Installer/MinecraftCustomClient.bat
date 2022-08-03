@@ -997,7 +997,8 @@ while ($MainUI) {
       #Get client location
       if ($IsWindows) {
         $drive = "C:/"
-        $InstallLoc = $choosenFlavor.install_location -replace " ",""
+        [string]$InstallLoc = $choosenFlavor.install_location
+        [string]$InstallLoc = FlavorObjectFix -in $InstallLoc
         if ($customDrive -ne "") {$drive = $customDrive}
         if ($customInstallLoc -ne "") {$InstallLoc = $customInstallLoc}
         #StringBuild
@@ -1116,10 +1117,10 @@ while ($MainUI) {
     if ($IsOffline) {
       $cp = Get-Location
       cd $drive
-      if (test-path "installs/minecraft-custom-client/custom") {
+      if ($customInstallLoc) {if (test-path $customInstallLoc) {$installpath = $customInstallLoc}
+      } elseif (test-path "installs/minecraft-custom-client/custom") {
         $installpath = "installs/minecraft-custom-client/custom"
-      }
-      if (test-path "installs/minecraft-custom-client/profile") {
+      } elseif (test-path "installs/minecraft-custom-client/profile") {
         $installpath = "installs/minecraft-custom-client/profile"
       }
       cd $cp
