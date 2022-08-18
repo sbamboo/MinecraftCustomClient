@@ -33,7 +33,7 @@
   {"1.19.2_Community-client_Lite_4_Beta2":[
     {"ID":"8cc1a548-4bec-4a17-8949-d7e1fd1c4ee4"},
     {"url":"https://drive.google.com/u/1/uc?id=1pjcKzqcuXxZD_wu1RU7ua2sQoSge0jOT&export=download&confirm=t"},
-    {"desc":"My larger version of my community client (containing litematica and more)"},
+    {"desc":"The light version of my community client (just the basics)"},
     {"archive_type":"zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},
     {"minecraft_version":"1.19.2"},
