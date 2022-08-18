@@ -234,15 +234,16 @@ Function GetJava {
         $script:javaPath = Get-Location
         $ProgressPreference = $new_ProgressPreference
       } else {
-        $script:customJava = $True
-        $script:javaPath = $pwd + "\java.exe"
+        $script:customJava = $true
+        $jname = 'jdk-17.0.3+7'
+        $script:javaPath = $pwd + "\" + $jname + "\bin\java.exe"
       }
     }
     $ErrorActionPreference = $old_gj_ErrorActionPreference
   }
 }
 
-#GetJava
+#GetFabric
 Function GetFabric {
   param(
     #os
