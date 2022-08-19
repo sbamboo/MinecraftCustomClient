@@ -357,7 +357,6 @@ Function MinecraftLauncherAgent {
         cd $returnPath
         #Auto startLauncher when done
         if ($startLauncher) {
-            
           if (Check-Command-bi "get-appxpackage") {
             if ((get-appxpackage | ?{$_.PackageFamilyName -like "$familyName"}).installlocation) {
                 start "shell:AppsFolder\$familyName!Minecraft"
