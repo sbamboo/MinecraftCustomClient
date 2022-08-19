@@ -1174,7 +1174,7 @@ while ($MainUI) {
     write-host "  Client data copy assistant"
     write-host "------------------------------"
     write-host ""
-    write-host "The data copier has not been inplomented yet" -f red
+    write-host "The data copier has not been inplemented yet" -f red
     write-host ""
     write-host "(the data copier will allow you to move resourcepacks and saves between clients)" -f blue
     write-host ""
