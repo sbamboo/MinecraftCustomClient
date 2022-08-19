@@ -143,6 +143,13 @@ if ($HasUpdated) {
   }
 
 #Functions
+#Check-Command
+function script:Check-Command($command) {
+  $old_ErrorActionPreference = $ErrorActionPreference; $ErrorActionPreference = 'SilentlyContinue'
+  if (iex($command)) {$commandExists = $true} else {$commandExists = $false}
+  return $commandExists
+  $ErrorActionPreference = $old_ErrorActionPreference
+}
 #ShowInfo
 Function ShowInfo {
   $VerificationHeader = "# Verification Header --918a-- #"
@@ -336,6 +343,14 @@ Function MinecraftLauncherAgent {
 
     #Kill launcher processes to apply launcher changes
     if ($dontkill) {} else { foreach ($proc in ($processes = Get-Process | where -property processname -like "*Minecraft*")) {Stop-Process $proc -force} }
+    
+    #Check-Command function (bi)
+    function script:Check-Command-bi($command) {
+      $old_ErrorActionPreference = $ErrorActionPreference; $ErrorActionPreference = 'SilentlyContinue'
+      if (iex($command)) {$commandExists = $true} else {$commandExists = $false}
+      return $commandExists
+      $ErrorActionPreference = $old_ErrorActionPreference
+    }
 
     #returnPath function
     function returnPath {
@@ -343,6 +358,7 @@ Function MinecraftLauncherAgent {
         #Auto startLauncher when done
         if ($startLauncher) {
             
+          if (Check-Command-bi "get-appxpackage") {
             if ((get-appxpackage | ?{$_.PackageFamilyName -like "$familyName"}).installlocation) {
                 start "shell:AppsFolder\$familyName!Minecraft"
             } else {
@@ -352,6 +368,12 @@ Function MinecraftLauncherAgent {
                     write-host "$text_NoLauncher" -f red
                 }
             }
+        } else {
+          if (Test-path "$binlauncdir") {
+            start "$binlauncdir"
+          } else {
+            write-host "$text_NoLauncher" -f red
+          }
         }
     }
         
@@ -1088,6 +1110,7 @@ while ($MainUI) {
       cls
       if ($startLauncher) {$startlauncherOption = "Yes"} else {
         write-host "  Start the launcher after adding the profile?"
+        write-host "            (Might not always work)"
         write-host "------------------------------------------------"
         $menuarray = $null
         $menuarray = "[Yes]","[No]"
