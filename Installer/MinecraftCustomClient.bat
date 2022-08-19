@@ -367,14 +367,15 @@ Function MinecraftLauncherAgent {
                     write-host "$text_NoLauncher" -f red
                 }
             }
-        } else {
-          if (Test-path "$binlauncdir") {
-            start "$binlauncdir"
           } else {
-            write-host "$text_NoLauncher" -f red
+            if (Test-path "$binlauncdir") {
+              start "$binlauncdir"
+            } else {
+              write-host "$text_NoLauncher" -f red
+            }
           }
         }
-    }
+      }
         
     #Add Install
     if ($add) {
