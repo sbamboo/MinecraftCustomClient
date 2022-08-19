@@ -18,7 +18,7 @@ exit /b %errorlevel%
 $app_author = "Simon Kalmi Claesson"
 $app_version = "1.0"
 $app_vID = "A0322-633d0b80-a17e-45a7-8259-fb0481b1d216"
-$app_mtd = "8a28@a0731d47cb66"
+$app_mtd = "8fdb@8f2328fa06ff"
 
 #Param
 function ParamHandle {
