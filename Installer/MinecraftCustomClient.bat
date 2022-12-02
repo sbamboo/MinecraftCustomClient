@@ -98,7 +98,7 @@ if ($install) {
   $flavorlist_name = $flavorlist_url | split-path -leaf
   $tempfolder_path = "MinecraftCustomClient_Installer_Temp"
   $javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
-  $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"
+  $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.1/fabric-installer-0.11.1.exe"
   $helpfile_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
   $helpfile_name = $helpfile_url | split-path -leaf
 
@@ -265,7 +265,7 @@ Function GetFabric {
   if ($workdir) {$wdir = $workdir} else {$wdir = $pwd}
   cd $wdir 
 
-  if ($fabricURI) {} else {$fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.jar"}
+  if ($fabricURI) {} else {$fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.1/fabric-installer-0.11.1.exe"}
   $fabricName = $fabricURI | split-path -leaf
 
   if($win) {
@@ -744,7 +744,7 @@ Function FabricInstaller {
     #Client
     if ($client) {
         #Begin StringBuild
-        $command = $java + " -jar "
+        $command = "." + $java + " -jar "
         #InstallerName
         if ($InstallerName) {$command = $command + "$InstallerName "} else {write-host "The script needs a fabric installer to be presented, please provide a filename/path to the -installerName flag, the script will instead try and use 'fabric-installer.jar' as a name." -f red; $command = $command + "fabric-installer.jar "}
         #Client tag
