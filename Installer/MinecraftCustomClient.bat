@@ -272,8 +272,8 @@ Function GetFabric {
     #Get fabricInstaller file if needed
     if (test-path $fabricName) {} else {
       iwr $fabricURI -OutFile $fabricName
-      [string]$script:fabricInstallerPath = "$pwd" + '\' + "$fabricName"
     }
+    [string]$script:fabricInstallerPath = "$pwd" + '\' + "$fabricName"
   }
 }
 
@@ -707,7 +707,7 @@ Function FabricInstaller {
 
     #SYNTAX:
     #FabricInstaller (-forceBaseJava) -installerName "fabric-installer.jar" -client/-server (-snapshot) -dir <mc_dir> -mcversion <mcver> -loader <fabric_loader_version> (-noprofile)
-
+    
     param(
         #Java
         [switch]$forceBaseJava,
@@ -726,7 +726,7 @@ Function FabricInstaller {
         [string]$loader,
         [switch]$noprofile
     )
-
+    
     #Java
     if ($forceBaseJava) {$java = "java"} else {
         if ($script:customJava) {
@@ -744,7 +744,7 @@ Function FabricInstaller {
     #Client
     if ($client) {
         #Begin StringBuild
-        $command = "." + $java + " -jar "
+        $command = ". " + $java + " -jar "
         #InstallerName
         if ($InstallerName) {$command = $command + "$InstallerName "} else {write-host "The script needs a fabric installer to be presented, please provide a filename/path to the -installerName flag, the script will instead try and use 'fabric-installer.jar' as a name." -f red; $command = $command + "fabric-installer.jar "}
         #Client tag
@@ -774,7 +774,7 @@ Function FabricInstaller {
         }
         #noprofile
         if ($noprofile) {$command = $command + "-noprofile"}
-
+         
         iex($command)
     }
 }
