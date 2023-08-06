@@ -4,6 +4,7 @@ import os
 import sys
 import argparse
 import json
+import uuid
 from datetime import datetime
 
 # [Settings]
@@ -30,12 +31,16 @@ cparser.add_argument('-flavorLauncherIcon','-launcherIcon', dest="flavorLauncher
 cparser.add_argument('-flavorModLoader','-modLoader', dest="flavorModLoader", help='LE: Modloader, reffer docs')
 cparser.add_argument('-flavorModLoaderVer','-modLoaderVer', dest="flavorModLoaderVer", help='LE: Modloader Version, reffer docs')
 cparser.add_argument('-flavorMinecraftVer','-minecraftVer','-mcVer', dest="flavorMinecraftVer", help='LE: Minecraft Version, reffer docs')
+cparser.add_argument('-bwcinstallLocation', dest="bwc_installLocation", help='BackwardsCompat: Install Location')
 cparser.add_argument('--flavorHidden','--hidden', dest="flavorHidden", help='Is it tagged hidden?', action='store_true')
 cparser.add_argument('--flavorSupported','--supported', dest="flavorSupported", help='Is it tagged supported?', action='store_true')
 cparser.add_argument('--create', dest="createRepo", help='Creates a repository.', action='store_true')
 cparser.add_argument('--update', dest="updateRepo", help='Updates a repository.', action='store_true')
+cparser.add_argument('--template', dest="createTemplate", help='Creates a template for a flavor.', action='store_true')
 cparser.add_argument('--add', dest="addFlavor", help='Adds a flavor.', action='store_true')
 cparser.add_argument('--silent', dest="silent", help='If given the script will only prompt the user and not print anything else.', action='store_true')
+cparser.add_argument('--backwardsCompat',dest="backwardsCompat",help="When using legacy sourceType: Includes extra fields for backwards compatability.", action='store_true')
+cparser.add_argument('--bwcNoAllowcopy',dest="bwc_noAllowCopy",help="BackwardsCompat: AllowCopy Tag=False", action='store_true')
 # Create main arguments object
 argus = cparser.parse_args()
 
@@ -108,14 +113,68 @@ if argus.updateRepo == True:
     open(repoFile,"w").write(repoData_json)
     d.pr("\033[32mDone!")
     
-# [Create Flavor Template] Taking: sourceType
-sourceType = argus.flavorSourceType
+# [Create Flavor Template] Taking: sourceType and --backwardsCompat
+if argus.createTemplate == True:
+    sourceType = argus.flavorSourceType
+    backwardsCompat = argus.backwardsCompat
+    _id = str(uuid.uuid4())
+    # Get file
+    d.pr("\033[33mGetting content of file...")
+    d.pr(f"\033[90m({repoFile})")
+    _json = json.loads( open(repoFile,"r").read() )
+    # Generate Template
+    d.pr(f"\033[33mGenerating template for sourceType: {sourceType}...")
+    flavorData = {
+        "name": "<Name Here>",
+        "desc": "<Desc Here>",
+        "id": _id,
+        "hidden": False,
+        "supported": True,
+        "sourceType": sourceType
+    }
+    if sourceType == "urlListing":
+        flavorData["source"] = "<Url>"
+    elif sourceType == "included": 
+        flavorData["source"] = "<FullListingJson>"
+    elif sourceType == "legacy":
+        flavorData["source"] = {
+            "url": "<Url>",
+            "archiveType": "<ArchiveType>",
+            "flavorDataFile": "<fileName>",
+            "launcherIcon": "",
+            "modLoader": "<ModLoader>",
+            "modLoaderVer": "<ModLoaderVer>",
+            "minecraftVer": "<minecraftVer>"
+        }
+    elif sourceType == "legacyB64":
+        flavorData["source"] = {
+            "base64": "<base64>",
+            "archiveType": "<ArchiveType>",
+            "flavorDataFile": "<fileName>",
+            "launcherIcon": "",
+            "modLoader": "<ModLoader>",
+            "modLoaderVer": "<ModLoaderVer>",
+            "minecraftVer": "<minecraftVer>"
+        }
+    if sourceType == "legacy" or sourceType == "legacyB64":
+        if backwardsCompat == True:
+            d.pr(f"\033[33mApplied backwardsCompatability.")
+            flavorData["source"]["backwardsCompat"] = {
+                "installLocation": "<InstallPathRelativeToRoot>",
+                "allowCopy": True
+            }
+    # Save to file
+    d.pr("\033[33mApplying changes...")
+    _json["flavors"].append(flavorData)
+    repoData_json = json.dumps(_json)
+    open(repoFile,"w").write(repoData_json)
+    d.pr("\033[32mDone!")
 
 # [Add modpack] generate id and return
 name = argus.flavorName
 desc = argus.flavorDesc
 
-_id = _# GENERATE UUID AND REMOVE LAST TEMP-UNDERSCORE
+_id = str(uuid.uuid4())
 hidden = argus.flavorHidden
 supported = argus.flavorSupported
 sourceType = argus.flavorSourceType
@@ -127,6 +186,9 @@ LE_dataFile = argus.flavorDataFile
 LE_modLoader = argus.flavorModLoader
 LE_modLoaderVer = argus.flavorModLoaderVer
 LE_minecraftVer = argus.flavorMinecraftVer
+bwc_installLocation = argus.bwc_installLocation
+bwc_allowCopy = True
+if argus.bwc_noAllowCopy == True: bwc_allowCopy == False
 
 # [Remove modpack] by id or by name
 name = argus.flavorName
@@ -136,4 +198,4 @@ _id = argus.flavorName # When searching by id use --flavorName param
 sourceType = argus.flavorSourceType
 sourceInluded = argus.flavorSource
 sourceUrl = argus.flavorSource
-_id = _# GENERATE UUID AND REMOVE LAST TEMP-UNDERSCORE
+_id = str(uuid.uuid4())

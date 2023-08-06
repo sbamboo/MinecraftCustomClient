@@ -146,7 +146,11 @@ Modpacks are since old called *Flavors*
                 "launcherIcon": "<base64_or_url>",
                 "modLoader": "Fabric",
                 "modLoaderVer": "0.14.21",
-                "minecraftVer": "1.20.1"
+                "minecraftVer": "1.20.1",
+                "backwardsCompat": {     // To make the spec completely backwards compatible a custom field can be added like this
+                    "installLocation": "installs/minecraftcustomclient/custom",
+                    "allowcopy": true,
+                }
             }
         }
     ]

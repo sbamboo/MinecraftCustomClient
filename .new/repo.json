@@ -1,1 +1,80 @@
-{"format": 1, "author": "Someone", "version": "0.0", "created": "2023-07-27", "lastUpdated": "2023-07-27", "flavors": []}
+{
+    "format": 1,
+    "author": "Someone",
+    "version": "0.0",
+    "created": "2023-07-27",
+    "lastUpdated": "2023-07-27",
+    "flavors": [{
+        "name": "<Name Here>",
+        "desc": "<Desc Here>",
+        "id": "c6879299-f039-4713-87ec-163ddeea374c",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "urlListing",
+        "source": "<Url>"
+    }, {
+        "name": "<Name Here>",
+        "desc": "<Desc Here>",
+        "id": "1b8740b2-a573-4c28-bdb9-56d2429c9c4e",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "included",
+        "source": "<FullListingJson>"
+    }, {
+        "name": "<Name Here>",
+        "desc": "<Desc Here>",
+        "id": "479c4f6d-b1e0-480f-95bb-37e9a2d9bd40",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "legacy",
+        "source": {
+            "url": "<Url>",
+            "archiveType": "<ArchiveType>",
+            "flavorDataFile": "<fileName>",
+            "launcherIcon": "",
+            "modLoader": "<ModLoader>",
+            "modLoaderVer": "<ModLoaderVer>",
+            "minecraftVer": "<minecraftVer>",
+            "backwardsCompat": {
+                "installLocation": "<InstallPathRelativeToRoot>",
+                "allowCopy": true
+            }
+        }
+    }, {
+        "name": "<Name Here>",
+        "desc": "<Desc Here>",
+        "id": "9a7db444-d2bd-43df-9605-c765fbbe08eb",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "legacyB64",
+        "source": {
+            "base64": "<base64>",
+            "archiveType": "<ArchiveType>",
+            "flavorDataFile": "<fileName>",
+            "launcherIcon": "",
+            "modLoader": "<ModLoader>",
+            "modLoaderVer": "<ModLoaderVer>",
+            "minecraftVer": "<minecraftVer>",
+            "backwardsCompat": {
+                "installLocation": "<InstallPathRelativeToRoot>",
+                "allowCopy": true
+            }
+        }
+    }, {
+        "name": "<Name Here>",
+        "desc": "<Desc Here>",
+        "id": "371ee66b-327b-4702-a798-57662ccf6942",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "legacyB64",
+        "source": {
+            "base64": "<base64>",
+            "archiveType": "<ArchiveType>",
+            "flavorDataFile": "<fileName>",
+            "launcherIcon": "",
+            "modLoader": "<ModLoader>",
+            "modLoaderVer": "<ModLoaderVer>",
+            "minecraftVer": "<minecraftVer>"
+        }
+    }]
+}
