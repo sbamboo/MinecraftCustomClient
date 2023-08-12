@@ -2,7 +2,7 @@
 
   {"TestClient":[
     {"ID":"84545270-e762-4a6e-8a9b-45df72ed35d8"},
-    {"url":"https://github.com/simonkalmiclaesson/MinecraftCustomClient/raw/main/Repo/Flavors/testclient.package"},
+    {"url":"https://github.com/sbamboo/MinecraftCustomClient/raw/main/Repo/Flavors/testclient.package"},
     {"desc":"Just a Test"},
     {"archive_type":"package.zip"},
     {"install_location":"installs/minecraft-custom-client/custom"},

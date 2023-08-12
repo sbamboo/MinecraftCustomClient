@@ -1,7 +1,7 @@
-#MinecraftCustomClient_Updater 1.1
+#MinecraftCustomClient_Updater 1.2
 #vars
 $host.ui.rawui.windowtitle = "Updating..."
-$adress = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/MinecraftCustomClient.bat"
+$adress = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Installer/MinecraftCustomClient.bat"
 $name = $adress | split-path -leaf
 
 #Check in parent dir

@@ -16,9 +16,9 @@ exit /b %errorlevel%
 
 #Version:
 $app_author = "Simon Kalmi Claesson"
-$app_version = "1.0"
-$app_vID = "A0422-99504d7f-82de-4390-b2e5-2248114868f0"
-$app_mtd = "ac08@0c9104093adc"
+$app_version = "1.1"
+$app_vID = "A0123-68572a54-95cf-4c1b-babc-434ea2c34e0f"
+$app_mtd = "a0fb@f2c296509527"
 
 #Param
 function ParamHandle {
@@ -90,16 +90,16 @@ if ($install) {
   $ProgressPreference = "SilentlyContinue"
   $new_ProgressPreference = $ProgressPreference
   #Url And Names
-  $lastver_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Installer/lastVer.mt"
+  $lastver_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Installer/lastVer.mt"
   $lastver_name = $lastver_url | split-path -leaf
-  $updater_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
+  $updater_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
   $updater_name = $updater_url | split-path -leaf
-  $flavorlist_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Repo/MinecraftCustomClient_flavors.json"
+  $flavorlist_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Repo/MinecraftCustomClient_flavors.json"
   $flavorlist_name = $flavorlist_url | split-path -leaf
   $tempfolder_path = "MinecraftCustomClient_Installer_Temp"
   $javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
   $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.1/fabric-installer-0.11.1.exe"
-  $helpfile_url = "https://raw.githubusercontent.com/simonkalmiclaesson/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
+  $helpfile_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
   $helpfile_name = $helpfile_url | split-path -leaf
 
 #Create temp folder
@@ -152,7 +152,7 @@ function script:Check-Command($command) {
 }
 #ShowInfo
 Function ShowInfo {
-  $VerificationHeader = "# Verification Header --918a-- #"
+  $VerificationHeader = "# Verification Header --918b-- #"
   $old_lw_ErrorActionPreference = $ErrorActionPreference
   $ErrorActionPreference = 'SilentlyContinue'
   $WebHelp = (iwr $helpfile_url).content
@@ -168,8 +168,8 @@ Function ShowInfo {
     iex($WebHelp)
   } else {
     write-host "WebHelp couldn't be downloaded please check it for more information." -f red
-    write-host "MCC installer is an app to install my minecraft clients with more simplicity then zipping files here and there"
-    write-host "It needs java but if not found it will download a binary"
+    write-host "MCC installer is an app to install my minecraft clients with more simplicity then just zipping files here and there."
+    write-host "(It needs java but if not found it will download a binary)"
     write-host "MCC installer also installs fabric and other client dependencies."
     write-host ""
     write-host "The app can be used from the command line so here is some cli help:"
@@ -180,11 +180,11 @@ Function ShowInfo {
     write-host ""
     write-host "  unInstall: UnInstalls a client (Specify '-client' flag)"
     write-host ""
-    write-host "  client: Specifies name of client to install or uninstall"
+    write-host "  client: Specifies the name of client to install or uninstall"
     write-host ""
     write-host "  customJava: Flag to allow the use of custom Java paths other then the pathed 'java' command."
     write-host ""
-    write-host "  javaPath: Path to custom java binary, used with the '-customJava' flag."
+    write-host "  javaPath: Path to custom java binary, used with the -customJava flag."
     write-host ""
     write-host "  startLauncher: Flag to autostart the minecraft launcher after installation."
     write-host ""
@@ -192,7 +192,7 @@ Function ShowInfo {
     write-host ""
     write-host "  customInstallLoc: Overwrite the installlocation for clients."
     write-host ""
-    write-host "  dontcheckdownloads: Using this flag will diable the download package-id check."
+    write-host "  dontcheckdownloads: Using this flag will disable the download package-id check."
     write-host ""
     write-host "  forceLegacyDownload: Forces the app to use InvokeWebRequest istead of Start-BitsTransfer"
     write-host ""
@@ -279,7 +279,7 @@ Function GetFabric {
 
 #MinecraftLauncherAgent
 Function MinecraftLauncherAgent {
-    #Minecraft Install Agent
+    #Minecraft Launcher Agent
     #This script helps to add/remove/list or replace minecraft launcher installs.
     #
     #Made by Simon Kalmi Claesson
@@ -332,7 +332,7 @@ Function MinecraftLauncherAgent {
 
     #Text
     $text_MissingParam = "You have not supplied one or more of the required parameters for this action!"
-    $text_NoLauncher = "No launcher found! Wont auto start"
+    $text_NoLauncher = "No launcher found! (Wont auto start)"
     $text_OPhasRun = "Operation has been run."
 
     #Defaults
@@ -654,13 +654,13 @@ Function MinecraftLauncherAgent {
         write-host "  MinecraftLauncher InstallAgent (GameInstalls)"
         write-host "-------------------------------------------------"
         write-host "This script helps to add/remove/list or replace minecraft launcher installs."
-        write-host "This script is written by Simon Kalmi Claesson"
+        write-host "This script is written by Simon Kalmi Claesson."
         write-host ""
         write-host "Operation parameters"
         write-host "  Add:"
-        write-host "    Adds a install to the launcher (Specify params: gameDir, versionID, name. Or optionaly icon)"
+        write-host "    Adds an install to the launcher (Specify params: gameDir, versionID, name. Or optionaly icon)"
         write-host "  Remove:"
-        write-host "    Removes a install from the launcher (Specify params: name)"
+        write-host "    Removes an install from the launcher (Specify params: name)"
         write-host "  List:"
         write-host "    Lists installs in the launcher"
         write-host "  Get:"
@@ -1134,37 +1134,41 @@ while ($MainUI) {
       write-host "---------------------------------------------------------"
       $clientname = Read-Host "client.name"
     }
-    #drive
-    $drive = "C:/"
-    if ($customDrive -ne "") {$drive = $customDrive}
-    #get InstallPath
-    if ($IsOffline) {
-      $cp = Get-Location
-      cd $drive
-      if ($customInstallLoc) {if (test-path $customInstallLoc) {$installpath = $customInstallLoc}
-      } elseif (test-path "installs/minecraft-custom-client/custom") {
-        $installpath = "installs/minecraft-custom-client/custom"
-      } elseif (test-path "installs/minecraft-custom-client/profile") {
-        $installpath = "installs/minecraft-custom-client/profile"
-      }
-      cd $cp
-    } else {
-      #get flavorlist
-      $Flavors = (iwr $flavorlist_url).content
-      $FlavorList = ConvertFrom-Json "$Flavors"
-      #check name
-      Foreach ($flavor in $FlavorList.Flavors) {
-        if ($flavor -like "*$clientname*") {
-          [string]$installpath = $FlavorList.Flavors.$clientname.install_location
-          [string]$installpath = FlavorObjectFix -in $installpath
+    if ($clientname -ne "") {
+      #drive
+      $drive = "C:/"
+      if ($customDrive -ne "") {$drive = $customDrive}
+      #get InstallPath
+      if ($IsOffline) {
+        $cp = Get-Location
+        cd $drive
+        if ($customInstallLoc) {if (test-path $customInstallLoc) {$installpath = $customInstallLoc}
+        } elseif (test-path "installs/minecraft-custom-client/custom") {
+          $installpath = "installs/minecraft-custom-client/custom"
+        } elseif (test-path "installs/minecraft-custom-client/profile") {
+          $installpath = "installs/minecraft-custom-client/profile"
+        }
+        cd $cp
+      } else {
+        #get flavorlist
+        $Flavors = (iwr $flavorlist_url).content
+        $FlavorList = ConvertFrom-Json "$Flavors"
+        #check name
+        Foreach ($flavor in $FlavorList.Flavors) {
+          if ($flavor -like "*$clientname*") {
+            [string]$installpath = $FlavorList.Flavors.$clientname.install_location
+            [string]$installpath = FlavorObjectFix -in $installpath
+          }
         }
       }
+      #remove
+      cd $drive
+      cd $installpath
+      rmdir "$clientname" -force -recurse
+      MinecraftLauncherAgent -remove -name "$clientname"
+    } else {
+      write-host "No clientName specified, aborting..."
     }
-    #remove
-    cd $drive
-    cd $installpath
-    rmdir "$clientname" -force -recurse
-    MinecraftLauncherAgent -remove -name "$clientname"
   }
 
   #if copyData
@@ -1181,7 +1185,7 @@ while ($MainUI) {
     pause
     #show choice for copy_from and allow custom path/folder or from standard dir
     #show choice for copy_to and allow custom path/folder or from standard dir
-    #show options (checkboxes) for what to copy:  Saves, modConfig, settins, resourcepacks, servers, shaders
+    #show options (checkboxes) for what to copy:  Saves, modConfig, settings, resourcepacks, servers, shaders
     $menuarray = $null
     $menuarray = "saves", "modConfig", "settings", "resourcepacks", "servers", "shaders"
     #  def_ui_Menu $menuarray -Multiselect
