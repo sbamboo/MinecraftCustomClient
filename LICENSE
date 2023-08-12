@@ -1,6 +1,6 @@
 This repository contains both a repository for clients aswell as tools, devtools and installers for them.
-These parts al have separate uses and thus also different needs for licenses. Because of this every part of this repository falls under different agreements while this one more or less exists as an overall agreement.
-Note that if a part dosen't have a license-file present in it's folder, it automaticly falls under this one.
+These parts al have separate uses and thus also different needs for licenses. Because of this, every part of this repository falls under different agreements while this one more or less exists as an overall agreement.
+Note, that if a part dosen't have a license-file present in it's folder, it automaticly falls under this one.
 
 Another thing thats necessary with the nature of this project is that different versions or revisions should be able to have different agreements and licenses.
 Altho I still have the full ability to change/switch or even remove license aggrements from a part of the project or the project as a whole.
@@ -9,15 +9,15 @@ As an example if you download a part of the project with no license/agreement ma
 NOTE! If you would download the same part again or an asset from/to it that at the new time of download, falls under a license said license would then apply to the downloaded parts.
 
 By downloading any part or asset of this repository you agree to read and comply with the license given and connected at the time of download, and agknowledge that I may change the license of said part without informing or saying anything before hand.
-You also agknowledge that I may remove this part of the license agrement at any time altho old or previously downloaded assets will still be under the license given at the time of download.
+You also agknowledge that I may remove this part of the license agrement at any time altho old or previously downloaded assets will still be under the license present at the time of download.
 
-The icons under the Assets folder are property of Simon Kalmi Claesson and not allowed to be used or shared without permission from their author (simon kalmi claesson)
+The icons under the Assets folder are property of Simon Kalmi Claesson and are not allowed to be used or shared without permission from their author (Simon Kalmi Claesson)
 
 ==========================================[General license]==========================================
 Any part of the project not licensed separatly will fall under the agreements bellow.
 
 You may download parts of the project or the repository as a whole without strictly asking for permission.
-However you must include al license information avaliable at the time of download with the asset downloaded,
+However you must include al license information avaliable at the time of download with the asset(s) downloaded,
 this includes both this license and any other license-file given.
 
 You may not redistribute any part of the project as your own!
@@ -31,5 +31,5 @@ But if you do so you must as previously specified, point to the original/officia
 
 =====================================================================================================
 
-
-Licence written 2022-07-26 and apply to al parts of this repository/project not specificly licensed diffrently.
+License originally written 2022-07-26 (Version 1.0)
+License modified 2023-08-12 (Version 1.1), and applies to al parts of this repository/project not specificly licensed diffrently.
