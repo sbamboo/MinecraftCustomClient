@@ -1,0 +1,10 @@
+# Format for future proofing
+format: 1
+
+# Listing file and format
+listing:
+  type: ""
+  path: ""
+
+# Things other then the listing to include, this can be * for anything in the folder or a list of entries
+includes: "*"

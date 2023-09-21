@@ -1,0 +1,16 @@
+format: "quick"
+
+minecraftVer: "1.20.1"
+modloader: "fabric"
+modloaderVer: "0.14.20"
+
+name: "Example modpack"
+version: "1.0"
+icon: ""
+
+include:
+  - ".\\config"
+  - ".\\servers.dat"
+
+lister:
+  silent: False
