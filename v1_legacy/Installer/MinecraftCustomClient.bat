@@ -16,9 +16,9 @@ exit /b %errorlevel%
 
 #Version:
 $app_author = "Simon Kalmi Claesson"
-$app_version = "1.1"
-$app_vID = "A0123-68572a54-95cf-4c1b-babc-434ea2c34e0f"
-$app_mtd = "a0fb@f2c296509527"
+$app_version = "1.1.1"
+$app_vID = "A0223-37e18484-bbe6-4973-8709-5cd0be3c26f0"
+$app_mtd = "ba13@3587c8fdc98b"
 
 #Param
 function ParamHandle {
@@ -90,16 +90,16 @@ if ($install) {
   $ProgressPreference = "SilentlyContinue"
   $new_ProgressPreference = $ProgressPreference
   #Url And Names
-  $lastver_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Installer/lastVer.mt"
+  $lastver_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v1_legacy/Installer/lastVer.mt"
   $lastver_name = $lastver_url | split-path -leaf
-  $updater_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Updater/MinecraftCustomClient_Updater.ps1"
+  $updater_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v1_legacy/Updater/MinecraftCustomClient_Updater.ps1"
   $updater_name = $updater_url | split-path -leaf
-  $flavorlist_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Repo/MinecraftCustomClient_flavors.json"
+  $flavorlist_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v1_legacy/Repo/MinecraftCustomClient_flavors.json"
   $flavorlist_name = $flavorlist_url | split-path -leaf
   $tempfolder_path = "MinecraftCustomClient_Installer_Temp"
   $javaURI = "https://aka.ms/download-jdk/microsoft-jdk-17.0.3-windows-x64.zip"
   $fabricURI = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.1/fabric-installer-0.11.1.exe"
-  $helpfile_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/Assets/_HelpAndInfo.bip"
+  $helpfile_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v1_legacy/Assets/_HelpAndInfo.bip"
   $helpfile_name = $helpfile_url | split-path -leaf
 
 #Create temp folder
