@@ -1,0 +1,24 @@
+format: "quick"
+
+minecraftVer: "1.20.1"
+modloader: "fabric"
+modloaderVer: "0.14.20"
+
+name: "Example modpack"
+desc: "My little modpack"
+version: "1.0"
+icon: ""
+hidden: False
+
+include:
+  - ".\\config"
+  - ".\\servers.dat"
+
+gitsync: True
+gitsyncPath: "{compiler}\\..\\..\\Repo"
+gitsyncBURL: "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo"
+
+lister:
+  silent: False
+  missingLinkAction: "m"
+  promptOnManual: False

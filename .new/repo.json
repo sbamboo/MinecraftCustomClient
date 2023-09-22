@@ -15,6 +15,14 @@
     }, {
         "name": "<Name Here>",
         "desc": "<Desc Here>",
+        "id": "c23168f5-7199-45e3-9cb9-c69216867aff",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "<Url>"
+    }, {
+        "name": "<Name Here>",
+        "desc": "<Desc Here>",
         "id": "1b8740b2-a573-4c28-bdb9-56d2429c9c4e",
         "hidden": false,
         "supported": true,
