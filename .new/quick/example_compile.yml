@@ -12,5 +12,9 @@ include:
   - ".\\config"
   - ".\\servers.dat"
 
+missingLinkAction: "b"
+
+gitsync: True
+
 lister:
   silent: False

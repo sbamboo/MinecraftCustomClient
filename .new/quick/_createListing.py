@@ -31,6 +31,8 @@ cparser.add_argument('-version','-ver','-v', dest="version", help="The version o
 cparser.add_argument('-destination','-dest','-d', dest="destination", help="Which filepath to save the listing to. (Default is root of this file)")
 cparser.add_argument('-customDeclare','-cd', dest="customDeclarations", help='Json string with custom entries to add to list. ([ {"type":"<type>","url":"<url>","filename":"<filename>"} / {"<filename>":"<url>"} ])')
 cparser.add_argument('-launcherIcon','-icon','-li', dest="launcherIcon", help='Base64 in format: "data:image/png;base64,<base64>" or a direct link to the image')
+cparser.add_argument('-missingActionStr', dest="missingActionStr", help='An action string to use for missing links.')
+cparser.add_argument('-archiveActionStr', dest="archiveActionStr", help='An action string to use for archives.')
 cparser.add_argument('--silent', dest="silent", help='If given the script will only prompt the user and not print anything else.', action='store_true')
 # Create main arguments object
 argus = cparser.parse_args()
@@ -127,7 +129,11 @@ for _id,entry in enumerate(notFounds):
 if len(notFounds) == 0:
     d.pr(f"\033[33m ^^^ Empty             \033[90m(Al found files were listed above)")
 else:
-    actionString = input(debugPrefix + f"\033[33mNon founds exists, action? \033[90m[\033[35mi\033[90m: ignore, \033[35mm\033[90m: manual, \033[35mb\033[90m: inlude as base64, \033[35ml\033[90m: just don't install, \033[35mEnter\033[90m: ignore, To not apply to al use '<action>:<indexes_sepparated_by_coma>'] "+"\033[0m")
+    if argus.missingActionStr:
+        actionString = argus.missingActionStr
+        print(debugPrefix + f"Running automated action: {actionString}")
+    else:
+        actionString = input(debugPrefix + f"\033[33mNon founds exists, action? \033[90m[\033[35mi\033[90m: ignore, \033[35mm\033[90m: manual, \033[35mb\033[90m: inlude as base64, \033[35ml\033[90m: just don't install, \033[35mEnter\033[90m: ignore, To not apply to al use '<action>:<indexes_sepparated_by_coma>'] "+"\033[0m")
     actionString = (actionString.lower()).strip()
     ids = None
     workingWith = urls.copy()
@@ -217,7 +223,11 @@ for _id,entry in enumerate(archives):
 if len(archives) == 0:
     d.pr(f"\033[33m ^^^ Empty             \033[90m(Al found files were listed above)")
 else:
-    actionString = input(debugPrefix + f"\033[33mSome archives were found? \033[90m[\033[35mi\033[90m: ignore, \033[35mb\033[90m: include as base64, \033[35ml\033[90m: just don't install, \033[35mEnter\033[90m: ignore, To not apply to al use '<action>:<indexes_sepparated_by_coma>'] "+"\033[0m")
+    if argus.archiveActionStr:
+        actionString = argus.archiveActionStr
+        print(debugPrefix + f"Running automated action: {actionString}")
+    else:
+        actionString = input(debugPrefix + f"\033[33mSome archives were found? \033[90m[\033[35mi\033[90m: ignore, \033[35mb\033[90m: include as base64, \033[35ml\033[90m: just don't install, \033[35mEnter\033[90m: ignore, To not apply to al use '<action>:<indexes_sepparated_by_coma>'] "+"\033[0m")
     actionString = (actionString.lower()).strip()
     ids = None
     workingWith = urls.copy()

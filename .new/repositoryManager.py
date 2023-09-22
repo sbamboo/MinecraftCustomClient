@@ -5,6 +5,7 @@ import sys
 import argparse
 import json
 import uuid
+import requests
 from datetime import datetime
 
 # [Settings]

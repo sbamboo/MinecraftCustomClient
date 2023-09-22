@@ -19,7 +19,7 @@ parent = os.path.abspath(os.path.dirname(__file__))
 # Setup
 encoding = "utf-8"
 timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-tempFolder = f"{parent}{os.sep}{timestamp}_quickcompile"
+tempFolder = f"{parent}{os.sep}{timestamp}-quickcompile"
 lister = f"{parent}{os.sep}_createListing.py"
 listing = f"{tempFolder}{os.sep}listing.json"
 
@@ -49,9 +49,27 @@ if fs.notExist(args.cmpl):
 content = open(args.cmpl,'r',encoding=encoding).read()
 compyml = yaml.safe_load(content)
 
+# pull
+if compyml.get('gitsync') == True:
+    import subprocess
+    print("Retriving hit repostiroy root path...")
+    try:
+        root_path_bytes = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'])
+        root_path = root_path_bytes.decode('utf-8').strip()
+        print(f"Found: '{root_path}'")
+    except:
+        root_path = None
+    if root_path != None and fs.doesExist(root_path):
+        print("Pulling repository...")
+        olddir = os.getcwd()
+        os.chdir(root_path)
+        os.system('git pull')
+        print("")
+        os.chdir(olddir)
+
 # Run jar retriver
 if fs.notExist(args.path):
-    print(f"Invalid odpack path: {args.path}")
+    print(f"Invalid modpack path: {args.path}")
 else:
     nonAllowed = ["",None]
     command = f' -modpack "{args.path}" -dest "{listing}"'
@@ -63,9 +81,14 @@ else:
         command += f' -ver "{compyml["version"]}"'
     if compyml.get("icon") not in nonAllowed:
         command += f' -icon "{compyml["icon"]}"'
-    if compyml["lister"]["silent"] == True:
-        command += " --silent"
-    #os.system(f"python3 {lister} {command}")
+    if compyml.get("lister") not in nonAllowed:
+        if compyml["lister"]["silent"] == True:
+            command += " --silent"
+    if compyml.get("missingLinkAction") not in nonAllowed:
+        command += f' -missingActionStr "{compyml["missingLinkAction"]}"'
+    if compyml.get("archiveFoundAction") not in nonAllowed:
+        command += f' -archiveActionStr "{compyml["archiveFoundAction"]}"'
+    os.system(f"python3 {lister} {command}")
 
 # Find other things to include
 incl = compyml.get("include")
@@ -102,13 +125,20 @@ if incl != None:
                             print(f"Including folder... '.{entry.replace(args.path,'')}'")
                             fs.copyFolder2(entry,dest)
 
-# zip
-olddir = os.getcwd()
-os.chdir(parent)
-zipfile = f"{os.path.basename(tempFolder)}.zip"
-print(f"Zipping modpack... ({zipfile})")
-shutil.make_archive(base_name=tempFolder, format='zip')
-print("Cleaning up...")
-fs.deleteDirNE(tempFolder)
-fs.renameFile(zipfile,f"{fs.getFileName(zipfile)}.mListing")
-os.chdir(olddir)
+    # zip
+    olddir = os.getcwd()
+    os.chdir(parent)
+    zipfile = f"{os.path.basename(tempFolder)}.zip"
+    print(f"Zipping modpack... ({zipfile})")
+    shutil.make_archive(tempFolder, 'zip', tempFolder)
+    print("Cleaning up...")
+    fs.deleteDirNE(tempFolder)
+    fs.renameFile(zipfile,f"{compyml['name'].replace(' ','-')}_{fs.getFileName(zipfile)}.mListing")
+    os.chdir(olddir)
+
+else:
+    listingfile = f"{os.path.basename(tempFolder)}.listing"
+    print(f"Writing modpack... ({listingfile})")
+    fs.copyFile(listing,os.path.join(tempFolder,f"{parent}{os.sep}{compyml['name'].replace(' ','-')}_{listingfile}"))
+    print("Cleaning up...")
+    fs.deleteDirNE(tempFolder)
