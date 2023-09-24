@@ -215,7 +215,6 @@ for url in urls:
 d.pr(f"\033[33mListing archives...")
 # Prints out the found archives with a number (this number will work up to 9999)
 for _id,entry in enumerate(archives):
-    prem = f"\033[90m{_id}: \033[91mNo url found for"
     prem = f"\033[90m{_id}: \033[91mArchive file"
     spacing = 8
     spacing = spacing - len(str(_id))

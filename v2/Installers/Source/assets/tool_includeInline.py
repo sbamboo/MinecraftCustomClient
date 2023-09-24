@@ -31,12 +31,17 @@ if args.path:
                     line = line.strip("#")
                     line = line.replace("IncludeInline: ","")
                     line = line.strip(" ")
+                    oline = line
                     if line.startswith("./"):
-                        line = line.replace("./", os.path.dirname(args.path))
+                        line = line.replace("./", os.path.dirname(args.path)+os.sep)
                     elif line.startswith(".\\"):
-                        line = line.replace(".\\", os.path.dirname(args.path))
+                        line = line.replace(".\\", os.path.dirname(args.path)+os.sep)
+                    line = line.replace("/",os.sep)
+                    line = line.replace("\\",os.sep)
                     if fs.doesExist(line):
-                        toIncludeContent = open(line,'r',encoding=encoding).read()
+                        toIncludeContent = f"#region [IncludeInline: {oline}]: START\n"
+                        toIncludeContent += open(line,'r',encoding=encoding).read()
+                        toIncludeContent += f"#endregion [IncludeInline: {oline}]: END"
                         lines[li] = toIncludeContent
         # set content
         content = '\n'.join(lines)

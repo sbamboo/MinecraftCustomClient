@@ -17,7 +17,7 @@ fabric_url = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.2/fa
 forge_url  = "https://files.minecraftforge.net/net/minecraftforge/forge"
 forForgeList = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Installers/Assets/forge-links.json"
 
-modpack = f"Example-modpack_2023-09-22_22-56-15-quickcompile.mListing"
+modpack = "<replaceble:modpack_relative_path_to_parent>"
 
 # IncludeInline: ./assets/lib_crshpiptools.py
 

@@ -109,7 +109,16 @@ class filesys():
 
     # Function to get the filename of file (Excluding file extension)
     def getFileName(path=str()):
-        return ('.'.join(os.path.basename(path).split(".")[:-1])).strip(".")
+        if "." in path:
+            return ('.'.join(os.path.basename(path).split(".")[:-1])).strip(".")
+        else:
+            return os.path.basename(path)
+
+    def getFileExtension(path=str()):
+        if "." in path:
+            return os.path.basename(path).split(".")[-1]
+        else:
+            return None
 
     # Error handler function where noexists flips functionality, checks for filetype and existance
     def errorHandler(action,path,noexist=False):
