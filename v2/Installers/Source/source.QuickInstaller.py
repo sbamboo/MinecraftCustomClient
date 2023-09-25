@@ -6,6 +6,7 @@ installer_release = "2023-09-22"
 prefix    = "\033[90m[\033[35mQuickInst\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
+prefix_la = "\033[90m[\033[94mLnch-Agnt\033[90m]\033[0m "
 title = f"MinecraftCustomClient - QuickInstaller {installer_version}: <modpack>"
 temp_foldername = "MCC_QuickInstaller_Temp"
 
@@ -25,6 +26,11 @@ modpack = "<replaceble:modpack_relative_path_to_parent>"
 _ = autopipImport("argparse")
 _ = autopipImport("scandir")
 _ = autopipImport("requests")
+_ = autopipImport("getpass")
+_ = autopipImport("subprocess")
+_ = autopipImport("datetime")
+_ = autopipImport("json")
+_ = autopipImport("psutil")
 
 # [Setup]
 
@@ -34,11 +40,18 @@ parent = os.path.abspath(os.path.dirname(__file__))
 modpack_path = os.path.join(parent,modpack)
 modpack = os.path.basename(modpack)
 title = title.replace("<modpack>", modpack)
+system = platform.system().lower()
 
 # [Args]
 encoding = "utf-8"
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
+parser.add_argument('-mcf','-cMinecraftLoc', dest="mcf", type=str, help='MinecraftFolder (.minecraft)')
+parser.add_argument('--fabprofile', help='Should fabric create a profile?', action="store_true")
+parser.add_argument('--dontkill', help='Should the install not kill minecraft process?', action="store_true")
+parser.add_argument('--autostart', help='Should the installer attempt to start the launcher?', action="store_true")
+parser.add_argument('-cLnProfFileN', type=str, help='The filename to overwrite the profile-listing file with.')
+parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore launcher if found, overwrite launcher with this.')
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
@@ -72,6 +85,8 @@ print(prefix+f"Starting install for '{modpack}'...")
 # IncludeInline: ./assets/lib_filesys.py
 
 # IncludeInline: ./assets/flavorFunctions.py
+
+# IncludeInline: ./assets/minecraftLauncherAgent.py
 
 # Create tempfolder
 fs = filesys
@@ -112,6 +127,10 @@ javapath = getjava(prefix_jv,tempFolder,lnx_java_url,mac_java_url,win_java_url)
 modld = listingData["modloader"]
 ldver = listingData["modloaderVer"]
 mcver = listingData["minecraftVer"]
+f_snapshot = False
+if "snapshot:" in mcver:
+    mcver = mcver.replace("snapshot:","")
+    f_snapshot = True
 print(prefix+f"Retriving loader-install url... ({modld}: {ldver} for {mcver})")
 tryMakeFrgUrl = True
 reScrapeFrgLst = False
@@ -132,9 +151,33 @@ if fs.notExist(loaderFp):
     exit()
 
 print(prefix+f"Starting install of loader... ({loaderFp})")
-f_snapshot = False
-f_dir = getLauncherDir()
+f_dir = getLauncherDir(args.mcf)
 f_mcversion = mcver
 f_loaderver = ldver
-f_noprofile = False
-installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,f_noprofile)
+f_noprofile = args.fabprofile
+installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True)
+
+print(prefix+f"Creating profile for: {modpack}")
+MinecraftLauncherAgent(
+    add=True,
+
+    name=fs.getFileName(modpack),
+    gameDir=dest,
+    icon=listingData.get("icon"),
+    versionId=getVerId(modld,ldver,mcver),
+
+    dontkill=args.dontkill,
+    startLauncher=args.autostart,
+    overWriteLoc=args.mcf,
+    overWriteFile=args.cLnProfFileN,
+    overWriteBinExe=args.cLnBinPath
+)
+
+#TODO: legacy packages
+#TODO: Apply install-directory (/installs/minecraft-custom-client/v2/?)
+#TODO: Clean up
+#TODO: Create installed-listing
+#TODO: Curse/Modrith/Prism???
+#TODO: Comment your code
+#TODO: Failsafe some things
+#TODO: Extract OfflinePackage

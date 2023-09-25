@@ -298,7 +298,7 @@ def _joinForgeListings(stdlist,newlist):
                     joinedList[key]["recommended"] = newlist[key]["recommended"]
     return joinedList
 
-def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUrl=str,forgeMakeUrl=True,forForgeMcVer=str,forForgeLdVer=str,forForgeInstType="latest",forForgeList=str,regetForge=False) -> str:
+def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUrl=str,forgeMakeUrl=True,forgeMakeUrlType="installer",forForgeMcVer=str,forForgeLdVer=str,forForgeInstType="latest",forForgeList=str,regetForge=False) -> str:
     '''Downloads a loader and return the path to it'''
     # Fabric
     if loaderType.lower() == "fabric":
@@ -308,7 +308,7 @@ def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUr
         url = None
         if forgeMakeUrl == True:
             print(prefix+"Attempting to build list...")
-            url = f"https://maven.minecraftforge.net/net/minecraftforge/forge/{forForgeMcVer}-{forForgeLdVer}/forge-{forForgeMcVer}-{forForgeLdVer}-installer.jar"
+            url = f"https://maven.minecraftforge.net/net/minecraftforge/forge/{forForgeMcVer}-{forForgeLdVer}/forge-{forForgeMcVer}-{forForgeLdVer}-{forgeMakeUrlType}.jar"
         else:
             print(prefix+"Getting stdlist from github...")
             # get stdlist
@@ -353,10 +353,20 @@ def getLoader(basedir,loaderType="fabric",loaderLink=str) -> str:
     downUrlFile(loaderLink, loader_filep)
     return loader_filep
 
-def getLauncherDir():
-    #TODO: Make this crossplatform
-    user = getpass.getuser()
-    return f"C:\\Users\\{user}\\AppData\\Roaming\\.minecraft"
+def getLauncherDir(preset=None):
+    if preset is not None:
+        return preset
+    else:
+        user = getpass.getuser()
+        system = platform.system().lower()
+        if system == "windows":
+            return f"C:\\Users\\{user}\\AppData\\Roaming\\.minecraft"
+        elif system == "darwin":  # macOS
+            return f"~/Library/Application Support/minecraft"
+        elif system == "linux":
+            return f"~/.minecraft"
+        else:
+            raise ValueError("Unsupported operating system")
 
 def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False):
     if loaderType.lower() == "fabric":
@@ -387,9 +397,10 @@ def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f
         #_ = input(prefix+"Once the installer is done, press any key to continue...")
         print(prefix+"Continuing...")
 
-
-def installToLauncher():
-    pass
-
-def installToCurseforge():
-    pass
+def getVerId(loaderType,loaderVer,mcVer):
+    if loaderType.lower() == "fabric":
+        return f"fabric-loader-{loaderVer}-{mcVer}"
+    elif loaderType.lower() == "forge":
+        return f"{mcVer}-forge-{loaderVer}"
+    else:
+        return mcVer

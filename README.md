@@ -7,7 +7,10 @@
 
 <br>
 
+*The /Installer and /Updater folders are depricated and only used for old clients trying to check for updates...*
+
 *The installer is currently only for windows.*
+
 
 
 
@@ -20,7 +23,7 @@
 3. Start the vanilla version of the client you want to install
 4. close Minecraft
 5. Start the installer (if it exits out fast, please try and start it with ADMIN privileges)
-6. If the installer couln't start the launcher please start it yourself.
+6. If the installer couldn't start the launcher please start it yourself.
 7. Make sure my client is selected and click play.
 8. If it errors out with something about "fabric" please download: [fabric-installer](https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.0/fabric-installer-0.11.0.exe) and run it with the correct mc-version and loader-version (latest is default)
 9. And restart the launcher and select my client and click play.
