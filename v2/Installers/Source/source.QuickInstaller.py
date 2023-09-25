@@ -204,6 +204,32 @@ MinecraftLauncherAgent(
     overWriteBinExe=args.cLnBinPath
 )
 
+# Add to installed-list
+mcc_installed_file = os.path.join(getStdInstallDest(system),"modpacks.json")
+mcc_installed = {
+    "DefaultInstallDirectory": getStdInstallDest(system),
+    "Installs":[]
+}
+## handel existing
+if fs.doesExist(mcc_installed_file):
+    raw = open(mcc_installed_file,'r',encoding=encoding).read()
+    mcc_installed = json.loads(raw)
+## get id
+mcc_installed_id = "<uuid>"
+if listingData.get("_legacy_fld") != None:
+    mcc_installed_id = listingData["_legacy_fld"].get("ID")
+## add client
+mcc_installed_current = {
+    "id": mcc_installed_id,
+    "name": os.path.basename(modpack),
+    "path": modpack_destF
+}
+mcc_installed["Installs"].append(mcc_installed_current)
+## write
+raw = json.dumps(mcc_installed)
+open(mcc_installed_file,'w',encoding=encoding).write(raw)
+
+
 # Clean up
 print(prefix+"Cleaning up...")
 try:
@@ -219,7 +245,6 @@ if args.autostart:
 else:
     print(prefix+"Done, now start your launcher and enjoy!")
 
-#TODO: Create installed-listing
 #TODO: Curse/Modrith/Prism???
 #TODO: Comment your code
 #TODO: Failsafe some things
