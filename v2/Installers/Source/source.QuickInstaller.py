@@ -18,6 +18,8 @@ fabric_url = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/0.11.2/fa
 forge_url  = "https://files.minecraftforge.net/net/minecraftforge/forge"
 forForgeList = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Installers/Assets/forge-links.json"
 
+legacy_repo_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v1_legacy/Repo/MinecraftCustomClient_flavors.json"
+
 modpack = "<replaceble:modpack_relative_path_to_parent>"
 
 # IncludeInline: ./assets/lib_crshpiptools.py
@@ -47,6 +49,7 @@ encoding = "utf-8"
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
 parser.add_argument('-mcf','-cMinecraftLoc', dest="mcf", type=str, help='MinecraftFolder (.minecraft)')
+parser.add_argument('-destination','-dest', dest="dest", type=str, help='Where should the client be installed?')
 parser.add_argument('--fabprofile', help='Should fabric create a profile?', action="store_true")
 parser.add_argument('--dontkill', help='Should the install not kill minecraft process?', action="store_true")
 parser.add_argument('--autostart', help='Should the installer attempt to start the launcher?', action="store_true")
@@ -95,10 +98,11 @@ tempFolder = os.path.join(parent,temp_foldername)
 try:
     if os.path.exists(tempFolder): shutil.rmtree(tempFolder)
 except:
-    if platform.system() == "Windows":
-        os.system(f'rmdir /s /q "{tempFolder}"')
-    else:
-        os.system(f'rm -rf "{tempFolder}"')
+    if os.path.exists(tempFolder):
+        if platform.system() == "Windows":
+            os.system(f'rmdir /s /q "{tempFolder}"')
+        else:
+            os.system(f'rm -rf "{tempFolder}"')
 fs.createDir(tempFolder)
 
 # get type
@@ -107,23 +111,45 @@ listingType = fs.getFileExtension(modpack_path)
 # extract archive to temp
 print(prefix+f"Extracting listing... (type: {listingType})")
 dest = extractModpackFile(modpack_path,tempFolder,encoding)
-listingFile = os.path.join(dest,"listing.json")
 
-# get listing data
-if fs.doesExist(listingFile) == True:
-    listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
+if listingType != "package":
+    # get listing data
+    listingFile = os.path.join(dest,"listing.json")
+    if fs.doesExist(listingFile) == True:
+        listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
+    else:
+        print("Failed to retrive listing content!")
+        exit()
 else:
-    print("Failed to retrive listing content!")
-    exit()
+    try:
+        mtaFile = os.path.join(dest,"flavor.mta")
+        listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+    except:
+        print("Failed to retrive listing content!")
+        exit()
 
 # get data
 print(prefix+f"Downloading listing content... (type: {listingType})")
-#downListingCont(dest,tempFolder,encoding,prefix_dl)
+downListingCont(dest,tempFolder,encoding,prefix_dl)
 
 # get java
 print(prefix+f"Checking java...")
 javapath = getjava(prefix_jv,tempFolder,lnx_java_url,mac_java_url,win_java_url)
 
+# handle install dest
+install_dest = getStdInstallDest(system)
+if listingData.get("_legacy_fld") != None:
+    _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
+    if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
+        install_dest = applyDestPref(_legacy_fld_isntLoc)
+if args.dest:
+    install_dest = args.dest
+fs.ensureDirPath(install_dest)
+## create subfolder
+modpack_destF = os.path.join(install_dest,fs.getFileName(modpack))
+if os.path.exists(modpack_destF) != True: os.mkdir(modpack_destF)
+
+# get mod info
 modld = listingData["modloader"]
 ldver = listingData["modloaderVer"]
 mcver = listingData["minecraftVer"]
@@ -150,6 +176,7 @@ if fs.notExist(loaderFp):
     print("Failed to downloader loader!")
     exit()
 
+# Install loader
 print(prefix+f"Starting install of loader... ({loaderFp})")
 f_dir = getLauncherDir(args.mcf)
 f_mcversion = mcver
@@ -157,12 +184,16 @@ f_loaderver = ldver
 f_noprofile = args.fabprofile
 installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True)
 
+# Copy content to final dest
+fs.copyFolder2(dest,modpack_destF)
+
+# Create profile
 print(prefix+f"Creating profile for: {modpack}")
 MinecraftLauncherAgent(
     add=True,
 
     name=fs.getFileName(modpack),
-    gameDir=dest,
+    gameDir=modpack_destF,
     icon=listingData.get("icon"),
     versionId=getVerId(modld,ldver,mcver),
 
@@ -173,9 +204,21 @@ MinecraftLauncherAgent(
     overWriteBinExe=args.cLnBinPath
 )
 
-#TODO: legacy packages
-#TODO: Apply install-directory (/installs/minecraft-custom-client/v2/?)
-#TODO: Clean up
+# Clean up
+print(prefix+"Cleaning up...")
+try:
+    if os.path.exists(tempFolder): shutil.rmtree(tempFolder)
+except:
+    if os.path.exists(tempFolder):
+        if platform.system() == "Windows":
+            os.system(f'rmdir /s /q "{tempFolder}"')
+        else:
+            os.system(f'rm -rf "{tempFolder}"')
+if args.autostart:
+    print(prefix+"Done, Enjoy!")
+else:
+    print(prefix+"Done, now start your launcher and enjoy!")
+
 #TODO: Create installed-listing
 #TODO: Curse/Modrith/Prism???
 #TODO: Comment your code

@@ -90,6 +90,15 @@ class filesys():
         if ret != True: print(helpText)
         else: return helpText
 
+    def replaceSeps(path=str()):
+        '''Replaces the path separators with os.sep'''
+        spath = path
+        if "/" in path:
+            spath = path.replace("/", os.sep)
+        elif "\\" in path:
+            spath = path.replace("\\", os.sep)
+        return spath
+
     # Function to check if a file/directory exists
     def doesExist(path=str()):
         return bool(os.path.exists(path))
@@ -98,6 +107,25 @@ class filesys():
     def notExist(path=str()):
         if os.path.exists(path): return False
         else: return True
+
+    # Function to create a path, folder per folder
+    def ensureDirPath(path=str()):
+        '''Creates a path, folder per folder. DON'T INCLUDE FILES IN THE PATH'''
+        path = filesys.replaceSeps(path)
+        sections = path.split(os.sep)
+        firstSection = sections[0]
+        sections.pop(0)
+        # Save cd then goto root
+        curdir = filesys.getWorkingDir()
+        filesys.setWorkingDir(f"{firstSection}{os.sep}")
+        try:
+            for section in sections:
+                sectionpath = os.path.join(filesys.getWorkingDir(), section)
+                if filesys.notExist(sectionpath):
+                    filesys.createDir(sectionpath)
+                filesys.setWorkingDir(sectionpath)
+        except: pass
+        filesys.setWorkingDir(curdir)
 
     # Function to check if object is file
     def isFile(path=str()):

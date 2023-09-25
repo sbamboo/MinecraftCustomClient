@@ -3,6 +3,8 @@ import subprocess
 import zipfile
 import tarfile
 import getpass
+import uuid
+from datetime import datetime
 
 # flavorFunctions fix missing fs
 try:
@@ -404,3 +406,53 @@ def getVerId(loaderType,loaderVer,mcVer):
         return f"{mcVer}-forge-{loaderVer}"
     else:
         return mcVer
+
+def convFromLegacy(flavorMTAfile,legacyRepoUrl,encoding="utf-8") -> dict:
+    # get flavorMTAcontent
+    raw = open(flavorMTAfile,'r',encoding=encoding).read()
+    mta = json.loads(raw)
+    nameFound = os.path.basename(os.path.dirname(flavorMTAfile))
+    # get props from name
+    for segment in mta["Data"]:
+        if segment.get("Name") != None:
+            nameFound = segment.get("Name")
+    # retrive repo for file
+    lrepo = {}
+    try:
+        lrepo_raw = getUrlContent(legacyRepoUrl)
+        lrepo = json.loads(lrepo_raw)
+    except: pass
+    lrepo_flavors = lrepo["Flavors"]
+    listFlavorData = {}
+    for flavor in lrepo_flavors:
+        if list(flavor.keys())[0] == nameFound:
+            listFlavorData = flavor[nameFound]
+    flavorData = {}
+    for item in listFlavorData:
+        key = list(item.keys())[0]
+        flavorData[key] = item[key]
+    # create template
+    listing = {
+        "format": 1,
+        "name": nameFound,
+        "version": "0.0",
+        "modloader": "fabric",
+        "modloaderVer": flavorData["fabric_loader"],
+        "minecraftVer": flavorData["minecraft_version"],
+        "created": datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+        "launcherIcon": flavorData["launcher_icon"],
+        "_legacy_fld": flavorData
+    }
+    return listing
+
+def applyDestPref(shortDest) -> str:
+    user = getpass.getuser()
+    if system == "windows":
+        p = os.path.join(f"C:\\users\\{user}\\",shortDest)
+    else:
+        p = os.path.join(f"/home/{user}/",shortDest)
+    return fs.replaceSeps(p)
+
+def getStdInstallDest(system):
+    p = applyDestPref(f"installs\\minecraft-custom-client\\v2")
+    return p
