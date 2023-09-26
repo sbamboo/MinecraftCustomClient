@@ -510,3 +510,11 @@ def getCFinstanceDict(modld,ldver,mcver):
                 "minecraftVersion": mcver
             }
         }
+
+# [Modrith]
+def getMDdir(system,ovv=None):
+    if ovv != None:
+        return ovv
+    else:
+        if system == "windows":
+            return applyDestPref("Appdata\\Roaming\\com.modrinth.theseus\\profiles")
