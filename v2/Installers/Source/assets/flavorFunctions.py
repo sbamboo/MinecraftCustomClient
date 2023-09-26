@@ -1,3 +1,4 @@
+# Imports
 import base64,os,shutil,requests,json,platform
 import subprocess
 import zipfile
@@ -6,18 +7,20 @@ import getpass
 import uuid
 from datetime import datetime
 
-# flavorFunctions fix missing fs
+# FlavorFunctions fix missing filesys instance
 try:
     filesys.defaultencoding
 except:
     from lib_filesys import filesys as fs
 
+# [Base64 helpers]
 def encodeB64U8(str) -> str:
     return base64.b64encode(str).decode('utf-8')
 
 def decodeB64U8(b64) -> str:
     return base64.b64decode(b64.encode('utf-8'))
 
+# [Url helpers]
 def getUrlContent(url) -> str:
     response = requests.get(url)
     if response.status_code == 200:
@@ -32,6 +35,7 @@ def downUrlFile(url,filepath):
         if fs.notExist(filepath):
             open(filepath,'wb').write(cont)
 
+# [Functionos]
 def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix=""):
     sources = listingData.get("sources")
     
@@ -216,6 +220,7 @@ def getjava(prefix="",temp_folder=str,lnx_url=str,mac_url=str,win_url=str,forceD
     print(prefix+"Continuing with downloaded java instance...")
     return java_binary
 
+# Function to scape minor version urls from curseforge website
 def scrapeMinorVerLinks(webcontent=str,baseurl=str):
     vers = webcontent.split('</li></div></div></ul>')
     vers = '</li></div></div></ul>'.join(vers)
@@ -239,6 +244,7 @@ def scrapeMinorVerLinks(webcontent=str,baseurl=str):
                     versions[parts[-1]] = baseurl + parts[0]
     return versions
 
+# Function to using the previously scraped link scrape the accuallt installer links
 def scrapeUniversals(prefix,scrapedPages=dict):
     universals = {}
     for ver,page in scrapedPages.items():
@@ -285,6 +291,7 @@ def scrapeUniversals(prefix,scrapedPages=dict):
             new_universals[key] = value
     return new_universals
 
+# Function to join together two forge-client listings
 def _joinForgeListings(stdlist,newlist):
     joinedList = stdlist
     for key,value in newlist.items():
@@ -294,23 +301,27 @@ def _joinForgeListings(stdlist,newlist):
             if joinedList[key] == None:
                 joinedList[key] = value
             else:
+                # prioritate std
                 if newlist[key].get("latest") != "":
                     joinedList[key]["latest"] = newlist[key]["latest"]
                 if newlist[key].get("recommended") != "":
                     joinedList[key]["recommended"] = newlist[key]["recommended"]
     return joinedList
 
+# Function to get the download url for a loader
 def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUrl=str,forgeMakeUrl=True,forgeMakeUrlType="installer",forForgeMcVer=str,forForgeLdVer=str,forForgeInstType="latest",forForgeList=str,regetForge=False) -> str:
     '''Downloads a loader and return the path to it'''
-    # Fabric
+    # Fabric (just return fabricURL)
     if loaderType.lower() == "fabric":
         return fabricUrl
     # Forge
     if loaderType.lower() == "forge":
         url = None
+        # Compile fstring url
         if forgeMakeUrl == True:
             print(prefix+"Attempting to build list...")
             url = f"https://maven.minecraftforge.net/net/minecraftforge/forge/{forForgeMcVer}-{forForgeLdVer}/forge-{forForgeMcVer}-{forForgeLdVer}-{forgeMakeUrlType}.jar"
+        # Otherwise use listing
         else:
             print(prefix+"Getting stdlist from github...")
             # get stdlist
@@ -330,7 +341,7 @@ def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUr
                 if stdlist != {} and universals != None and universals != {}:
                     print(prefix+"Joining lists...")
                     stdlist = _joinForgeListings(stdlist,universals)
-            # return
+            # return without empty listings
             if forForgeMcVer in stdlist.keys():
                 urlL = stdlist[forForgeMcVer]
                 late = urlL.get("latest")
@@ -346,7 +357,8 @@ def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUr
                     elif late != "":
                         url = late
         return url
-            
+
+# Function to get the loader given an url 
 def getLoader(basedir,loaderType="fabric",loaderLink=str) -> str:
     loader_folder = os.path.join(basedir,loaderType.lower())
     if fs.notExist(loader_folder): fs.createDir(loader_folder)
@@ -355,6 +367,7 @@ def getLoader(basedir,loaderType="fabric",loaderLink=str) -> str:
     downUrlFile(loaderLink, loader_filep)
     return loader_filep
 
+# Function to get the os-standard .minecraft path
 def getLauncherDir(preset=None):
     if preset is not None:
         return preset
@@ -370,6 +383,7 @@ def getLauncherDir(preset=None):
         else:
             raise ValueError("Unsupported operating system")
 
+# Function to run installer for a loader
 def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False):
     if loaderType.lower() == "fabric":
         print(prefix+"Starting fabric install...")
@@ -399,6 +413,7 @@ def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f
         #_ = input(prefix+"Once the installer is done, press any key to continue...")
         print(prefix+"Continuing...")
 
+# Get client versionID
 def getVerId(loaderType,loaderVer,mcVer):
     if loaderType.lower() == "fabric":
         return f"fabric-loader-{loaderVer}-{mcVer}"
@@ -407,6 +422,7 @@ def getVerId(loaderType,loaderVer,mcVer):
     else:
         return mcVer
 
+# Legacy > newFormat converter
 def convFromLegacy(flavorMTAfile,legacyRepoUrl,encoding="utf-8") -> dict:
     # get flavorMTAcontent
     raw = open(flavorMTAfile,'r',encoding=encoding).read()
@@ -445,6 +461,7 @@ def convFromLegacy(flavorMTAfile,legacyRepoUrl,encoding="utf-8") -> dict:
     }
     return listing
 
+# Apply user directory to a path
 def applyDestPref(shortDest) -> str:
     user = getpass.getuser()
     if system == "windows":
@@ -453,6 +470,43 @@ def applyDestPref(shortDest) -> str:
         p = os.path.join(f"/home/{user}/",shortDest)
     return fs.replaceSeps(p)
 
+# Get std final destination
 def getStdInstallDest(system):
     p = applyDestPref(f"installs\\minecraft-custom-client\\v2")
     return p
+
+# Function to handle icon
+def getIcon(icon,icon128,legacy,modded):
+    if icon == "mcc:icon128":
+        return icon128
+    elif icon == "mcc:legacy":
+        return legacy
+    elif icon == "mcc:modded":
+        return modded
+    else:
+        return icon
+
+# [Curseforge]
+def getCFdir(ovv=None):
+    if ovv != None:
+        return ovv
+    else:
+        return applyDestPref("curseforge\\minecraft\\Instances")
+
+def getCFinstanceDict(modld,ldver,mcver):
+    if modld.lower() == "fabric":
+        return {
+            "baseModLoader": {
+                "forgeVersion": ldver,
+                "name": f"fabric-{ldver}-{mcver}",
+                "minecraftVersion": mcver
+            }
+        }
+    else:
+        return {
+            "baseModLoader": {
+                "forgeVersion": ldver,
+                "name": f"{modld.lower()}-{ldver}",
+                "minecraftVersion": mcver
+            }
+        }
