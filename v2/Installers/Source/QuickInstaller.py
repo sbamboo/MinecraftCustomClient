@@ -2,7 +2,7 @@
 
 # [Settings]
 installer_version = "1.0"
-installer_release = "2023-09-22"
+installer_release = "2023-09-27(0)"
 prefix    = "\033[90m[\033[35mQuickInst\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -64,6 +64,8 @@ parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore l
 #parser.add_argument('-curseInstanceP', type=str, help='A custom path to curseforge/minecraft/Instances')
 parser.add_argument('--rinth', help='Should the installer attempt to install into modrinth instead?', action="store_true")
 parser.add_argument('-rinthInstanceP', type=str, help='A custom path to com.modrinth.theseus/profiles')
+parser.add_argument('--y', help='always answer with Yes', action="store_true")
+parser.add_argument('--n', help='always answer with No', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
@@ -144,8 +146,8 @@ else:
     try:
         mtaFile = os.path.join(dest,"flavor.mta")
         listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
-    except:
-        print("Failed to retrive listing content!")
+    except Exception as e:
+        print("Failed to retrive listing content!",e)
         cleanUp(tempFolder)
         exit()
 
@@ -153,8 +155,8 @@ else:
 print(prefix+f"Downloading listing content... (type: {listingType})")
 try:
     downListingCont(dest,tempFolder,encoding,prefix_dl)
-except:
-    print(prefix+"Failed to download listing content!")
+except Exception as e:
+    print(prefix+"Failed to download listing content!",e)
     cleanUp(tempFolder)
     exit()
 
@@ -162,8 +164,8 @@ except:
 print(prefix+f"Checking java...")
 try:
     javapath = getjava(prefix_jv,tempFolder,lnx_java_url,mac_java_url,win_java_url)
-except:
-    print(prefix+"Failed to get java!")
+except Exception as e:
+    print(prefix+"Failed to get java!",e)
     cleanUp(tempFolder)
     exit()
 
@@ -193,7 +195,12 @@ if args.rinth == True:
     if args.rinth == True:
         _p = os.path.join(install_dest,fs.getFileName(modpack))
         if os.path.exists(_p):
-            c = print("Modrith profile already exists, overwrite it? [y/n]")
+            if args.y:
+                c = args.y
+            elif args.n:
+                c = args.n
+            else:
+                c = input("Modrith profile already exists, overwrite it? [y/n]")
             if c.lower() == "n":
                 cleanUp(tempFolder)
                 exit()
@@ -230,8 +237,8 @@ try:
         print("Failed to downloader loader!")
         cleanUp(tempFolder)
         exit()
-except:
-    print(prefix+"Failed to get loader!")
+except Exception as e:
+    print(prefix+"Failed to get loader!",e)
     cleanUp(tempFolder)
     exit()
 
@@ -243,8 +250,8 @@ f_loaderver = ldver
 f_noprofile = args.fabprofile
 try:
     installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True)
-except:
-    print(prefix+"Failed to install loader!")
+except Exception as e:
+    print(prefix+"Failed to install loader!",e)
     cleanUp(tempFolder)
     exit()
 
@@ -256,7 +263,7 @@ print(prefix+f"Creating profile for: {modpack}")
 if args.rinth == False:
     try:
         gicon = getIcon(
-            listingData.get("icon"),
+            getIconFromListing(listingData),
             icon_base64_icon128,
             icon_base64_legacy,
             icon_base64_modded,
@@ -277,8 +284,8 @@ if args.rinth == False:
             overWriteFile=args.cLnProfFileN,
             overWriteBinExe=args.cLnBinPath
         )
-    except:
-        print(prefix+"Failed to create profile in minecraft launcher!")
+    except Exception as e:
+        print(prefix+"Failed to create profile in minecraft launcher",e)
         cleanUp(tempFolder)
         exit()
     #elif args.curse:
@@ -291,13 +298,16 @@ if args.rinth == False:
 else:
     try:
         gicon = getIcon(
-            listingData.get("icon"),
+            getIconFromListing(listingData),
             icon_base64_icon128,
             icon_base64_legacy,
             icon_base64_modded,
             icon_base64_default
         )
+        print(f"{getIconFromListing(listingData)} => {gicon}")
+        _gicon = gicon
         gicon = prepMRicon(modpack_destF,gicon)
+        print(f"{_gicon} => {gicon}")
         mrInstanceFile = os.path.join(modpack_destF,"profile.json")
         mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,fs.getFileName(modpack),gicon)
         if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)

@@ -55,6 +55,11 @@ if fs.notExist(args.path):
     print(f"Invalid modpack path: {args.path}")
     exit()
 
+# Get sent compile
+built_in_compile = os.path.join(args.path,"compile.yml")
+if os.path.exists(built_in_compile) and args.cmpl == None:
+    args.cmpl = built_in_compile
+
 # Create temporary folder
 fs.createDir(tempFolder)
 
@@ -236,5 +241,5 @@ if gitsp != None:
             destfolder = os.path.join(gitsp,"Packages",compyml['name'])
             fs.ensureDirPath(destfolder)
             bundleFile = os.path.join(destfolder,"bundle.zip")
-            bundleScript = os.path.join(parent,"tools","bundleQuick.py")
+            bundleScript = os.path.join(parent,"_bundleQuick.py")
             os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}"')

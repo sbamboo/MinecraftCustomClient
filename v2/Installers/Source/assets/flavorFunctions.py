@@ -61,7 +61,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             if _filename == "resources.zip" and resources_zip_found == False:
                 zipC = decodeB64U8(_base64)
                 nf = os.path.join(destinationDirPath,_filename)
-                with open(destinationDirPath,'wb', encoding=encoding) as file:
+                with open(destinationDirPath,'wb') as file:
                     file.write(zipC)
                 if fs.getFileExtension(nf) != "zip":
                     znf = os.path.join(os.path.dirname(nf),fs.getFileName(nf)+".zip")
@@ -72,14 +72,14 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             else:
                 zipC = decodeB64U8(_base64)
                 nf = os.path.join(modsF,_filename)
-                with open(destinationDirPath,'wb', encoding=encoding) as file:
+                with open(destinationDirPath,'wb') as file:
                     file.write(zipC)
                 shutil.unpack_archive(nf,modsF)
         # customB64 (non-archive)
         if _type == "customB64":
             jarC = decodeB64U8(_base64)
             nf = os.path.join(modsF,_filename)
-            with open(nf,'wb', encoding=encoding) as file:
+            with open(nf,'wb') as file:
                 file.write(jarC)
         # downloadable
         if _type in downloadable:
@@ -497,6 +497,13 @@ def getIcon(icon,icon128,legacy,modded,default):
         return default
     else:
         return _icon
+
+def getIconFromListing(listingData):
+    ico = listingData.get("icon")
+    if ico == None:
+        return listingData.get("launcherIcon")
+    else:
+        return ico
 
 # [Curseforge]
 def getCFdir(ovv=None):

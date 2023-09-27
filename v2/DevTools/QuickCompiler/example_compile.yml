@@ -12,6 +12,8 @@ hidden: False
 
 include:
   - ".\\config"
+  - ".\\resourcepacks"
+  - ".\\options.txt"
   - ".\\servers.dat"
 
 gitsync: True
@@ -20,7 +22,7 @@ gitsyncBURL: "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/ma
 
 lister:
   silent: False
-  missingLinkAction: "m"
+  missingLinkAction: "b"
   promptOnManual: False
 
 bundle: True

@@ -1,5 +1,5 @@
 import os,sys,argparse,zipfile
-from lib_filesys import filesys as fs
+from libs.filesys import filesys as fs
 
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
 parser.add_argument('-modpack', type=str, help='The modpack to bundle')
@@ -8,10 +8,12 @@ args = parser.parse_args()
 
 parent = os.path.dirname(__file__)
 
-quick  = os.path.abspath(os.path.join(parent,"..","QuickInstaller.py"))
+assets = os.path.abspath(os.path.join(parent,"..","..","Installers","Source"))
+
+quick  = os.path.abspath(os.path.join(assets,"QuickInstaller.py"))
 nquick = os.path.join(os.path.dirname(quick),"source.QuickInstaller.py")
 
-inln = os.path.abspath(os.path.join(parent,"tool_includeInline.py"))
+inln = os.path.abspath(os.path.join(assets,"assets","tool_includeInline.py"))
 
 # copy
 fs.copyFile(quick,nquick)
