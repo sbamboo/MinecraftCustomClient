@@ -95,7 +95,7 @@ class filesys():
         spath = path
         if "/" in path:
             spath = path.replace("/", os.sep)
-        elif "\\" in path:
+        if "\\" in path:
             spath = path.replace("\\", os.sep)
         return spath
 

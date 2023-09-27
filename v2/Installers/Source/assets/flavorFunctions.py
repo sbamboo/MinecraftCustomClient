@@ -6,6 +6,7 @@ import tarfile
 import getpass
 import uuid
 from datetime import datetime
+import hashlib
 
 # FlavorFunctions fix missing filesys instance
 try:
@@ -464,8 +465,13 @@ def convFromLegacy(flavorMTAfile,legacyRepoUrl,encoding="utf-8") -> dict:
 # Apply user directory to a path
 def applyDestPref(shortDest) -> str:
     user = getpass.getuser()
+    system = platform.system().lower()
     if system == "windows":
         p = os.path.join(f"C:\\users\\{user}\\",shortDest)
+    elif system == "darwin":
+        p = os.path.join(f"~/Users/{user}/",shortDest)
+        if os.path.exists(p) != True:
+            p = os.path.join(f"/home/{user}/",shortDest)
     else:
         p = os.path.join(f"/home/{user}/",shortDest)
     return fs.replaceSeps(p)
@@ -476,7 +482,7 @@ def getStdInstallDest(system):
     return p
 
 # Function to handle icon
-def getIcon(icon,icon128,legacy,modded):
+def _getIcon(icon,icon128,legacy,modded):
     if icon == "mcc:icon128":
         return icon128
     elif icon == "mcc:legacy":
@@ -485,6 +491,12 @@ def getIcon(icon,icon128,legacy,modded):
         return modded
     else:
         return icon
+def getIcon(icon,icon128,legacy,modded,default):
+    _icon = _getIcon(icon,icon128,legacy,modded)
+    if _icon == None:
+        return default
+    else:
+        return _icon
 
 # [Curseforge]
 def getCFdir(ovv=None):
@@ -511,10 +523,77 @@ def getCFinstanceDict(modld,ldver,mcver):
             }
         }
 
-# [Modrith]
-def getMDdir(system,ovv=None):
+# [Modrinth]
+def getMRdir(system,ovv=None):
     if ovv != None:
         return ovv
     else:
         if system == "windows":
             return applyDestPref("Appdata\\Roaming\\com.modrinth.theseus\\profiles")
+        elif system == "darwin":
+            return fs.ensureDirPath(os.path.abspath(f"~/Library/Application Support/com.modrinth.theseus/profiles"))
+        else:
+            return applyDestPref(f"com.modrinth.theseus/profiles")
+
+def getMRloaderURL(modld,ldver,mcver):
+    if modld.lower() == "fabric":
+        return f"https://meta.modrinth.com/fabric/v0/versions/{ldver}.json"
+    elif modld.lower() == "forge":
+        return f"https://meta.modrinth.com/forge/v0/versions/{mcver}-forge-{ldver}.json"
+
+def getMRinstanceDict(modld,ldver,mcver,modDestF,name,icon):
+    return {
+        "uuid": str(uuid.uuid4()),
+        "install_stage": "installed",
+        "path": os.path.basename(modDestF),
+        "metadata": {
+        "name": name,
+        "icon": str(icon),
+        "groups": [],
+        "game_version": mcver,
+        "loader": modld,
+        "loader_version": {
+            "id": ldver,
+            "url": getMRloaderURL(modld,ldver,mcver),
+            "stable": True
+        }
+        },
+        "fullscreen": None,
+        "projects": {},
+        "modrinth_update_version": None
+    }
+
+def sha1_hash_file(filepath):
+    sha1 = hashlib.sha1()
+    with open(filepath, "rb") as file:
+        while True:
+            data = file.read(65536)  # Read the file in 64k chunks
+            if not data:
+                break
+            sha1.update(data)
+    return sha1.hexdigest()
+
+def prepMRicon(modpackDestF,icon):
+    iconPath = ""
+    if icon == None:
+        return icon
+    finalPng = os.path.join(modpackDestF,"mcc_generated_icon.png")
+    if os.path.exists(finalPng): os.remove(finalPng)
+    # handle b64
+    if "data:image/png;base64," in icon:
+        icon = icon.replace("data:image/png;base64,","",1)
+        icon_binary = base64.b64decode(icon)
+        with open(finalPng, "wb") as f:
+            f.write(icon_binary)
+    else:
+        if os.path.exists(icon):
+            fs.copyFile(icon,finalPng)
+        else:
+            iconPath = icon.replace("\\","/")
+    iconPath = finalPng.replace("\\","/")
+    # get hash
+    sha1 = sha1_hash_file(iconPath)
+    cacheF = '/'.join([os.path.dirname(iconPath),"..","..","caches","icons",sha1+".png"])
+    cacheF = os.path.abspath(cacheF)
+    fs.copyFile(iconPath,cacheF)
+    return cacheF
