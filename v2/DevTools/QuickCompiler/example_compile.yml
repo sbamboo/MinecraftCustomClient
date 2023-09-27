@@ -22,3 +22,5 @@ lister:
   silent: False
   missingLinkAction: "m"
   promptOnManual: False
+
+bundle: True

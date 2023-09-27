@@ -189,6 +189,14 @@ if args.rinth == True:
         system,
         args.rinthInstanceP
     )
+    ## handle modrinth profile already existing
+    if args.rinth == True:
+        _p = os.path.join(install_dest,fs.getFileName(modpack))
+        if os.path.exists(_p):
+            c = print("Modrith profile already exists, overwrite it? [y/n]")
+            if c.lower() == "n":
+                cleanUp(tempFolder)
+                exit()
     fs.ensureDirPath(install_dest)
 ## get modpack destination folder
 modpack_destF = os.path.join(install_dest,fs.getFileName(modpack))

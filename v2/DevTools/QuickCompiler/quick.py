@@ -231,3 +231,10 @@ if gitsp != None:
             # save repo
             jRepo = json.dumps(dRepo)
             open(poss,'w',encoding=encoding).write(jRepo)
+        # bundle
+        if compyml.get("bundle") == True:
+            destfolder = os.path.join(gitsp,"Packages",compyml['name'])
+            fs.ensureDirPath(destfolder)
+            bundleFile = os.path.join(destfolder,"bundle.zip")
+            bundleScript = os.path.join(parent,"tools","bundleQuick.py")
+            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}"')
