@@ -73,11 +73,15 @@ args = parser.parse_args()
 if args.enc:
     encoding = args.enc
 
+try:
+    oexit = exit
+except:
+    oexit = None
 def exit(): 
     global args
     if args.debugexit == True:
         _ = input("DEBUG: Waiting on exit...")
-    exit() #repl-exit
+    oexit() #repl-exit
 
 # [Functions]
 
@@ -124,23 +128,28 @@ except:
     exit()
 # show select
 flavors = repoData.get("flavors")
-for i,fl in flavors:
+for i,fl in enumerate(flavors):
     print(f'{i} : {fl["name"]}')
 print("(Write exit to exit)")
 ind = input("Index: ")
 if "exit" in ind:
     exit()
 # get modpack url
-modpack_url = flavors[ind]["url"]
+modpack_url = flavors[int(ind)]["source"]
 # download url
 modpack_path = os.path.join(parent,os.path.basename(modpack_url))
-cont = getUrlContent(modpack_url)
+response = requests.get(modpack_url)
+if response.status_code == 200:
+    # Content of the file
+    cont = response.content
+else:
+    cont = None
 if cont != None and cont != "":
     if fs.notExist(modpack_path):
         open(modpack_path,'wb').write(cont)
 
 # [Prep selected package]
-modpack = os.path.basename(modpack)
+modpack = os.path.basename(modpack_path)
 title = title.replace("<modpack>", modpack)
 system = platform.system().lower()
 

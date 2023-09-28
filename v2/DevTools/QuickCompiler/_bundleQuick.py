@@ -62,6 +62,8 @@ if args.prepbuild:
     toinclude = []
     for i,line in enumerate(lines):
         if i not in toExclude:
+            if "oexit()" in line and "#repl-exit" in line:
+                line = line.replace("oexit()","raise Exception('EXIT')")
             if "exit()" in line and "#repl-exit" in line:
                 line = line.replace("exit()","raise Exception('EXIT')")
             toinclude.append(line)
