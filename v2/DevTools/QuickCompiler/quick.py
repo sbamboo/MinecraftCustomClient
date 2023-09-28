@@ -78,7 +78,7 @@ compyml = yaml.safe_load(content)
 # pull
 if compyml.get('gitsync') == True:
     import subprocess
-    print("Retriving hit repostiroy root path...")
+    print("Retriving git repository root path...")
     try:
         root_path_bytes = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'])
         root_path = root_path_bytes.decode('utf-8').strip()
@@ -282,13 +282,6 @@ if gitsp != None:
                 print("Continuing...")
                 try:
                     shutil.rmtree(buildenv)
-                except: pass
-                try:
-                    if os.path.exists(buildenv):
-                        if platform.system() == "Windows":
-                            os.system(f'rmdir /s /q "{buildenv}"')
-                        else:
-                            os.system(f'rm -rf "{buildenv}"')
                 except:
                     print(f"Failed to remove build enviroment, please manually remove: '{buildenv}'")
                 print("Done!")
