@@ -13,6 +13,7 @@ assets = os.path.abspath(os.path.join(parent,"..","..","Installers","Source"))
 
 quick  = os.path.abspath(os.path.join(assets,"QuickInstaller.py"))
 nquick = os.path.join(os.path.dirname(quick),"source.QuickInstaller.py")
+qlogo = os.path.join(os.path.dirname(nquick),"..","Assets","quicklogo.ico")
 pkgs = os.path.join(os.path.dirname(nquick),"packages.txt")
 buildScript = os.path.join(parent,"_bundle_buildscript.py")
 
@@ -61,7 +62,7 @@ if args.prepbuild:
     toinclude = []
     for i,line in enumerate(lines):
         if i not in toExclude:
-            if "exit()" in line:
+            if "exit()" in line and "#repl-exit" in line:
                 line = line.replace("exit()","raise Exception('EXIT')")
             toinclude.append(line)
     c = '\n'.join(toinclude)
@@ -90,7 +91,9 @@ with zipfile.ZipFile(args.destzip, 'w') as zipf:
         zipf.write(pkgs, arcname=os.path.basename(pkgs))
 
     # Add build script
-    zipf.write(buildScript, arcname="build.py")
+    if args.prepbuild:
+        zipf.write(buildScript, arcname="build.py")
+        zipf.write(qlogo, arcname="logo.ico")
 
 os.remove(nquick)
 if packages != []:

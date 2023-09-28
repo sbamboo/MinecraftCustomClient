@@ -51,6 +51,9 @@ modpack = os.path.basename(modpack)
 title = title.replace("<modpack>", modpack)
 system = platform.system().lower()
 
+# Enable ansi on windows
+os.system("")
+
 # [Args]
 encoding = "utf-8"
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
@@ -68,9 +71,18 @@ parser.add_argument('--rinth', help='Should the installer attempt to install int
 parser.add_argument('-rinthInstanceP', type=str, help='A custom path to com.modrinth.theseus/profiles')
 parser.add_argument('--y', help='always answer with Yes', action="store_true")
 parser.add_argument('--n', help='always answer with No', action="store_true")
+parser.add_argument('-exprt', help='Exports a copy of the unpacked tempdata, takes the zip to export to. (its created so give path to non-existent file)', type=str)
+parser.add_argument('-imprt', help='Imports a copy of the unpacked tempdata, takes the zip to import from.', type=str)
+parser.add_argument('--debugexit', help='DEBUG: Should crosshell pause on exit?', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
+
+def exit(): 
+    global args
+    if args.debugexit == True:
+        _ = input("DEBUG: Waiting on exit...")
+    exit() #repl-exit
 
 # [Pre Release softwere notice]
 print(prefix+"\033[33mNote! This is pre-release software, the installer is provided AS-IS and i take no responsibility for issues that may arrise when using it.\nIf you wish to stop this script, close it now.\033[0m")
@@ -132,121 +144,146 @@ except:
             os.system(f'rm -rf "{tempFolder}"')
 fs.createDir(tempFolder)
 
-# get type
-listingType = fs.getFileExtension(modpack_path)
-
-# extract archive to temp
-print(prefix+f"Extracting listing... (type: {listingType})")
-dest = extractModpackFile(modpack_path,tempFolder,encoding)
-
-if listingType != "package":
-    # get listing data
-    listingFile = os.path.join(dest,"listing.json")
-    if fs.doesExist(listingFile) == True:
-        listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
-    else:
-        print("Failed to retrive listing content!")
-        cleanUp(tempFolder)
-        exit()
+# IMPORT
+if args.imprt:
+    pass
 else:
+    # get type
+    listingType = fs.getFileExtension(modpack_path)
+
+    # extract archive to temp
+    print(prefix+f"Extracting listing... (type: {listingType})")
+    dest = extractModpackFile(modpack_path,tempFolder,encoding)
+
+    if listingType != "package":
+        # get listing data
+        listingFile = os.path.join(dest,"listing.json")
+        if fs.doesExist(listingFile) == True:
+            listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
+        else:
+            print("Failed to retrive listing content!")
+            cleanUp(tempFolder)
+            exit()
+    else:
+        try:
+            mtaFile = os.path.join(dest,"flavor.mta")
+            listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+        except Exception as e:
+            print("Failed to retrive listing content!",e)
+            cleanUp(tempFolder)
+            exit()
+
+    # get data
+    print(prefix+f"Downloading listing content... (type: {listingType})")
     try:
-        mtaFile = os.path.join(dest,"flavor.mta")
-        listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+        downListingCont(dest,tempFolder,encoding,prefix_dl)
     except Exception as e:
-        print("Failed to retrive listing content!",e)
+        print(prefix+"Failed to download listing content!",e)
         cleanUp(tempFolder)
         exit()
 
-# get data
-print(prefix+f"Downloading listing content... (type: {listingType})")
-try:
-    downListingCont(dest,tempFolder,encoding,prefix_dl)
-except Exception as e:
-    print(prefix+"Failed to download listing content!",e)
-    cleanUp(tempFolder)
-    exit()
+    # get java
+    print(prefix+f"Checking java...")
+    try:
+        javapath = getjava(prefix_jv,tempFolder,lnx_java_url,mac_java_url,win_java_url)
+    except Exception as e:
+        print(prefix+"Failed to get java!",e)
+        cleanUp(tempFolder)
+        exit()
 
-# get java
-print(prefix+f"Checking java...")
-try:
-    javapath = getjava(prefix_jv,tempFolder,lnx_java_url,mac_java_url,win_java_url)
-except Exception as e:
-    print(prefix+"Failed to get java!",e)
-    cleanUp(tempFolder)
-    exit()
-
-# handle install dest
-install_dest = getStdInstallDest(system)
-if listingData.get("_legacy_fld") != None:
-    _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
-    if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
-        install_dest = applyDestPref(_legacy_fld_isntLoc)
-if args.dest:
-    install_dest = args.dest
-fs.ensureDirPath(install_dest)
-## handle curse
-#if args.curse == True:
-#    install_dest = getCFdir(
-#        args.curseInstanceP
-#    )
-#    fs.ensureDirPath(install_dest)
-## create subfolder
-## handle modrinth
-if args.rinth == True:
-    install_dest = getMRdir(
-        system,
-        args.rinthInstanceP
-    )
-    ## handle modrinth profile already existing
-    if args.rinth == True:
-        _p = os.path.join(install_dest,fs.getFileName(modpack))
-        if os.path.exists(_p):
-            if args.y:
-                c = args.y
-            elif args.n:
-                c = args.n
-            else:
-                c = input("Modrith profile already exists, overwrite it? [y/n]")
-            if c.lower() == "n":
-                cleanUp(tempFolder)
-                exit()
+    # handle install dest
+    install_dest = getStdInstallDest(system)
+    if listingData.get("_legacy_fld") != None:
+        _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
+        if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
+            install_dest = applyDestPref(_legacy_fld_isntLoc)
+    if args.dest:
+        install_dest = args.dest
     fs.ensureDirPath(install_dest)
-## get modpack destination folder
-modpack_destF = os.path.join(install_dest,fs.getFileName(modpack))
-if os.path.exists(modpack_destF) != True: os.mkdir(modpack_destF)
+    ## handle curse
+    #if args.curse == True:
+    #    install_dest = getCFdir(
+    #        args.curseInstanceP
+    #    )
+    #    fs.ensureDirPath(install_dest)
+    ## create subfolder
+    ## handle modrinth
+    if args.rinth == True:
+        install_dest = getMRdir(
+            system,
+            args.rinthInstanceP
+        )
+        ## handle modrinth profile already existing
+        if args.rinth == True:
+            _p = os.path.join(install_dest,fs.getFileName(modpack))
+            if os.path.exists(_p):
+                if args.y:
+                    c = args.y
+                elif args.n:
+                    c = args.n
+                else:
+                    c = input("Modrith profile already exists, overwrite it? [y/n]")
+                if c.lower() == "n":
+                    cleanUp(tempFolder)
+                    exit()
+        fs.ensureDirPath(install_dest)
+    ## get modpack destination folder
+    modpack_destF = os.path.join(install_dest,fs.getFileName(modpack))
+    if os.path.exists(modpack_destF) != True: os.mkdir(modpack_destF)
 
-# get mod info
-try:
-    modld = listingData["modloader"]
-    ldver = listingData["modloaderVer"]
-    mcver = listingData["minecraftVer"]
-    f_snapshot = False
-    if "snapshot:" in mcver:
-        mcver = mcver.replace("snapshot:","")
-        f_snapshot = True
-    print(prefix+f"Retriving loader-install url... ({modld}: {ldver} for {mcver})")
-    tryMakeFrgUrl = True
-    reScrapeFrgLst = False
-    loaderURL = getLoaderUrl(prefix,modld,tempFolder,fabric_url,forge_url,tryMakeFrgUrl,mcver,ldver,"latest",forForgeList,reScrapeFrgLst)
-    print(prefix+f"Using: {loaderURL}")
+    # get mod info
+    try:
+        modld = listingData["modloader"]
+        ldver = listingData["modloaderVer"]
+        mcver = listingData["minecraftVer"]
+        f_snapshot = False
+        if "snapshot:" in mcver:
+            mcver = mcver.replace("snapshot:","")
+            f_snapshot = True
+        print(prefix+f"Retriving loader-install url... ({modld}: {ldver} for {mcver})")
+        tryMakeFrgUrl = True
+        reScrapeFrgLst = False
+        loaderURL = getLoaderUrl(prefix,modld,tempFolder,fabric_url,forge_url,tryMakeFrgUrl,mcver,ldver,"latest",forForgeList,reScrapeFrgLst)
+        print(prefix+f"Using: {loaderURL}")
 
-    print(prefix+f"Downloading loader...")
-    loaderFp = getLoader(tempFolder,modld,loaderURL)
-    # fail fix with forge makeurl
-    if fs.notExist(loaderFp) and modld == "forge" and tryMakeFrgUrl == True:
-        print(prefix+f"Failed, retrying to get forge url...")
-        loaderURL = getLoaderUrl(prefix,modld,tempFolder,fabric_url,forge_url,False,mcver,ldver,"latest",forForgeList,reScrapeFrgLst)
         print(prefix+f"Downloading loader...")
         loaderFp = getLoader(tempFolder,modld,loaderURL)
-    # fail
-    if fs.notExist(loaderFp):
-        print("Failed to downloader loader!")
+        # fail fix with forge makeurl
+        if fs.notExist(loaderFp) and modld == "forge" and tryMakeFrgUrl == True:
+            print(prefix+f"Failed, retrying to get forge url...")
+            loaderURL = getLoaderUrl(prefix,modld,tempFolder,fabric_url,forge_url,False,mcver,ldver,"latest",forForgeList,reScrapeFrgLst)
+            print(prefix+f"Downloading loader...")
+            loaderFp = getLoader(tempFolder,modld,loaderURL)
+        # fail
+        if fs.notExist(loaderFp):
+            print("Failed to downloader loader!")
+            cleanUp(tempFolder)
+            exit()
+    except Exception as e:
+        print(prefix+"Failed to get loader!",e)
         cleanUp(tempFolder)
         exit()
-except Exception as e:
-    print(prefix+"Failed to get loader!",e)
+
+# EXPORT
+if args.exprt:
+    if args.exprt.endswith(".zip"):
+        args.exprt = args.exprt[::-1].replace("piz.","",1)[::-1]
+    print(f"Exporting to '{args.exprt}'")
+    shutil.make_archive(args.exprt, "zip", tempFolder)
     cleanUp(tempFolder)
     exit()
+elif args.imprt:
+    print(f"Importing from '{args.imprt}'")
+    try:
+        if not os.path.exists(tempFolder):
+            os.makedirs(tempFolder)
+        # Extract the contents of the zip file to the tempFolder
+        with zipfile.ZipFile(args.imprt, 'r') as zip_ref:
+            zip_ref.extractall(tempFolder)
+    except:
+        print("Failed to import tempfolder!")
+        cleanUp(tempFolder)
+        exit()
 
 # Install loader
 print(prefix+f"Starting install of loader... ({loaderFp})")
@@ -360,6 +397,3 @@ if args.autostart:
     print(prefix+"Done, Enjoy!")
 else:
     print(prefix+"Done, now start your launcher and enjoy!")
-
-#TODO: Curse/Modrith/Prism???
-#TODO: Extract OfflinePackage
