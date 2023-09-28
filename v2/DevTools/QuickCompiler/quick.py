@@ -238,8 +238,43 @@ if gitsp != None:
             open(poss,'w',encoding=encoding).write(jRepo)
         # bundle
         if compyml.get("bundle") == True:
+            print("Bundling quickinstaller...")
             destfolder = os.path.join(gitsp,"Packages",compyml['name'])
             fs.ensureDirPath(destfolder)
             bundleFile = os.path.join(destfolder,"bundle.zip")
             bundleScript = os.path.join(parent,"_bundleQuick.py")
+            # create bundle
             os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}"')
+            print("Done!")
+        # build
+        if compyml.get("build") != None and compyml.get("build") != False:
+            print("Prepping build enviroment for quickinstaller...")
+            destfolder = os.path.join(gitsp,"Packages",compyml['name'])
+            fs.ensureDirPath(destfolder)
+            bundleFile = os.path.join(destfolder,"build_source.zip")
+            bundleScript = os.path.join(parent,"_bundleQuick.py")
+            # create bundle for build-env
+            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}" --prepbuild')
+            print("Done!")
+            # build
+            if compyml["build"].get("autobuildwin") == True:
+                print("Attempting to build quickinstaller (win_x86)...")
+                # extract build env
+                buildenv = os.path.join(os.path.dirname(bundleFile),"build-env")
+                shutil.unpack_archive(bundleFile,buildenv)
+                # run build-script
+                buildScript = os.path.join(buildenv,"build.py")
+                if os.path.exists(buildScript) != True:
+                    raise Exception("No build script found, invalid build-env!")
+                olddir = os.getcwd()
+                os.chdir(buildenv)
+                os.system(f"{sys.executable} {buildScript}")
+                os.chdir(buildenv)
+                # get exe for quickInstaller
+                quickInstExe = os.path.join(buildenv,"QuickInstaller.exe")
+                exeDest = os.path.join(destfolder,"build-win_x86")
+                fs.ensureDirPath(exeDest)
+                fs.copyFile(quickInstExe,os.path.join(exeDest,os.path.basename(quickInstExe)))
+                # clean up
+                shutil.rmtree(buildenv)
+                print("Done!")

@@ -27,6 +27,7 @@ icon_base64_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 
 modpack = "<replaceble:modpack_relative_path_to_parent>"
 
+# BuildPrep: ST-excl
 # IncludeInline: ./assets/lib_crshpiptools.py
 
 # [Imports]
@@ -38,11 +39,12 @@ _ = autopipImport("subprocess")
 _ = autopipImport("datetime")
 _ = autopipImport("json")
 _ = autopipImport("psutil")
+# BuildPrep: END-excl
 
 # [Setup]
 
 import requests,platform,sys,os,shutil,argparse
-import json
+import json,time
 parent = os.path.abspath(os.path.dirname(__file__))
 modpack_path = os.path.join(parent,modpack)
 modpack = os.path.basename(modpack)
@@ -69,6 +71,10 @@ parser.add_argument('--n', help='always answer with No', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
+
+# [Pre Release softwere notice]
+print(prefix+"\033[33mNote! This is pre-release software, the installer is provided AS-IS and i take no responsibility for issues that may arrise when using it.\nIf you wish to stop this script, close it now.\033[0m")
+time.sleep(2)
 
 # [Functions]
 
@@ -304,10 +310,7 @@ else:
             icon_base64_modded,
             icon_base64_default
         )
-        print(f"{getIconFromListing(listingData)} => {gicon}")
-        _gicon = gicon
         gicon = prepMRicon(modpack_destF,gicon)
-        print(f"{_gicon} => {gicon}")
         mrInstanceFile = os.path.join(modpack_destF,"profile.json")
         mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,fs.getFileName(modpack),gicon)
         if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)
