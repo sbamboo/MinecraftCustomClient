@@ -11,7 +11,7 @@ except:
 import json
 import shutil
 from libs.configTui_wrapper.wrapper_with_crshModuloTools import configTui_WrapperMain
-
+import platform
 import uuid
 
 def generate_uuid():
@@ -276,5 +276,19 @@ if gitsp != None:
                 fs.ensureDirPath(exeDest)
                 fs.copyFile(quickInstExe,os.path.join(exeDest,os.path.basename(quickInstExe)))
                 # clean up
-                shutil.rmtree(buildenv)
+                import time
+                print("Waiting 2s for process to finish...")
+                time.sleep(2)
+                print("Continuing...")
+                try:
+                    shutil.rmtree(buildenv)
+                except: pass
+                try:
+                    if os.path.exists(buildenv):
+                        if platform.system() == "Windows":
+                            os.system(f'rmdir /s /q "{buildenv}"')
+                        else:
+                            os.system(f'rm -rf "{buildenv}"')
+                except:
+                    print(f"Failed to remove build enviroment, please manually remove: '{buildenv}'")
                 print("Done!")
