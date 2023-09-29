@@ -80,6 +80,21 @@ d.pr(f"\033[33mScanning mods directory of: '{modpack.split(os.sep)[-1]}'")
 pathObjects = scantree(mods)
 for obj in pathObjects:
     if obj.name.endswith(".jar"):
+        # From modrinth
+        if has_connection() == True and obj.name not in lookedAtFiles:
+            modrinth = MJRL("sbamboo/MinecraftCustomClient")
+            name = obj.name
+            name = name.replace("-", " ")
+            name = name.replace("_", " ")
+            suggestedProject = name.split(" ")[0]
+            nameHits = modrinth.SearchForQuery(suggestedProject, suggestedProject)
+            if len(nameHits) > 0:
+                retrivedUrls = modrinth.GetLinksPerFilename(suggestedProject,obj.name)
+                if len(retrivedUrls) > 0:
+                    lookedAtFiles.append(obj.name)
+                    for url in retrivedUrls:
+                        urls.append({"type":"modrinth","url":url,"filename":obj.name})
+                        d.pr(f"\033[32mFound url on modrinth \033[90m: \033[32m{url}")
         # From curseforgeManifest
         if os.path.exists(manifest) and obj.name not in lookedAtFiles:
             retrivedUrls = getJarByFilename("curseforge",obj.name,curseforgeManifest=manifest)
@@ -88,23 +103,8 @@ for obj in pathObjects:
                 for url in retrivedUrls:
                     urls.append({"type":"curseforgeManifest","url":url,"filename":obj.name})
                     d.pr(f"\033[34mFound url in manifest \033[90m: \033[34m{url}")
-        # From modrith
-        if has_connection() == True and obj.name not in lookedAtFiles:
-            modrith = MJRL("sbamboo/MinecraftCustomClient")
-            name = obj.name
-            name = name.replace("-", " ")
-            name = name.replace("_", " ")
-            suggestedProject = name.split(" ")[0]
-            nameHits = modrith.SearchForQuery(suggestedProject, suggestedProject)
-            if len(nameHits) > 0:
-                retrivedUrls = modrith.GetLinksPerFilename(suggestedProject,obj.name)
-                if len(retrivedUrls) > 0:
-                    lookedAtFiles.append(obj.name)
-                    for url in retrivedUrls:
-                        urls.append({"type":"modrith","url":url,"filename":obj.name})
-                        d.pr(f"\033[32mFound url on modrith  \033[90m: \033[32m{url}")
         elif obj.name not in lookedAtFiles:
-            d.pr(f"\033[31mNo network, modrith?  \033[90m: \033[31m{obj.name}")
+            d.pr(f"\033[31mNo network, modrinth?  \033[90m: \033[31m{obj.name}")
     # Non jar files
     else:
         if obj.name.split(".")[-1] in archiveExtensions:

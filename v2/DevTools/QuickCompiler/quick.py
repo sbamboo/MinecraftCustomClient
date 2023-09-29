@@ -125,6 +125,15 @@ if "<ManualUrlWaitingToBeFilledIn>" in content and compyml.get("promptOnManual")
     else:
         print("Okay, remember to change on install :D")
 
+# Include webinclude
+wincl = compyml.get("webInclude")
+if wincl != None:
+    print(f"Including '{wincl}' as webInclude...")
+    _content = json.loads(content)
+    _content["webInclude"] = wincl
+    content = json.dumps(_content)
+    open(listing,'w',encoding=encoding).write(content)
+
 # Find other things to include
 incl = compyml.get("include")
 if incl != None:

@@ -39,6 +39,19 @@ def downUrlFile(url,filepath):
 # [Functionos]
 def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix=""):
     sources = listingData.get("sources")
+    webinclude = listingData.get("webInclude")
+
+    # handle webinclude
+    if webinclude != None:
+        for incl in webinclude:
+            url = list(incl.keys())[0]
+            relpathToDest = list(incl.values())[0]
+            if relpathToDest.startswith(".\\"):
+                relpathToDest = relpathToDest.replace(".\\","",1)
+            elif relpathToDest.startswith("./"):
+                relpathToDest = relpathToDest.replace("./","",1)
+            fpath = os.path.join(destinationDirPath,relpathToDest)
+            downUrlFile(url,fpath)
     
     # ensure mods directory
     modsF = os.path.join(destinationDirPath,"mods")
@@ -47,7 +60,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
     # iterate over sources to extract them to the dest
     resources_zip_found = False
     listedNameOnlys = []
-    downloadable = ["custom","curseforgeManifest","modrith"]
+    downloadable = ["custom","curseforgeManifest","modrinth"]
     for source in sources:
         _type     = source.get("type")
         _url      = source.get("url")
