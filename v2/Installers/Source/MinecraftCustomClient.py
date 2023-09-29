@@ -145,7 +145,7 @@ if response.status_code == 200:
 else:
     cont = None
 if cont != None and cont != "":
-    if fs.notExist(modpack_path):
+    if os.path.exists(modpack_path) == False:
         open(modpack_path,'wb').write(cont)
 
 # [Prep selected package]
