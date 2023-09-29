@@ -51,6 +51,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             elif relpathToDest.startswith("./"):
                 relpathToDest = relpathToDest.replace("./","",1)
             fpath = os.path.join(destinationDirPath,relpathToDest)
+            fs.ensureDirPath(os.path.dirname(fpath))
             downUrlFile(url,fpath)
     
     # ensure mods directory

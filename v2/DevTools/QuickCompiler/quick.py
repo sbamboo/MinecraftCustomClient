@@ -243,6 +243,8 @@ if gitsp != None:
             if exists == False:
                 dRepo["flavors"].append(entry)
             # save repo
+            if dRepo.get("lastUpdated") != None:
+                dRepo["lastUpdated"] = datetime.now().strftime('%Y-%m-%d')
             jRepo = json.dumps(dRepo)
             open(poss,'w',encoding=encoding).write(jRepo)
         # bundle
