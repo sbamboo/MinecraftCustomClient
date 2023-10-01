@@ -82,11 +82,17 @@ args = parser.parse_args()
 if args.enc:
     encoding = args.enc
 
+def dummy():
+    pass
+try:
+    oexit = exit
+except:
+    oexit = dummy
 def exit(): 
     global args
     if args.debugexit == True:
         _ = input("DEBUG: Waiting on exit...")
-    exit() #repl-exit
+    oexit() #repl-exit
 
 # [Pre Release softwere notice]
 print(prefix+"\033[33mNote! This is pre-release software, the installer is provided AS-IS and i take no responsibility for issues that may arrise when using it.\nIf you wish to stop this script, close it now.\033[0m")
@@ -271,7 +277,6 @@ else:
         exit()
 
 # EXPORT
-infoFile = os.path.join(tempFolder,"modpack_info.json")
 if args.exprt:
     if args.exprt.endswith(".zip"):
         args.exprt = args.exprt[::-1].replace("piz.","",1)[::-1]
@@ -289,7 +294,8 @@ if args.exprt:
         "f_snapshot": f_snapshot,
         "loaderURL": loaderURL
     }
-    open(infoFile,'w',encoding=encoding).write(json.dumps(infoFile))
+    infoFile = os.path.join(tempFolder,"modpack_info.json")
+    open(infoFile,'w',encoding=encoding).write(json.dumps(modpackInfo))
     print(f"Exporting to '{args.exprt}'")
     shutil.make_archive(args.exprt, "zip", tempFolder)
     cleanUp(tempFolder,modpack_path)
@@ -302,6 +308,7 @@ elif args.imprt:
         # Extract the contents of the zip file to the tempFolder
         with zipfile.ZipFile(args.imprt, 'r') as zip_ref:
             zip_ref.extractall(tempFolder)
+        infoFile = os.path.join(tempFolder,"modpack_info.json")
         impData = json.loads( open(infoFile,'r',encoding=encoding).read() )
     except:
         print("Failed to import tempfolder!")

@@ -78,10 +78,12 @@ args = parser.parse_args()
 if args.enc:
     encoding = args.enc
 
+def dummy():
+    pass
 try:
     oexit = exit
 except:
-    oexit = None
+    oexit = dummy
 def exit(): 
     global args
     if args.debugexit == True:
@@ -331,7 +333,7 @@ if args.exprt:
         "f_snapshot": f_snapshot,
         "loaderURL": loaderURL
     }
-    open(infoFile,'w',encoding=encoding).write(json.dumps(infoFile))
+    open(infoFile,'w',encoding=encoding).write(json.dumps(modpackInfo))
     print(f"Exporting to '{args.exprt}'")
     shutil.make_archive(args.exprt, "zip", tempFolder)
     cleanUp(tempFolder,modpack_path)
