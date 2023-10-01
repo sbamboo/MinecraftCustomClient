@@ -145,7 +145,7 @@ else:
         fl.pop("name")
         flavorsDict[n] = fl
     flavorsDict["[Exit]"] = {"desc": "ncb:"}
-    key = showDictSel(flavorsDict,selTitle="Select a flavor to install:", selSuffix="\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select\nq : Quit\n␛ : Quit\033[0m")
+    key = showDictSel(flavorsDict,selTitle="Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:", selSuffix="\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select\nq : Quit\n␛ : Quit\033[0m")
     if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
         exit()
     # get modpack url
