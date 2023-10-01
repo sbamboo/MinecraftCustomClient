@@ -47,7 +47,7 @@ except NameError:
 
 # [Setup]
 
-import requests,platform,sys,os,shutil,argparse
+import platform,sys,os,shutil,argparse,zipfile
 import json,time
 parent = os.path.abspath(os.path.dirname(__file__))
 modpack_path = os.path.join(parent,modpack)
@@ -94,7 +94,7 @@ time.sleep(2)
 
 # [Functions]
 
-def cleanUp(tempFolder):
+def cleanUp(tempFolder,modpack_path=None):
     try:
         if os.path.exists(tempFolder): shutil.rmtree(tempFolder)
     except:
@@ -103,6 +103,8 @@ def cleanUp(tempFolder):
                 os.system(f'rmdir /s /q "{tempFolder}"')
             else:
                 os.system(f'rm -rf "{tempFolder}"')
+    if modpack_path != None:
+        if os.path.exists(modpack_path): os.remove(modpack_path)
 
 # ConUtils functions, note the lib is made by Simon Kalmi Claesson.
 def setConTitle(title):
@@ -150,65 +152,7 @@ fs.createDir(tempFolder)
 
 # IMPORT
 if args.imprt:
-    # get dest
-    dest = os.path.join(tempFolder,fs.getFileName(os.path.basename(args.imprt)))
-    # get type
-    listingType = fs.getFileExtension(modpack_path)
-    # get data
-    if listingType != "package":
-        # get listing data
-        listingFile = os.path.join(dest,"listing.json")
-        if fs.doesExist(listingFile) == True:
-            listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
-        else:
-            print("Failed to retrive listing content!")
-            cleanUp(tempFolder)
-            exit()
-    else:
-        try:
-            mtaFile = os.path.join(dest,"flavor.mta")
-            listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
-        except Exception as e:
-            print("Failed to retrive listing content!",e)
-            cleanUp(tempFolder)
-            exit()
-
-    modld = listingData["modloader"]
-    ldver = listingData["modloaderVer"]
-    mcver = listingData["minecraftVer"]
-
-    # handle install dest
-    install_dest = getStdInstallDest(system)
-    if listingData.get("_legacy_fld") != None:
-        _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
-        if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
-            install_dest = applyDestPref(_legacy_fld_isntLoc)
-    if args.dest:
-        install_dest = args.dest
-    fs.ensureDirPath(install_dest)
-    if args.rinth == True:
-        install_dest = getMRdir(
-            system,
-            args.rinthInstanceP
-        )
-        ## handle modrinth profile already existing
-        if args.rinth == True:
-            _p = os.path.join(install_dest,fs.getFileName(modpack))
-            if os.path.exists(_p):
-                if args.y:
-                    c = args.y
-                elif args.n:
-                    c = args.n
-                else:
-                    c = input("Modrith profile already exists, overwrite it? [y/n]")
-                if c.lower() == "n":
-                    cleanUp(tempFolder)
-                    exit()
-        fs.ensureDirPath(install_dest)
-
-    ## get modpack destination folder
-    modpack_destF = os.path.join(install_dest,fs.getFileName(os.path.basename(args.imprt)))
-    if os.path.exists(modpack_destF) != True: os.mkdir(modpack_destF)
+    pass
 else:
     # get type
     listingType = fs.getFileExtension(modpack_path)
@@ -224,7 +168,7 @@ else:
             listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
         else:
             print("Failed to retrive listing content!")
-            cleanUp(tempFolder)
+            cleanUp(tempFolder,modpack_path)
             exit()
     else:
         try:
@@ -232,7 +176,7 @@ else:
             listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
         except Exception as e:
             print("Failed to retrive listing content!",e)
-            cleanUp(tempFolder)
+            cleanUp(tempFolder,modpack_path)
             exit()
 
     # get data
@@ -241,7 +185,7 @@ else:
         downListingCont(dest,tempFolder,encoding,prefix_dl)
     except Exception as e:
         print(prefix+"Failed to download listing content!",e)
-        cleanUp(tempFolder)
+        cleanUp(tempFolder,modpack_path)
         exit()
 
     # get java
@@ -250,7 +194,7 @@ else:
         javapath = getjava(prefix_jv,tempFolder,lnx_java_url,mac_java_url,win_java_url)
     except Exception as e:
         print(prefix+"Failed to get java!",e)
-        cleanUp(tempFolder)
+        cleanUp(tempFolder,modpack_path)
         exit()
 
     # handle install dest
@@ -286,7 +230,7 @@ else:
                 else:
                     c = input("Modrith profile already exists, overwrite it? [y/n]")
                 if c.lower() == "n":
-                    cleanUp(tempFolder)
+                    cleanUp(tempFolder,modpack_path)
                     exit()
         fs.ensureDirPath(install_dest)
     ## get modpack destination folder
@@ -319,20 +263,36 @@ else:
         # fail
         if fs.notExist(loaderFp):
             print("Failed to downloader loader!")
-            cleanUp(tempFolder)
+            cleanUp(tempFolder,modpack_path)
             exit()
     except Exception as e:
         print(prefix+"Failed to get loader!",e)
-        cleanUp(tempFolder)
+        cleanUp(tempFolder,modpack_path)
         exit()
 
 # EXPORT
+infoFile = os.path.join(tempFolder,"modpack_info.json")
 if args.exprt:
     if args.exprt.endswith(".zip"):
         args.exprt = args.exprt[::-1].replace("piz.","",1)[::-1]
+    modpackInfo = {
+        "modpack": modpack,
+        "modpack_path": modpack_path,
+        "dest": dest,
+        "listingData": listingData,
+        "listingType": listingType,
+        "listingFile": listingFile,
+        "loaderFp": loaderFp,
+        "javapath": javapath,
+        "install_dest": install_dest,
+        "modpack_destF": modpack_destF,
+        "f_snapshot": f_snapshot,
+        "loaderURL": loaderURL
+    }
+    open(infoFile,'w',encoding=encoding).write(json.dumps(infoFile))
     print(f"Exporting to '{args.exprt}'")
     shutil.make_archive(args.exprt, "zip", tempFolder)
-    cleanUp(tempFolder)
+    cleanUp(tempFolder,modpack_path)
     exit()
 elif args.imprt:
     print(f"Importing from '{args.imprt}'")
@@ -342,10 +302,26 @@ elif args.imprt:
         # Extract the contents of the zip file to the tempFolder
         with zipfile.ZipFile(args.imprt, 'r') as zip_ref:
             zip_ref.extractall(tempFolder)
+        impData = json.loads( open(infoFile,'r',encoding=encoding).read() )
     except:
         print("Failed to import tempfolder!")
         cleanUp(tempFolder)
         exit()
+    modpack = impData["modpack"]
+    modpack_path = impData["modpack_path"]
+    dest = impData["dest"]
+    listingData = impData["listingData"]
+    listingType = impData["listingType"]
+    listingFile = impData["listingFile"]
+    loaderFp = impData["loaderFp"]
+    javapath = impData["javapath"]
+    install_dest = impData["install_dest"]
+    modpack_destF = impData["modpack_destF"]
+    f_snapshot = impData["f_snapshot"]
+    loaderURL = impData["loaderURL"]
+    modld = listingData["modloader"]
+    ldver = listingData["modloaderVer"]
+    mcver = listingData["minecraftVer"]
 
 # Install loader
 print(prefix+f"Starting install of loader... ({loaderFp})")
@@ -357,7 +333,7 @@ try:
     installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True)
 except Exception as e:
     print(prefix+"Failed to install loader!",e)
-    cleanUp(tempFolder)
+    cleanUp(tempFolder,modpack_path)
     exit()
 
 # Copy content to final dest
@@ -391,7 +367,7 @@ if args.rinth == False:
         )
     except Exception as e:
         print(prefix+"Failed to create profile in minecraft launcher",e)
-        cleanUp(tempFolder)
+        cleanUp(tempFolder,modpack_path)
         exit()
     #elif args.curse:
     #    cfInstanceFile = os.path.join(modpack_destF,"minecraftinstance.json")
