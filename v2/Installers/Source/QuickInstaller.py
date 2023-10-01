@@ -31,14 +31,18 @@ modpack = "<replaceble:modpack_relative_path_to_parent>"
 # IncludeInline: ./assets/lib_crshpiptools.py
 
 # [Imports]
-_ = autopipImport("argparse")
-_ = autopipImport("scandir")
-_ = autopipImport("requests")
-_ = autopipImport("getpass")
-_ = autopipImport("subprocess")
-_ = autopipImport("datetime")
-_ = autopipImport("json")
-_ = autopipImport("psutil")
+try:
+    _ = autopipImport("argparse")
+    _ = autopipImport("scandir")
+    _ = autopipImport("requests")
+    _ = autopipImport("getpass")
+    _ = autopipImport("subprocess")
+    _ = autopipImport("datetime")
+    _ = autopipImport("json")
+    _ = autopipImport("psutil")
+except NameError:
+    print("\033[31mAutoPipImport failed, has the script been run through the include-inline tool?\033[0m")
+    exit()
 # BuildPrep: END-excl
 
 # [Setup]

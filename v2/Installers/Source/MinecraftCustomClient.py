@@ -27,22 +27,27 @@ icon_base64_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 
 repo_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/repo.json"
 
-# BuildPrep: ST-excl
 # IncludeInline: ./assets/lib_crshpiptools.py
 
+# BuildPrep: ST-excl
 # [Imports]
-_ = autopipImport("argparse")
-_ = autopipImport("scandir")
-_ = autopipImport("requests")
-_ = autopipImport("getpass")
-_ = autopipImport("subprocess")
-_ = autopipImport("datetime")
-_ = autopipImport("json")
-_ = autopipImport("psutil")
+try:
+    _ = autopipImport("argparse")
+    _ = autopipImport("scandir")
+    _ = autopipImport("requests")
+    _ = autopipImport("getpass")
+    _ = autopipImport("subprocess")
+    _ = autopipImport("datetime")
+    _ = autopipImport("json")
+    _ = autopipImport("psutil")
+    _ = autopipImport("readchar")
+except NameError:
+    print("\033[31mAutoPipImport failed, has the script been run through the include-inline tool?\033[0m")
+    exit()
 # BuildPrep: END-excl
 
 # [Setup]
-import requests,platform,sys,os,shutil,argparse
+import requests,platform,os,sys,shutil,argparse
 import json,time
 parent = os.path.abspath(os.path.dirname(__file__))
 
@@ -119,6 +124,7 @@ print(prefix+"\033[33mNote! This is pre-release software, the installer is provi
 time.sleep(2)
 
 # [Show repo]
+# IncludeInline: ./assets/ui_dict_selector.py
 # get repo
 try:
     repoContent = requests.get(repo_url).text
@@ -128,14 +134,17 @@ except:
     exit()
 # show select
 flavors = repoData.get("flavors")
-for i,fl in enumerate(flavors):
-    print(f'{i} : {fl["name"]}')
-print("(Write exit to exit)")
-ind = input("Index: ")
-if "exit" in ind:
+flavorsDict = {}
+for fl in flavors:
+    n = fl["name"]
+    fl.pop("name")
+    flavorsDict[n] = fl
+flavorsDict["[Exit]"] = {"desc": "ncb:"}
+key = showDictSel(flavorsDict,selTitle="Select a flavor to install:", selSuffix="\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select\nq : Quit\n␛ : Quit\033[0m")
+if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
     exit()
 # get modpack url
-modpack_url = flavors[int(ind)]["source"]
+modpack_url = flavors[key]["source"]
 # download url
 modpack_path = os.path.join(parent,os.path.basename(modpack_url))
 response = requests.get(modpack_url)
