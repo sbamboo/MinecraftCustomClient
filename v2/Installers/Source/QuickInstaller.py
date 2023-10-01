@@ -150,7 +150,65 @@ fs.createDir(tempFolder)
 
 # IMPORT
 if args.imprt:
-    pass
+    # get dest
+    dest = os.path.join(tempFolder,fs.getFileName(os.path.basename(args.imprt)))
+    # get type
+    listingType = fs.getFileExtension(modpack_path)
+    # get data
+    if listingType != "package":
+        # get listing data
+        listingFile = os.path.join(dest,"listing.json")
+        if fs.doesExist(listingFile) == True:
+            listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
+        else:
+            print("Failed to retrive listing content!")
+            cleanUp(tempFolder)
+            exit()
+    else:
+        try:
+            mtaFile = os.path.join(dest,"flavor.mta")
+            listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+        except Exception as e:
+            print("Failed to retrive listing content!",e)
+            cleanUp(tempFolder)
+            exit()
+
+    modld = listingData["modloader"]
+    ldver = listingData["modloaderVer"]
+    mcver = listingData["minecraftVer"]
+
+    # handle install dest
+    install_dest = getStdInstallDest(system)
+    if listingData.get("_legacy_fld") != None:
+        _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
+        if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
+            install_dest = applyDestPref(_legacy_fld_isntLoc)
+    if args.dest:
+        install_dest = args.dest
+    fs.ensureDirPath(install_dest)
+    if args.rinth == True:
+        install_dest = getMRdir(
+            system,
+            args.rinthInstanceP
+        )
+        ## handle modrinth profile already existing
+        if args.rinth == True:
+            _p = os.path.join(install_dest,fs.getFileName(modpack))
+            if os.path.exists(_p):
+                if args.y:
+                    c = args.y
+                elif args.n:
+                    c = args.n
+                else:
+                    c = input("Modrith profile already exists, overwrite it? [y/n]")
+                if c.lower() == "n":
+                    cleanUp(tempFolder)
+                    exit()
+        fs.ensureDirPath(install_dest)
+
+    ## get modpack destination folder
+    modpack_destF = os.path.join(install_dest,fs.getFileName(os.path.basename(args.imprt)))
+    if os.path.exists(modpack_destF) != True: os.mkdir(modpack_destF)
 else:
     # get type
     listingType = fs.getFileExtension(modpack_path)
@@ -320,7 +378,7 @@ if args.rinth == False:
             prefix=prefix_la,
             add=True,
 
-            name=fs.getFileName(modpack),
+            name=listingData["name"],
             gameDir=modpack_destF,
             icon=gicon,
             versionId=getVerId(modld,ldver,mcver),
@@ -353,7 +411,7 @@ else:
         )
         gicon = prepMRicon(modpack_destF,gicon)
         mrInstanceFile = os.path.join(modpack_destF,"profile.json")
-        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,fs.getFileName(modpack),gicon)
+        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,listingData["name"],gicon)
         if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)
         open(mrInstanceFile,'w',encoding=encoding).write(
             json.dumps(mrInstanceDict)

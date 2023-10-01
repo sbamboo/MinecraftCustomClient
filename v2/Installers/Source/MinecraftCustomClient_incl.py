@@ -1,3 +1,5 @@
+#TODO: Fix imprt modpack_path set, since now its just the zip path not the folder path
+
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
@@ -27,7 +29,70 @@ icon_base64_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 
 repo_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/repo.json"
 
-# IncludeInline: ./assets/lib_crshpiptools.py
+#region [IncludeInline: ./assets/lib_crshpiptools.py]: START
+import subprocess,sys,importlib,os
+
+def getExecutingPython() -> str:
+    '''CSlib: Returns the path to the python-executable used to start crosshell'''
+    return sys.executable
+
+def _check_pip() -> bool:
+    '''CSlib_INTERNAL: Checks if PIP is present'''
+    try:
+        with open(os.devnull, 'w') as devnull:
+            subprocess.check_call([sys.executable, "-m", "pip", "--version"], stdout=devnull, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError:
+        return False
+    except FileNotFoundError:
+        return False
+    return True
+def intpip(pip_args=str):
+    '''CSlib: Function to use pip from inside python, this function should also install pip if needed (Experimental)
+    Returns: bool representing success or not'''
+    if not _check_pip():
+        print("PIP not found. Installing pip...")
+        get_pip_script = "https://bootstrap.pypa.io/get-pip.py"
+        try:
+            subprocess.check_call([sys.executable, "-m", "ensurepip"])
+        except subprocess.CalledProcessError:
+            print("Failed to install pip using ensurepip. Aborting.")
+            return False
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+        except subprocess.CalledProcessError:
+            print("Failed to upgrade pip. Aborting.")
+            return False
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", get_pip_script])
+        except subprocess.CalledProcessError:
+            print("Failed to install pip using get-pip.py. Aborting.")
+            return False
+        print("PIP installed successfully.")
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip"] + pip_args.split())
+        return True
+    except subprocess.CalledProcessError:
+        print(f"Failed to execute pip command: {pip_args}")
+        return False
+
+# Safe import function
+def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None):
+    '''CSlib: Tries to import the module, if failed installes using intpip and tries again.'''
+    try:
+        imported_module = importlib.import_module(moduleName)
+    except:
+        if pipName != None:
+            command = f"install {pipName}"
+        else:
+            command = f"install {moduleName}"
+        if addPipArgsStr != None:
+            if not addPipArgsStr.startswith(" "):
+                addPipArgsStr = " " + addPipArgsStr
+            command += addPipArgsStr
+        intpip(command)
+        imported_module = importlib.import_module(moduleName)
+    return imported_module
+#endregion [IncludeInline: ./assets/lib_crshpiptools.py]: END
 
 # BuildPrep: ST-excl
 # [Imports]
@@ -124,38 +189,147 @@ print(prefix+"\033[33mNote! This is pre-release software, the installer is provi
 time.sleep(2)
 
 # [Show repo]
-# IncludeInline: ./assets/ui_dict_selector.py
-# get repo
-try:
-    repoContent = requests.get(repo_url).text
-    repoData = json.loads(repoContent)
-except:
-    print("Failed to get repository")
-    exit()
-# show select
-flavors = repoData.get("flavors")
-flavorsDict = {}
-for fl in flavors:
-    n = fl["name"]
-    fl.pop("name")
-    flavorsDict[n] = fl
-flavorsDict["[Exit]"] = {"desc": "ncb:"}
-key = showDictSel(flavorsDict,selTitle="Select a flavor to install:", selSuffix="\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select\nq : Quit\n␛ : Quit\033[0m")
-if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
-    exit()
-# get modpack url
-modpack_url = flavors[key]["source"]
-# download url
-modpack_path = os.path.join(parent,os.path.basename(modpack_url))
-response = requests.get(modpack_url)
-if response.status_code == 200:
-    # Content of the file
-    cont = response.content
+#region [IncludeInline: ./assets/ui_dict_selector.py]: START
+import os
+import sys
+import readchar
+
+# Function to clear the terminal screen
+def clear_screen():
+    if os.name == 'posix':
+        os.system('clear')
+    else:
+        os.system('cls')
+
+# Function to display the list of items
+def display_items(selected_index, items, selkey, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False):
+    # get dispWidth
+    width,height = os.get_terminal_size()
+    if dispWidth == "vw": dispWidth = width
+    if dispWidth == "vh": dispWidth = height
+    # clear screen (use function for os-indep)
+    clear_screen()
+    # get the length of the longest key
+    max_key_length = max(len(key) for key in items.keys())
+    # print
+    print(selTitle)
+    for i, key in enumerate(list(items.keys())):
+        # get the org-value based on selkey
+        if selkey == "" or selkey == None:
+            ovalue = items[key]
+        else:
+            ovalue = items[key][selkey]
+        if "ncb:" not in ovalue:
+            value = "{" + ovalue + "}"
+        else: value = ""
+        # concat a string using left-adjusted keys
+        string = f"  {key.ljust(max_key_length)}   {value}"
+        # if over dispwidth cut with ... to correct size (indep of key-length)
+        if len(string) > dispWidth-2:
+            off = 12+max_key_length                                               # numerical amnt to cut (12 is what worked and the next is so it reacts on key-len)
+            string = string.replace(value,"{"+ovalue[:dispWidth-off] + "..."+"}") # chn string basaed on cutoff
+        # print the string with formatting if enabeld
+        if i == int(selected_index):
+            string = ">" + string[1:] # add the >
+            if stripAnsi == True:
+                print(f"{string}")
+            else:
+                print(f"\x1b[32m{string}\x1b[0m")
+        else:
+            print(f"{string}")
+    # print suffix msg
+    if selSuffix != None:
+        print(selSuffix)
+
+# Function to get a single keypress
+def get_keypress():
+    return readchar.readchar()
+
+# Function to get the up-key
+def getup(keylow):
+    if os.name == 'nt':
+        return keylow == "h"
+    else:
+        return keylow == "a"
+
+# Function to get the down-key
+def getdown(keylow):
+    if os.name == 'nt':
+        return keylow == "p"
+    else:
+        return keylow == "b"
+
+# Function to get the enter-key
+def getent(keylow):
+    if os.name == 'nt':
+        return keylow == "\r"
+    else:
+        return keylow == "\n"
+
+# Main function to show a dictionary based on the dict.value.<key> / or dict.value (if selkey = ""/None)
+def showDictSel(nameDescDict=dict, selKey="desc", sti=0, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False):
+    '''
+    Add "ncb:" to your value to ommit the curly brackets.
+    '''
+    selected_index = sti # start index
+    disp = True
+    while True:
+        # display the items if disp = True
+        if disp == True:
+            display_items(selected_index, nameDescDict, selKey, selTitle, selSuffix, dispWidth, stripAnsi)
+        else:
+            disp = True
+        # check keys and change selected index depends on keys
+        key = get_keypress()
+        if getup(key.lower()):
+            selected_index = selected_index - 1
+            # roll-over
+            if selected_index < 0: selected_index = len(nameDescDict)-1
+        elif getdown(key.lower()):
+            selected_index = selected_index + 1
+            # roll-over
+            if selected_index > len(nameDescDict)-1: selected_index = 0
+        elif getent(key.lower()):
+            return list(nameDescDict.keys())[selected_index]
+        elif key.lower() == "q" or key.lower() == "\x1b":
+            return None
+        # if no key pressed set disp to false, so it wont redisp on an-uncaught key
+        else:
+            disp = False#endregion [IncludeInline: ./assets/ui_dict_selector.py]: END
+if args.imprt:
+    modpack_path = args.imprt
 else:
-    cont = None
-if cont != None and cont != "":
-    if os.path.exists(modpack_path) == False:
-        open(modpack_path,'wb').write(cont)
+    # get repo
+    try:
+        repoContent = requests.get(repo_url).text
+        repoData = json.loads(repoContent)
+    except:
+        print("Failed to get repository")
+        exit()
+    # show select
+    flavors = repoData.get("flavors")
+    flavorsDict = {}
+    for fl in flavors:
+        n = fl["name"]
+        fl.pop("name")
+        flavorsDict[n] = fl
+    flavorsDict["[Exit]"] = {"desc": "ncb:"}
+    key = showDictSel(flavorsDict,selTitle="Select a flavor to install:", selSuffix="\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select\nq : Quit\n␛ : Quit\033[0m")
+    if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
+        exit()
+    # get modpack url
+    modpack_url = flavorsDict[key]["source"]
+    # download url
+    modpack_path = os.path.join(parent,os.path.basename(modpack_url))
+    response = requests.get(modpack_url)
+    if response.status_code == 200:
+        # Content of the file
+        cont = response.content
+    else:
+        cont = None
+    if cont != None and cont != "":
+        if os.path.exists(modpack_path) == False:
+            open(modpack_path,'wb').write(cont)
 
 # [Prep selected package]
 modpack = os.path.basename(modpack_path)
@@ -167,11 +341,1593 @@ setConTitle(title)
 
 print(prefix+f"Starting install for '{modpack}'...")
 
-# IncludeInline: ./assets/lib_filesys.py
+#region [IncludeInline: ./assets/lib_filesys.py]: START
+# FileSys: Library to work with filesystems.
+# Made by: Simon Kalmi Claesson
 
-# IncludeInline: ./assets/flavorFunctions.py
+# Imports
+import os
+import shutil
+import platform
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
 
-# IncludeInline: ./assets/minecraftLauncherAgent.py
+# Simple alternative to conUtils
+class altConUtils():
+    def IsWindows():
+        # Get platform and return boolean value depending of platform
+        platformv = platform.system()
+        if platformv == "Linux":
+            return False
+        elif platformv == "Darwin":
+            return False
+        elif platformv == "Windows":
+            return True
+        else:
+            return False
+    def IsLinux():
+        # Get platform and return boolean value depending of platform
+        platformv = platform.system()
+        if platformv == "Linux":
+            return True
+        elif platformv == "Darwin":
+            return False
+        elif platformv == "Windows":
+            return False
+        else:
+            return False
+    def IsMacOS():
+        # Get platform and return boolean value depending of platform
+        platformv = platform.system()
+        if platformv == "Linux":
+            return False
+        elif platformv == "Darwin":
+            return True
+        elif platformv == "Windows":
+            return False
+        else:
+            return False
+
+# Class containing functions
+class filesys():
+
+    defaultencoding = "utf-8"
+
+    sep = os.sep
+
+    # Help function
+    def help(ret=False):
+        helpText = '''
+        This class contains functions to perform filessytem actions like creating and removing files/directories.
+        Functions included are:
+          - help: Shows this help message.
+          - errorhandler: Internal function to handle errors. (Taking "action=<str_action>", "path=<str_path>" and "noexist=<bool>"
+          - renameFile: Renames a file. (Taking "filepath=<str>", "newFilepath=<str>")
+          - renameDir: Renames a directory. (Taking "folderpath=<str>", "newFolderpath=<str>")
+          - doesExist: Checks if a file/directory exists. (Taking "path=<str>")
+          - notExist: Checks if a file/directory does not exist. (Taking "path=<str>")
+          - isFile: Checks if a object is a file. (Taking "path=<str>")
+          - isDir: Checks if a object is a directory. (Taking "path=<str>")
+          - getFileName: Returns the filename of the given file, excluding file extension. (Taking "path=<str>")
+          - createFile: Creates a file. (Taking "filepath=<str>", "overwrite=<bool>" and "encoding=<encoding>")
+          - createDir: Creates a directory. (Taking "folderpath=<str>")
+          - deleteFile: Deletes a file. (Taking "filepath=<str>")
+          - deleteDir: Deletes an empty directory. (Taking "folderpath=<str>")
+          - deleteDirNE: Deletes a non empty directory, wrapping shutil.rmtree. (Taking "folderpath=<str>")
+          - writeToFile: Writes to a file. (Taking "inputs=<str>", "filepath=<str>", "append=<bool>" and "encoding=<encoding>")
+          - readFromFile: Gets the content of a file. (Taking "filepath=<str>" and "encoding=<encoding>")
+          - getWorkingDir: Gets the current working directory.
+          - setWorkingDir: Sets or changes the working directory. (Taking "dir=<str>")
+          - copyFile: Wrapper around shutil.copy2. (Taking "sourcefile=<str>" and "destination=<str>")
+          - copyFolder: Wrapper around shutil.copytree. (Taking "sourceDirectory=<str>" and "destinationDirectory=<str>")
+          - copyFolder2: Custom recursive folder copy, destination may exists. (Taking "sourceDirectory=<str>", "destinationDirectory=<str>" and "debug=<bool>")
+          - archive: Creates an archive of a folder. (Taking "sourceDirectory=<str>","<destination=<str>" and "format=<archive.format>") Note! Paths on on windows must be double slashed.
+          - unArchive: Unpacks a archive into a folder. (Taking "archiveFile=<str>","<destination=<str>") Note! Paths on on windows must be double slashed.
+          - scantree: Returns a generator, wrapps scantree. (Taking "path=<str>")
+          - isExecutable: Checks if a file is an executable. (Taking "filepath=<str>" and optionally "fileEndings=<list>")
+          - getMagicMime: Gets the magic-mime info of a file. (Taking "filepath=<str>")
+          - openFolder: Opens a folder in the host's filemanager. (Taking "path=<str>") Might not work on al systems!
+        For al functions taking encoding, the argument is an overwrite for the default encoding "filesys.defaultencoding" that is set to {filesys.defaultencoding}.
+        '''
+        if ret != True: print(helpText)
+        else: return helpText
+
+    def replaceSeps(path=str()):
+        '''Replaces the path separators with os.sep'''
+        spath = path
+        if "/" in path:
+            spath = path.replace("/", os.sep)
+        if "\\" in path:
+            spath = path.replace("\\", os.sep)
+        return spath
+
+    # Function to check if a file/directory exists
+    def doesExist(path=str()):
+        return bool(os.path.exists(path))
+        
+    # Function to check if a file/directory does not exist
+    def notExist(path=str()):
+        if os.path.exists(path): return False
+        else: return True
+
+    # Function to create a path, folder per folder
+    def ensureDirPath(path=str()):
+        '''Creates a path, folder per folder. DON'T INCLUDE FILES IN THE PATH'''
+        path = filesys.replaceSeps(path)
+        sections = path.split(os.sep)
+        firstSection = sections[0]
+        sections.pop(0)
+        # Save cd then goto root
+        curdir = filesys.getWorkingDir()
+        filesys.setWorkingDir(f"{firstSection}{os.sep}")
+        try:
+            for section in sections:
+                sectionpath = os.path.join(filesys.getWorkingDir(), section)
+                if filesys.notExist(sectionpath):
+                    filesys.createDir(sectionpath)
+                filesys.setWorkingDir(sectionpath)
+        except: pass
+        filesys.setWorkingDir(curdir)
+
+    # Function to check if object is file
+    def isFile(path=str()):
+        return bool(os.path.isfile(path))
+
+    # Function to check if object is directory
+    def isDir(path=str()):
+        return bool(os.path.isdir(path))
+
+    # Function to get the filename of file (Excluding file extension)
+    def getFileName(path=str()):
+        if "." in path:
+            return ('.'.join(os.path.basename(path).split(".")[:-1])).strip(".")
+        else:
+            return os.path.basename(path)
+
+    def getFileExtension(path=str()):
+        if "." in path:
+            return os.path.basename(path).split(".")[-1]
+        else:
+            return None
+
+    # Error handler function where noexists flips functionality, checks for filetype and existance
+    def errorHandler(action,path,noexist=False):
+        output = True
+        # Noexists checks
+        if noexist:
+            if filesys.doesExist(path):
+                if action == "dir": output = f"\033[31mError: Directory already exists! ({path})\033[0m"
+                if action == "file": output = f"\033[31mError: File already exists! ({path})\033[0m"
+        else:
+            if filesys.doesExist(path):
+                # Directory
+                if action == "dir":
+                    if not filesys.isDir(path):
+                        output = f"\033[31mError: Object is not directory. ({path})\033[0m"
+                # Files
+                elif action == "file":
+                    if not filesys.isFile(path):
+                        output = f"\033[31mError: Object is not file. ({path})\033[0m"
+            # Not found
+            else:
+                if action == "folder": output = f"\033[31mError: Folder not found! ({path})\033[0m"
+                if action == "file": output = f"\033[31mError: File not found! ({path})\033[0m"
+        return output
+
+    # Function to rename a file
+    def renameFile(filepath=str(),newFilepath=str()):
+        # Validate
+        valid1 = filesys.errorHandler("file",filepath)
+        valid2 = filesys.errorHandler("file",newFilepath,noexist=True)
+        if valid1 != True:
+            print("[filepath]"+valid1)
+        elif valid2 != True:
+            print("[newFilepath]"+valid2)
+        else:
+            try:
+                os.rename(filepath,newFilepath)
+            except: print("\033[31mAn error occurred!\033[0m")
+
+    # Function to rename a folder
+    def renameDir(folderpath=str(),newFolderpath=str()):
+        # Validate
+        valid1 = filesys.errorHandler("dir",folderpath)
+        valid2 = filesys.errorHandler("dir",newFolderpath,noexist=True)
+        if valid1 != True:
+            print("[folderpath]"+valid1)
+        elif valid2 != True:
+            print("[newFolderpath]"+valid2)
+        else:
+            try:
+                shutil.move(folderpath,newFolderpath)
+            except: print("\033[31mAn error occurred!\033[0m")
+
+    # Function to create file
+    def createFile(filepath=str(), overwrite=False, encoding=None):
+        # Validate
+        valid = filesys.errorHandler("file",filepath,noexist=True)
+        # Overwrite to file
+        if "already exists" in str(valid):
+            if overwrite == False:
+                print("File already exists, set overwrite to true to overwrite it.")
+            else:
+                try:
+                    f = open(filepath, "x", encoding=encoding)
+                    f.close()
+                except: print("\033[31mAn error occurred!\033[0m")
+        # Create new file
+        else:
+            try:
+                f = open(filepath, "w", encoding=encoding)
+                f.close()
+            except: print("\033[31mAn error occurred!\033[0m")
+    
+    # Function to create directory
+    def createDir(folderpath=str()):
+        # Validate
+        valid = filesys.errorHandler("dir",folderpath,noexist=True)
+        # Make directory
+        if valid == True:
+            try: os.mkdir(folderpath)
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+    
+    # Function to delete a file
+    def deleteFile(filepath=str()):
+        # Validate
+        valid = filesys.errorHandler("file",filepath)
+        # Delete file
+        if valid == True:
+            try: os.remove(filepath)
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to delete directory
+    def deleteDir(folderpath=str()):
+        # Validate
+        valid = filesys.errorHandler("dir",folderpath)
+        # Delete directory
+        if valid == True:
+            try: os.rmdir(folderpath)
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to delete directory NON EMPTY
+    def deleteDirNE(folderpath=str()):
+        # Validate
+        valid = filesys.errorHandler("dir",folderpath)
+        # Delete directory
+        if valid == True:
+            try: shutil.rmtree(folderpath)
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to write to a file
+    def writeToFile(inputs=str(),filepath=str(), append=False, encoding=None, autocreate=False):
+        if encoding != None: encoding = filesys.defaultencoding
+        # AutoCreate
+        if autocreate == True:
+            if not os.path.exists(filepath): filesys.createFile(filepath=filepath,encoding=encoding)
+        # Validate
+        valid = filesys.errorHandler("file",filepath)
+        if valid == True:
+            # Check if function should append
+            if append == True:
+                try:
+                    f = open(filepath, "a", encoding=encoding)
+                    f.write(inputs)
+                    f.close()
+                except: print("\033[31mAn error occurred!\033[0m")
+            # Overwrite existing file
+            else:
+                try:
+                    f = open(filepath, "w", encoding=encoding)
+                    f.write(inputs)
+                    f.close()
+                except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to get file contents from file
+    def readFromFile(filepath=str(),encoding=None):
+        if encoding != None: encoding = filesys.defaultencoding
+        # Validate
+        valid = filesys.errorHandler("file",filepath)
+        # Read from file
+        if valid == True:
+            try: 
+                f = open(filepath, 'r', encoding=encoding)
+                content = f.read()
+                f.close()
+                return content
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to get current working directory
+    def getWorkingDir():
+        return os.getcwd()
+    
+    # Function to change working directory
+    def setWorkingDir(dir=str()):
+        os.chdir(dir)
+
+    # Function to copy a file
+    def copyFile(sourcefile=str(),destination=str()):
+        valid = filesys.errorHandler("file",sourcefile)
+        if valid == True:
+            try:
+                shutil.copy2(sourcefile, destination)
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to copy a folder
+    def copyFolder(sourceDirectory=str(),destinationDirectory=str()):
+        valid = filesys.errorHandler("dir",sourceDirectory)
+        if valid == True:
+            try:
+                shutil.copytree(sourceDirectory, destinationDirectory)
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Another function to copy a folder, custom made to allow the destination to exists
+    def copyFolder2(sourceDirectory=str(),destinationDirectory=str(),debug=False):
+        # Validate
+        valid = filesys.errorHandler("dir", sourceDirectory)
+        if valid == True:
+            # Get files and folders in source that should be copied.
+            entries = filesys.scantree(sourceDirectory)
+            # Make sure that the destination directory only contains os.sep characters.
+            destinationDirectory = destinationDirectory.replace("\\",os.sep)
+            destinationDirectory = destinationDirectory.replace("/",os.sep)
+            # Save the old working directory
+            olddir = os.getcwd()
+            # DEBUG
+            if debug: print(f"Copying from '{sourceDirectory}' to '{destinationDirectory}' and was working in '{olddir}'\n\n")
+            # Loop through al the files/folders that should be copied
+            for entrie in entries:
+                # Create the path to the file/folder in the source.
+                newpath = (entrie.path).replace(sourceDirectory,f"{destinationDirectory}{os.sep}")
+                newpath = newpath.replace(f"{os.sep}{os.sep}",os.sep)
+                folderpath = newpath
+                # If the source is a file then remove it from the path to make sure that al folders can be created before copying the file.
+                if os.path.isfile(entrie.path):
+                    folderpath = os.path.dirname(folderpath)
+                # Make sure al the folders in the path exists
+                splitdir = folderpath.split(os.sep)
+                # goto root and remove root from splitdir
+                if altConUtils.IsWindows():
+                    if splitdir[0][-1] != "\\": splitdir[0] = splitdir[0] + '\\'
+                    os.chdir(splitdir[0])
+                    splitdir.pop(0)
+                else: os.chdir("/")
+                # DEBUG
+                if debug: print(f"Working on '{entrie.path}' with new directory of '{folderpath}' and type-data 'IsFile:{os.path.isfile(entrie.path)}' and splitdir '{splitdir}'\n")
+                # Iterate over the files
+                for part in splitdir:
+                    partPath = os.path.realpath(str(f"{os.getcwd()}{os.sep}{part}"))
+                    try:
+                        os.chdir(partPath)
+                        # DEBUG
+                        if debug: print(f"{entrie.name}: 'Working on path partial '{part}'")
+                    except:
+                        os.mkdir(partPath)
+                        os.chdir(partPath)
+                        # DEBUG
+                        if debug: print(f"{entrie.name}: 'Needed to create path partial '{part}'")
+                # If the source was a file copy it
+                if os.path.isfile(entrie.path):
+                    shutil.copy2(entrie.path,newpath)
+                    # DEBUG
+                    if debug: print(f"Copied file '{entrie.path}'")
+                # DEBUG
+                if debug: print("\n\n")
+            os.chdir(olddir)
+        else:
+            print(valid); exit()
+
+    # Function to zip a file
+    def archive(sourceDirectory=str(),destination=str(),format=str()):
+        valid = filesys.errorHandler("dir", destination)
+        if valid == True:
+            try:
+                shutil.make_archive(('.'.join(destination.split(".")[:-1]).strip("'")), format=format, root_dir=sourceDirectory)
+            except:  print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to unzip a file
+    def unArchive(archiveFile=str(),destination=str()):
+        valid = filesys.errorHandler("file", archiveFile)
+        if valid == True:
+            try:
+                shutil.unpack_archive(archiveFile, destination)
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+        
+    # Function to scantree using scantree()
+    def scantree(path=str()):
+        valid = filesys.errorHandler("dir", path)
+        if valid == True:
+            try:
+                # Code
+                for entry in scandir(path):
+                    if entry.is_dir(follow_symlinks=False):
+                        yield from filesys.scantree(entry.path)
+                    else:
+                        yield entry
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to check if a file is an executable
+    def isExecutable(filepath=str(),fileEndings=None):
+        exeFileEnds = [".exe",".cmd",".com",".py"]
+        if fileEndings != None: exeFileEnds = fileEndings
+        valid = filesys.errorHandler("file", filepath)
+        if valid == True:
+            try:
+                # [Code]
+                # Non Windows
+                if altConUtils.IsLinux() or altConUtils.IsMacOS():
+                    try: import magic
+                    except:
+                        os.system("pip3 install file-magic")
+                    detected = magic.detect_from_filename(filepath)
+                    return "application" in str(detected.mime_type)
+                # Windows
+                if altConUtils.IsWindows():
+                    fending = str("." +''.join(filepath.split('.')[-1]))
+                    if fending in exeFileEnds:
+                        return True
+                    else:
+                        return False
+            except: print("\033[31mAn error occurred!\033[0m")
+        else:
+            print(valid); exit()
+
+    # Function to get magic-mime info:
+    def getMagicMime(filepath=str()):
+        import magic # Internal import since module should only be loaded if function is called.
+        detected = magic.detect_from_filename(filepath)
+        return detected.mime_type
+
+    # Function to open a folder in the host's filemanager
+    def openFolder(path=str()):
+        # Local imports:
+        try: import distro
+        except:
+            os.system("python3 -m pip install distro")
+            import distro
+        # Launch manager
+        if altConUtils.IsWindows(): os.system(f"explorer {path}")
+        elif altConUtils.IsMacOS(): os.system(f"open {path}")
+        elif altConUtils.IsLinux():
+            #Rassberry pi
+            if distro.id() == "raspbian": os.system(f"pcmanfm {path}")
+
+
+# Class with "powershell-styled" functions
+class pwshStyled():
+
+    # Alias to doesExist
+    def testPath(path=str()):
+        return filesys.doesExist(path)
+
+    # Alias to readFromFile
+    def getContent(filepath=str(),encoding=None):
+        return filesys.readFromFile(filepath=filepath,encoding="utf-8")
+    
+    # Alias to writeToFile
+    def outFile(inputs=str(),filepath=str(),append=False,encoding=None):
+        filesys.writeToFile(inputs=str(),filepath=str(),append=False,encoding=None)
+
+    # Alias to createFile
+    def touchFile(filepath=str(),encoding=None):
+        filesys.createFile(filepath=filepath, overwrite=False, encoding=encoding)
+#endregion [IncludeInline: ./assets/lib_filesys.py]: END
+
+#region [IncludeInline: ./assets/flavorFunctions.py]: START
+# Imports
+import base64,os,shutil,requests,json,platform
+import subprocess
+import zipfile
+import tarfile
+import getpass
+import uuid
+from datetime import datetime
+import hashlib
+
+# FlavorFunctions fix missing filesys instance
+try:
+    filesys.defaultencoding
+except:
+    from lib_filesys import filesys as fs
+
+# [Base64 helpers]
+def encodeB64U8(str) -> str:
+    return base64.b64encode(str).decode('utf-8')
+
+def decodeB64U8(b64) -> str:
+    return base64.b64decode(b64.encode('utf-8'))
+
+# [Url helpers]
+def getUrlContent(url) -> str:
+    response = requests.get(url)
+    if response.status_code == 200:
+        # Content of the file
+        return response.content
+    else:
+        return None
+
+def downUrlFile(url,filepath):
+    cont = getUrlContent(url)
+    if cont != None and cont != "":
+        if fs.notExist(filepath):
+            open(filepath,'wb').write(cont)
+
+# [Functionos]
+def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix=""):
+    sources = listingData.get("sources")
+    webinclude = listingData.get("webInclude")
+
+    # handle webinclude
+    if webinclude != None:
+        for incl in webinclude:
+            url = list(incl.keys())[0]
+            relpathToDest = list(incl.values())[0]
+            if relpathToDest.startswith(".\\"):
+                relpathToDest = relpathToDest.replace(".\\","",1)
+            elif relpathToDest.startswith("./"):
+                relpathToDest = relpathToDest.replace("./","",1)
+            fpath = os.path.join(destinationDirPath,relpathToDest)
+            fs.ensureDirPath(os.path.dirname(fpath))
+            downUrlFile(url,fpath)
+    
+    # ensure mods directory
+    modsF = os.path.join(destinationDirPath,"mods")
+    if fs.notExist(modsF): fs.createDir(modsF)
+
+    # iterate over sources to extract them to the dest
+    resources_zip_found = False
+    listedNameOnlys = []
+    downloadable = ["custom","curseforgeManifest","modrinth"]
+    for source in sources:
+        _type     = source.get("type")
+        _url      = source.get("url")
+        _filename = source.get("filename")
+        _base64   = source.get("base64")
+        # debug
+        print(prefix+f"Installing '{_filename}' of type '{_type}'...")
+        # base64 archive
+        if _type == "customArchiveB64":
+            # handle resources.zip (a listingIncluded base64 archive to be extracted to root)
+            if _filename == "resources.zip" and resources_zip_found == False:
+                zipC = decodeB64U8(_base64)
+                nf = os.path.join(destinationDirPath,_filename)
+                with open(destinationDirPath,'wb') as file:
+                    file.write(zipC)
+                if fs.getFileExtension(nf) != "zip":
+                    znf = os.path.join(os.path.dirname(nf),fs.getFileName(nf)+".zip")
+                    fs.renameFile(nf,znf)
+                    nf = znf
+                shutil.unpack_archive(nf,destinationDirPath)
+            # Regular zip file
+            else:
+                zipC = decodeB64U8(_base64)
+                nf = os.path.join(modsF,_filename)
+                with open(destinationDirPath,'wb') as file:
+                    file.write(zipC)
+                shutil.unpack_archive(nf,modsF)
+        # customB64 (non-archive)
+        if _type == "customB64":
+            jarC = decodeB64U8(_base64)
+            nf = os.path.join(modsF,_filename)
+            with open(nf,'wb') as file:
+                file.write(jarC)
+        # downloadable
+        if _type in downloadable:
+            if "<ManualUrlWaitingToBeFilledIn>" not in _url:
+                downUrlFile(_url,os.path.join(modsF,_filename))
+        # nameOnly
+        if _type == "filenameOnly":
+            listedNameOnlys.append(_filename)
+    # write filenameOnly
+    if listedNameOnlys != []:
+        tx = ""
+        for fn in listedNameOnlys:
+            tx += f"{fn}\n"
+        nolf = os.path.join(modsF,"listedFilenames.txt")
+        if fs.doesExist(nolf): fs.deleteFile(nolf)
+        open(nolf,'w',encoding=encoding).write(tx)
+
+def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
+    # get type
+    listingType = fs.getFileExtension(modpack_path)
+    # ensure extractFolder
+    dest = os.path.join(parent,fs.getFileName(os.path.basename(modpack_path)))
+    if fs.notExist(dest): fs.createDir(dest)
+    # handle archives (.zip/.package/.mListing) they are diffrent but handled the same at this stage
+    if listingType != "listing":
+        if listingType != "zip":
+            newfile = os.path.join(os.path.dirname(modpack_path),fs.getFileName(modpack_path)+".zip")
+            fs.copyFile(modpack_path,newfile)
+            shutil.unpack_archive(newfile,dest)
+            fs.deleteFile(newfile)
+        else:
+            shutil.unpack_archive(modpack_,dest)
+    else:
+        oldname = os.path.join(dest,os.path.basename(modpack_path))
+        newname = os.path.join(dest,"listing.json")
+        fs.copyFile(modpack_path,dest)
+        fs.renameFile(oldname,newname)
+    return dest
+
+def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix=""):
+    dest = extractedPackFolderPath
+    # get data
+    poss = os.path.join(dest,"listing.json")
+    # If there is a listing file we must install the listing content
+    if fs.doesExist(poss):
+        content = open(poss,'r',encoding=encoding).read()
+        listing = json.loads(content)
+        installListing(listing,extractedPackFolderPath,encoding,prefix)
+
+def _getJvb(path):
+    java_binary = os.path.join(path, "java")
+    if platform.system().lower() == "windows":
+        java_binary += ".exe"
+    if os.path.exists(java_binary):
+        return java_binary
+    else:
+        return None
+
+def find_java_binary(folder):
+    # Check in folder
+    jvb = _getJvb(folder)
+    if jvb != None: return jvb
+    # Check subsequent folders
+    for elem in os.listdir(folder):
+        elem = os.path.join(folder,elem)
+        if os.path.isdir(elem):
+            jvb = _getJvb(elem)
+            if jvb != None: return jvb
+    # Traverse
+    for root, _, _ in os.walk(folder):
+        if "bin" in root:
+            java_binary = os.path.join(root, "java")
+            if platform.system().lower() == "windows":
+                java_binary += ".exe"
+            if os.path.exists(java_binary):
+                return java_binary
+
+def getjava(prefix="",temp_folder=str,lnx_url=str,mac_url=str,win_url=str,forceDownload=False):
+    # Check if Java is available in the CLI
+    try:
+        subprocess.check_output(["java", "-version"], stderr=subprocess.STDOUT, universal_newlines=True)
+        if forceDownload != True:
+            print(prefix+"Found java in path, continuing...")
+            return "java"  # Java is already available
+    except FileNotFoundError:
+        print(prefix+"Java not found in path, downloading...")
+
+    # Determine the appropriate download URL based on the operating system
+    system = platform.system().lower()
+    if system == "linux":
+        url = lnx_url
+    elif system == "darwin":
+        url = mac_url
+    elif system == "windows":
+        url = win_url
+    else:
+        raise NotImplementedError("Unsupported operating system")
+
+    # Create a "java" folder in the temp_folder
+    java_folder = os.path.join(temp_folder, "java")
+    os.makedirs(java_folder)
+
+    # Download and unpack Java
+    response = requests.get(url, stream=True)
+    print(prefix+"Java downloaded, extracting archive...")
+    if response.status_code == 200:
+        if url.endswith(".zip"):
+            with open(os.path.join(java_folder, "java.zip"), "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+            with zipfile.ZipFile(os.path.join(java_folder, "java.zip"), 'r') as zip_ref:
+                zip_ref.extractall(java_folder)
+        elif url.endswith(".tar.gz"):
+            with open(os.path.join(java_folder, "java.tar.gz"), "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+            with tarfile.open(os.path.join(java_folder, "java.tar.gz"), 'r:gz') as tar_ref:
+                tar_ref.extractall(java_folder)
+        else:
+            raise NotImplementedError("Unsupported archive format")
+
+    print(prefix+"Java extracted, locating binary...")
+
+    # Find the Java binary
+    java_binary = find_java_binary(java_folder)
+    if not java_binary:
+        raise RuntimeError("Java binary not found in the extracted folder")
+
+    # Mark the Java binary as executable on macOS and Linux
+    if system in ["linux", "darwin"]:
+        print(prefix+"Found, marking as executable...")
+        os.chmod(java_binary, 0o755)
+    else:
+        print(prefix+"Found.")
+
+    # Return the path to the Java binary
+    print(prefix+"Continuing with downloaded java instance...")
+    return java_binary
+
+# Function to scape minor version urls from curseforge website
+def scrapeMinorVerLinks(webcontent=str,baseurl=str):
+    vers = webcontent.split('</li></div></div></ul>')
+    vers = '</li></div></div></ul>'.join(vers)
+    vers = vers.split('<li class="li-version-list">')
+    vers.pop(0)
+    versions = {}
+    for ver in vers:
+        # get minor
+        ver = ver.split('<ul class="nav-collapsible " style="display: none;">')[-1]
+        ver = ver.split('</ul>')[0]
+        ver = ver.replace("<li>","")
+        ver = ver.replace("</li>","")
+        ver = ver.split('<ul class="nav-collapsible ">')[-1]
+        for line in ver.split("\n"):
+            if "<a href=" in line:
+                line = line.split('<a href="')[-1]
+                line = line.split('</a>')[0]
+                parts = line.split('">')
+                if parts[-1] != "":
+                    if baseurl.endswith("/") != True: baseurl = baseurl+"/"
+                    versions[parts[-1]] = baseurl + parts[0]
+    return versions
+
+# Function to using the previously scraped link scrape the accuallt installer links
+def scrapeUniversals(prefix,scrapedPages=dict):
+    universals = {}
+    for ver,page in scrapedPages.items():
+        # scape page
+        wtext = requests.get(page).text
+        if '<i class="fa classifier-universal' in wtext:
+            wtext = wtext.split('<i class="fa classifier-universal')
+            #wtext.pop(0)
+            #wtext.pop(-1)
+            for segment in wtext:
+                seg = segment.split('<div class="link">')[-1]
+                seg = seg.split('" title="Universal"')[0]
+                seg = seg.split('<a href="')[-1]
+                if "privacy.html" not in seg:
+                    print(prefix+"Found universal jar: "+seg)
+                    if universals.get(ver) == None:
+                        universals[ver] = {"latest":"","recommended":""}
+                    if universals[ver]["latest"] == "" and ".zip" not in seg:
+                        universals[ver]["latest"] = seg
+                    else:
+                        if ".zip" not in seg:
+                            universals[ver]["recommended"] = seg
+        elif '<i class="fa classifier-installer' in wtext:
+            wtext = wtext.split('<i class="fa classifier-installer')
+            #wtext.pop(0)
+            #wtext.pop(-1)
+            for segment in wtext:
+                seg = segment.split('<div class="link-boosted">')[-1]
+                seg = seg.split('" title="Installer"')[0]
+                seg = seg.split('<a href="')[-1]
+                if "privacy.html" not in seg:
+                    print(prefix+"Found installer jar: "+seg)
+                    if universals.get(ver) == None:
+                        universals[ver] = {"latest":"","recommended":""}
+                    if universals[ver]["latest"] == "" and ".zip" not in seg:
+                        universals[ver]["latest"] = seg
+                    else:
+                        if ".zip" not in seg:
+                            universals[ver]["recommended"] = seg
+    # remove empty
+    new_universals = {}
+    for key,value in universals.items():
+        if value != {"latest":"","recommended":""}:
+            new_universals[key] = value
+    return new_universals
+
+# Function to join together two forge-client listings
+def _joinForgeListings(stdlist,newlist):
+    joinedList = stdlist
+    for key,value in newlist.items():
+        if key not in stdlist.keys():
+            joinedList[key] = value
+        else:
+            if joinedList[key] == None:
+                joinedList[key] = value
+            else:
+                # prioritate std
+                if newlist[key].get("latest") != "":
+                    joinedList[key]["latest"] = newlist[key]["latest"]
+                if newlist[key].get("recommended") != "":
+                    joinedList[key]["recommended"] = newlist[key]["recommended"]
+    return joinedList
+
+# Function to get the download url for a loader
+def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUrl=str,forgeMakeUrl=True,forgeMakeUrlType="installer",forForgeMcVer=str,forForgeLdVer=str,forForgeInstType="latest",forForgeList=str,regetForge=False) -> str:
+    '''Downloads a loader and return the path to it'''
+    # Fabric (just return fabricURL)
+    if loaderType.lower() == "fabric":
+        return fabricUrl
+    # Forge
+    if loaderType.lower() == "forge":
+        url = None
+        # Compile fstring url
+        if forgeMakeUrl == True:
+            print(prefix+"Attempting to build list...")
+            url = f"https://maven.minecraftforge.net/net/minecraftforge/forge/{forForgeMcVer}-{forForgeLdVer}/forge-{forForgeMcVer}-{forForgeLdVer}-{forgeMakeUrlType}.jar"
+        # Otherwise use listing
+        else:
+            print(prefix+"Getting stdlist from github...")
+            # get stdlist
+            stdlist = {}
+            cont = getUrlContent(forForgeList)
+            if cont != None and cont != "":
+                stdlist = json.loads(cont)
+            # scrape current
+            if regetForge == True:
+                print(prefix+"Re-scraping list...")
+                # scrape webcontent
+                webcontent = requests.get(forgeUrl).text
+                scrapedPages = scrapeMinorVerLinks(webcontent,forgeUrl)
+                # scrape universals
+                universals = scrapeUniversals(prefix,scrapedPages)
+                # join
+                if stdlist != {} and universals != None and universals != {}:
+                    print(prefix+"Joining lists...")
+                    stdlist = _joinForgeListings(stdlist,universals)
+            # return without empty listings
+            if forForgeMcVer in stdlist.keys():
+                urlL = stdlist[forForgeMcVer]
+                late = urlL.get("latest")
+                reco = urlL.get("recommended")
+                if forForgeInstType.lower() == "latest":
+                    if late != "":
+                        url = late
+                    elif reco != "":
+                        url = reco
+                else:
+                    if reco != "":
+                        url = reco
+                    elif late != "":
+                        url = late
+        return url
+
+# Function to get the loader given an url 
+def getLoader(basedir,loaderType="fabric",loaderLink=str) -> str:
+    loader_folder = os.path.join(basedir,loaderType.lower())
+    if fs.notExist(loader_folder): fs.createDir(loader_folder)
+    loader_filen = os.path.basename(loaderLink)
+    loader_filep = os.path.join(loader_folder,loader_filen)
+    downUrlFile(loaderLink, loader_filep)
+    return loader_filep
+
+# Function to get the os-standard .minecraft path
+def getLauncherDir(preset=None):
+    if preset is not None:
+        return preset
+    else:
+        user = getpass.getuser()
+        system = platform.system().lower()
+        if system == "windows":
+            return f"C:\\Users\\{user}\\AppData\\Roaming\\.minecraft"
+        elif system == "darwin":  # macOS
+            return f"~/Library/Application Support/minecraft"
+        elif system == "linux":
+            return f"~/.minecraft"
+        else:
+            raise ValueError("Unsupported operating system")
+
+# Function to run installer for a loader
+def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False):
+    if loaderType.lower() == "fabric":
+        print(prefix+"Starting fabric install...")
+        command = java_path + " -jar " + f'"{loaderFile}"' + " client"
+        if f_snapshot == True:
+            command += " -snapshot"
+        if f_dir != None:
+            command += f' -dir "{f_dir}"'
+        if f_mcversion != None:
+            command += f' -mcversion "{f_mcversion}"'
+        if f_loaderver != None:
+            command += f' -loader "{f_loaderver}"'
+        if f_noprofile == True:
+            command += " -noprofile"
+        os.system(command)
+        print(prefix+"Continuing...")
+    elif loaderType.lower() == "forge":
+        print(prefix+"Starting forge install...")
+        print(prefix+"Follow the forge installers instructions.")
+        # set dir to forge install to make sure log is placed in right folder
+        olddir = os.getcwd()
+        os.chdir(os.path.dirname(loaderFile))
+        # run
+        os.system(f'{java_path} -jar "{loaderFile}"')
+        # move back to the prv dir
+        os.chdir(olddir)
+        #_ = input(prefix+"Once the installer is done, press any key to continue...")
+        print(prefix+"Continuing...")
+
+# Get client versionID
+def getVerId(loaderType,loaderVer,mcVer):
+    if loaderType.lower() == "fabric":
+        return f"fabric-loader-{loaderVer}-{mcVer}"
+    elif loaderType.lower() == "forge":
+        return f"{mcVer}-forge-{loaderVer}"
+    else:
+        return mcVer
+
+# Legacy > newFormat converter
+def convFromLegacy(flavorMTAfile,legacyRepoUrl,encoding="utf-8") -> dict:
+    # get flavorMTAcontent
+    raw = open(flavorMTAfile,'r',encoding=encoding).read()
+    mta = json.loads(raw)
+    nameFound = os.path.basename(os.path.dirname(flavorMTAfile))
+    # get props from name
+    for segment in mta["Data"]:
+        if segment.get("Name") != None:
+            nameFound = segment.get("Name")
+    # retrive repo for file
+    lrepo = {}
+    try:
+        lrepo_raw = getUrlContent(legacyRepoUrl)
+        lrepo = json.loads(lrepo_raw)
+    except: pass
+    lrepo_flavors = lrepo["Flavors"]
+    listFlavorData = {}
+    for flavor in lrepo_flavors:
+        if list(flavor.keys())[0] == nameFound:
+            listFlavorData = flavor[nameFound]
+    flavorData = {}
+    for item in listFlavorData:
+        key = list(item.keys())[0]
+        flavorData[key] = item[key]
+    # create template
+    listing = {
+        "format": 1,
+        "name": nameFound,
+        "version": "0.0",
+        "modloader": "fabric",
+        "modloaderVer": flavorData["fabric_loader"],
+        "minecraftVer": flavorData["minecraft_version"],
+        "created": datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+        "launcherIcon": flavorData["launcher_icon"],
+        "_legacy_fld": flavorData
+    }
+    return listing
+
+# Apply user directory to a path
+def applyDestPref(shortDest) -> str:
+    user = getpass.getuser()
+    system = platform.system().lower()
+    if system == "windows":
+        p = os.path.join(f"C:\\users\\{user}\\",shortDest)
+    elif system == "darwin":
+        p = os.path.join(f"~/Users/{user}/",shortDest)
+        if os.path.exists(p) != True:
+            p = os.path.join(f"/home/{user}/",shortDest)
+    else:
+        p = os.path.join(f"/home/{user}/",shortDest)
+    return fs.replaceSeps(p)
+
+# Get std final destination
+def getStdInstallDest(system):
+    p = applyDestPref(f"installs\\minecraft-custom-client\\v2")
+    return p
+
+# Function to handle icon
+def _getIcon(icon,icon128,legacy,modded):
+    if icon == "mcc:icon128":
+        return icon128
+    elif icon == "mcc:legacy":
+        return legacy
+    elif icon == "mcc:modded":
+        return modded
+    else:
+        return icon
+def getIcon(icon,icon128,legacy,modded,default):
+    _icon = _getIcon(icon,icon128,legacy,modded)
+    if _icon == None:
+        return default
+    else:
+        return _icon
+
+def getIconFromListing(listingData):
+    ico = listingData.get("icon")
+    if ico == None:
+        return listingData.get("launcherIcon")
+    else:
+        return ico
+
+# [Curseforge]
+def getCFdir(ovv=None):
+    if ovv != None:
+        return ovv
+    else:
+        return applyDestPref("curseforge\\minecraft\\Instances")
+
+def getCFinstanceDict(modld,ldver,mcver):
+    if modld.lower() == "fabric":
+        return {
+            "baseModLoader": {
+                "forgeVersion": ldver,
+                "name": f"fabric-{ldver}-{mcver}",
+                "minecraftVersion": mcver
+            }
+        }
+    else:
+        return {
+            "baseModLoader": {
+                "forgeVersion": ldver,
+                "name": f"{modld.lower()}-{ldver}",
+                "minecraftVersion": mcver
+            }
+        }
+
+# [Modrinth]
+def getMRdir(system,ovv=None):
+    if ovv != None:
+        return ovv
+    else:
+        if system == "windows":
+            return applyDestPref("Appdata\\Roaming\\com.modrinth.theseus\\profiles")
+        elif system == "darwin":
+            return fs.ensureDirPath(os.path.abspath(f"~/Library/Application Support/com.modrinth.theseus/profiles"))
+        else:
+            return applyDestPref(f"com.modrinth.theseus/profiles")
+
+def getMRloaderURL(modld,ldver,mcver):
+    if modld.lower() == "fabric":
+        return f"https://meta.modrinth.com/fabric/v0/versions/{ldver}.json"
+    elif modld.lower() == "forge":
+        return f"https://meta.modrinth.com/forge/v0/versions/{mcver}-forge-{ldver}.json"
+
+def getMRinstanceDict(modld,ldver,mcver,modDestF,name,icon):
+    return {
+        "uuid": str(uuid.uuid4()),
+        "install_stage": "installed",
+        "path": os.path.basename(modDestF),
+        "metadata": {
+        "name": name,
+        "icon": str(icon),
+        "groups": [],
+        "game_version": mcver,
+        "loader": modld,
+        "loader_version": {
+            "id": ldver,
+            "url": getMRloaderURL(modld,ldver,mcver),
+            "stable": True
+        }
+        },
+        "fullscreen": None,
+        "projects": {},
+        "modrinth_update_version": None
+    }
+
+def sha1_hash_file(filepath):
+    sha1 = hashlib.sha1()
+    with open(filepath, "rb") as file:
+        while True:
+            data = file.read(65536)  # Read the file in 64k chunks
+            if not data:
+                break
+            sha1.update(data)
+    return sha1.hexdigest()
+
+def prepMRicon(modpackDestF,icon):
+    iconPath = ""
+    if icon == None:
+        return icon
+    finalPng = os.path.join(modpackDestF,"mcc_generated_icon.png")
+    if os.path.exists(finalPng): os.remove(finalPng)
+    # handle b64
+    if "data:image/png;base64," in icon:
+        icon = icon.replace("data:image/png;base64,","",1)
+        icon_binary = base64.b64decode(icon)
+        with open(finalPng, "wb") as f:
+            f.write(icon_binary)
+    else:
+        if os.path.exists(icon):
+            fs.copyFile(icon,finalPng)
+        else:
+            iconPath = icon.replace("\\","/")
+    iconPath = finalPng.replace("\\","/")
+    # get hash
+    sha1 = sha1_hash_file(iconPath)
+    cacheF = '/'.join([os.path.dirname(iconPath),"..","..","caches","icons",sha1+".png"])
+    cacheF = os.path.abspath(cacheF)
+    fs.copyFile(iconPath,cacheF)
+    return cacheF
+#endregion [IncludeInline: ./assets/flavorFunctions.py]: END
+
+#region [IncludeInline: ./assets/minecraftLauncherAgent.py]: START
+# import
+import os,platform,subprocess,json,getpass
+from datetime import datetime
+
+# launcherDirGet
+def getLauncherDir(preset=None):
+    if preset is not None:
+        return preset
+    else:
+        user = getpass.getuser()
+        system = platform.system().lower()
+        if system == "windows":
+            return f"C:\\Users\\{user}\\AppData\\Roaming\\.minecraft"
+        elif system == "darwin":  # macOS
+            return f"~/Library/Application Support/minecraft"
+        elif system == "linux":
+            return f"~/.minecraft"
+        else:
+            raise ValueError("Unsupported operating system")
+
+# terminateMc
+def terminateMC():
+    import psutil
+    # Get a list of all running processes
+    for process in psutil.process_iter(['pid', 'name']):
+        try:
+            process_name = process.info['name']
+            # Check if the process name contains "Minecraft"
+            if 'minecraft' in process_name.lower():
+                # Terminate the process
+                pid = process.info['pid']
+                psutil.Process(pid).terminate()
+                print(f"Terminated process '{process_name}' with PID {pid}")
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass  # Handle exceptions if necessary
+
+# Check if a command exists
+def check_command_exists(command):
+    try:
+        subprocess.check_output([command, '--version'], stderr=subprocess.STDOUT, shell=True, text=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+# Launch appxLauncher if avaliable
+def check_and_launch_appxMinecraftLauncher():
+    # Check if the OS is Windows
+    if platform.system().lower() != 'windows':
+        return False
+    # Check if "pwsh" or "powershell" command is available
+    if check_command_exists("pwsh"):
+        powershell_command = "pwsh"
+    elif check_command_exists("powershell"):
+        powershell_command = "powershell"
+    else:
+        return False
+    # Check if "get-appxpackage" command is available inside PowerShell
+    ps_script = """
+    $result = Get-Command -Name "get-appxpackage" -ErrorAction SilentlyContinue
+    if ($result -ne $null) {
+        $familyName = (Get-AppxPackage -Name "Microsoft.4297127D64EC6").PackageFamilyName
+        try {
+            iex('Start-Process shell:AppsFolder\\' + $familyName + '!Minecraft')
+        }
+        catch {
+            Write-Host "Error: $_"
+            exit 1
+        }
+    }
+    """
+    # Execute the PowerShell script and capture the return code
+    try:
+        subprocess.check_call([powershell_command, "-Command", ps_script])
+        return True  # Return True if the script executes successfully
+    except subprocess.CalledProcessError as e:
+        print(f"PowerShell script execution failed with exit code {e.returncode}.")
+        return False  # Return False if the script fails
+
+def pause():
+    '''Pauses the terminal (Waits for input)
+    ConUtils is dependent on platform commands so this might not work everywere :/'''
+    # Get platform
+    platformv = platform.system()
+    # Linux using resize
+    if platformv == "Linux":
+        os.system(f"read -p ''")
+    # Mac using resize
+    elif platformv == "Darwin":
+        os.system(f"read -n 1 -s -r -p ''")
+    # Windows using PAUSE
+    elif platformv == "Windows":
+        os.system("PAUSE > nul")
+    # Error message if platform isn't supported
+    else:
+        raise Exception(f"Error: Platform {platformv} not supported yet!")
+
+def get_current_datetime_mcpformat():
+    current_datetime = datetime.utcnow()
+    formatted_datetime = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+    return formatted_datetime
+
+def get_current_datetime_logformat():
+    current_datetime = datetime.utcnow()
+    formatted_datetime = current_datetime.strftime('%d_%m_%Y %H-%M-%S')
+    return formatted_datetime
+
+# Main function
+def MinecraftLauncherAgent(
+    #Minecraft Launcher Agent
+    #This function helps to add/remove/list or replace minecraft launcher installs.
+    #
+    #Made by Simon Kalmi Claesson
+    #Version:  2023-09-25(1) 2.1 PY
+    #
+
+    # [Arguments]
+    ## extra
+    prefix="",
+    encoding="utf-8",
+    ## Options
+    startLauncher=False,
+    suppressMsgs=False,
+    dontkill=False,
+
+    ## Prio inputs
+    add=False,
+    remove=False,
+    list=False,
+    get=False,
+    replace=False,
+
+    ## Later inputs
+    oldInstall=str,
+    gameDir=str,
+    icon=str,
+    versionId=str,
+    name=str,
+    overWriteLoc=str,
+    overWriteFile=str,
+    overWriteBinExe=str,
+
+    ## extraAdditions
+    dontbreak=False
+):
+    # [Setup]
+    ## Variables
+    doExitOnMsg = False
+    doPause = False
+    toReturn = None
+    system = platform.system().lower()
+    ## DontBreak
+    if dontbreak == True:
+        doExitOnMsg = False
+
+    ## Presets
+    defa_MCFolderLoc = getLauncherDir()
+    defa_MCProfFileN = "launcher_profiles.json"
+    backupFolderName = ".installAgentBackups"
+    familyName = "Microsoft.4297127D64EC6_8wekyb3d8bbwe"
+    binlaunchdir = "C:\Program Files (x86)\Minecraft Launcher\MinecraftLauncher.exe"
+    if overWriteBinExe != None and overWriteBinExe != str:
+        binlaunchdir = overWriteBinExe
+    opHasRun = False
+    returnPath = os.getcwd()
+
+    ## Text
+    #Text
+    text_MissingParam = "You have not supplied one or more of the required parameters for this action!"
+    text_NoLauncher = "No launcher found! (Wont auto start)"
+    text_OPhasRun = "Operation has been run."
+
+    # Kill launcher
+    if dontkill != True:
+        # Non windows dont kill
+        if system != "windows":
+            print(prefix+"Non-windows platform identified, won't kill launcher.")
+            _ = input(prefix+"Kill the minecraft/launcher processes manually and then press ENTER to continue...")
+        # kill
+        terminateMC()
+
+    # [Add]
+    if add == True:
+        # missing params
+        if gameDir == None or versionId == None or name == None:
+            if suppressMsgs != True:
+                print(prefix+text_MissingParam)
+            if doPause == True:
+                pause()
+            if dontbreak != True:
+                if doExitOnMsg == True: exit()
+                else: return
+        # overwrite
+        loc = defa_MCFolderLoc
+        file = defa_MCProfFileN
+        if overWriteLoc != None and overWriteLoc != str:
+            loc = overWriteLoc
+        if overWriteFile != None and overWriteFile != str:
+            file = overWriteFile
+
+        # get file content and change to dict
+        os.chdir(loc)
+        jsonFile = open(file,'r',encoding=encoding).read()
+        _dict = json.loads(jsonFile)
+        profiles = _dict.get("profiles")
+        if profiles == None: profiles = {}
+
+        # create template profile
+        template = {
+            "created": get_current_datetime_mcpformat(),
+            "gameDir": gameDir,
+            "icon": icon,
+            "lastVersionId": versionId,
+            "name": name,
+            "type": "custom"
+        }
+
+        # create temporary vars and fix add profile to data
+        newProfiles = profiles.copy()
+        newProfiles[template['name']] = template
+        newDict = _dict.copy()
+        newDict["profiles"] = newProfiles
+        # convert to JSON
+        endJson = json.dumps(newDict)
+        
+        #Prep Backup
+        newFileName = "(" + get_current_datetime_logformat() + ")" + file
+        newFileName = newFileName.replace("/","_")
+        newFileName = newFileName.replace(":","-")
+        #Backup
+        if os.path.exists(backupFolderName) != True:
+            os.mkdir(backupFolderName)
+        cl = os.getcwd()
+        if system == "windows":
+            newFilePath = os.path.join(".\\",backupFolderName,newFileName)
+        else:
+            newFilePath = os.path.join("./",backupFolderName,newFileName)
+        open(newFilePath,'w',encoding=encoding).write(jsonFile)
+
+        # Replace content in org file
+        open(file,'w',encoding=encoding).write(endJson)
+
+        #Done
+        if suppressMsgs != True:
+            print(prefix+text_OPhasRun)
+            os.chdir(returnPath)
+            if startLauncher == True:
+                succed = check_and_launch_appxMinecraftLauncher()
+                if succed == False:
+                    if os.path.exists(binlaunchdir):
+                        os.system(binlaunchdir)
+                    else:
+                        print(prefix+text_NoLauncher)
+        opHasRun = True
+
+    # Remove install
+    elif remove == True:
+        # missing params
+        if name == None:
+            if suppressMsgs != True:
+                print(prefix+text_MissingParam)
+            if doPause == True:
+                pause()
+            if dontbreak != True:
+                if doExitOnMsg == True: exit()
+                else: return
+        # overwrite
+        loc = defa_MCFolderLoc
+        file = defa_MCProfFileN
+        if overWriteLoc != None and overWriteLoc != str:
+            loc = overWriteLoc
+        if overWriteFile != None and overWriteFile != str:
+            file = overWriteFile
+
+        # get file content and change to dict
+        os.chdir(loc)
+        jsonFile = open(file,'r',encoding=encoding).read()
+        _dict = json.loads(jsonFile)
+        profiles = _dict.get("profiles")
+        if profiles == None: profiles = {}
+
+        # create temporary vars and fix add profile to data
+        newProfiles = profiles.copy()
+        if newProfiles.get(name) != None:
+            newProfiles.pop(name)
+        newDict = _dict.copy()
+        newDict["profiles"] = newProfiles
+
+        # convert to JSON
+        endJson = json.dumps(newDict)
+        
+        #Prep Backup
+        newFileName = "(" + get_current_datetime_logformat() + ")" + file
+        newFileName = newFileName.replace("/","_")
+        newFileName = newFileName.replace(":","-")
+        #Backup
+        if os.path.exists(backupFolderName) != True:
+            os.mkdir(backupFolderName)
+        cl = os.getcwd()
+        system
+        if system == "windows":
+            newFilePath = os.path.join(".\\",backupFolderName,newFileName)
+        else:
+            newFilePath = os.path.join("./",backupFolderName,newFileName)
+        open(newFilePath,'w',encoding=encoding).write(jsonFile)
+
+        # Replace content in org file
+        open(file,'w',encoding=encoding).write(endJson)
+
+        #Done
+        if suppressMsgs != True:
+            print(prefix+text_OPhasRun)
+            os.chdir(returnPath)
+            if startLauncher == True:
+                succed = check_and_launch_appxMinecraftLauncher()
+                if succed == False:
+                    if os.path.exists(binlaunchdir):
+                        os.system(binlaunchdir)
+                    else:
+                        print(prefix+text_NoLauncher)
+        opHasRun = True
+
+    # List profiles
+    elif list == True:
+        # overwrite
+        loc = defa_MCFolderLoc
+        file = defa_MCProfFileN
+        if overWriteLoc != None and overWriteLoc != str:
+            loc = overWriteLoc
+        if overWriteFile != None and overWriteFile != str:
+            file = overWriteFile
+            
+        # get file content and change to dict
+        os.chdir(loc)
+        jsonFile = open(file,'r',encoding=encoding).read()
+        _dict = json.loads(jsonFile)
+        profiles = _dict.get("profiles")
+        if profiles == None: profiles = {}
+
+        print('\n'.join([key for key in profiles.keys()]))
+
+        #Done
+        if suppressMsgs != True:
+            print(prefix+text_OPhasRun)
+            os.chdir(returnPath)
+            if startLauncher == True:
+                succed = check_and_launch_appxMinecraftLauncher()
+                if succed == False:
+                    if os.path.exists(binlaunchdir):
+                        os.system(binlaunchdir)
+                    else:
+                        print(prefix+text_NoLauncher)
+        opHasRun = True
+
+    # Get profiles
+    elif get == True:
+        # overwrite
+        loc = defa_MCFolderLoc
+        file = defa_MCProfFileN
+        if overWriteLoc != None and overWriteLoc != str:
+            loc = overWriteLoc
+        if overWriteFile != None and overWriteFile != str:
+            file = overWriteFile
+            
+        # get file content and change to dict
+        os.chdir(loc)
+        jsonFile = open(file,'r',encoding=encoding).read()
+        _dict = json.loads(jsonFile)
+        profiles = _dict.get("profiles")
+        if profiles == None: profiles = {}
+
+        toReturn = profiles
+
+        #Done
+        if suppressMsgs != True:
+            print(prefix+text_OPhasRun)
+            os.chdir(returnPath)
+            if startLauncher == True:
+                succed = check_and_launch_appxMinecraftLauncher()
+                if succed == False:
+                    if os.path.exists(binlaunchdir):
+                        os.system(binlaunchdir)
+                    else:
+                        print(prefix+text_NoLauncher)
+        opHasRun = True
+    
+    # Replace profiles
+    elif replace == True:
+        # missing params
+        if oldInstall == None or gameDir == None or versionId == None or name == None:
+            if suppressMsgs != True:
+                print(prefix+text_MissingParam)
+            if doPause == True:
+                pause()
+            if dontbreak != True:
+                if doExitOnMsg == True: exit()
+                else: return
+        # overwrite
+        loc = defa_MCFolderLoc
+        file = defa_MCProfFileN
+        if overWriteLoc != None and overWriteLoc != str:
+            loc = overWriteLoc
+        if overWriteFile != None and overWriteFile != str:
+            file = overWriteFile
+
+        # get file content and change to dict
+        os.chdir(loc)
+        jsonFile = open(file,'r',encoding=encoding).read()
+        _dict = json.loads(jsonFile)
+        profiles = _dict.get("profiles")
+        if profiles == None: profiles = {}
+
+        # create template profile
+        template = {
+            "created": get_current_datetime_mcpformat(),
+            "gameDir": gameDir,
+            "icon": icon,
+            "lastVersionId": versionId,
+            "name": name,
+            "type": "custom"
+        }
+
+        # create temporary vars and fix add profile to data
+        newProfiles = profiles.copy()
+        newProfiles[oldInstall] = template
+        newDict = _dict.copy()
+        newDict["profiles"] = newProfiles
+        # convert to JSON
+        endJson = json.dumps(newDict)
+        
+        #Prep Backup
+        newFileName = "(" + get_current_datetime_logformat() + ")" + file
+        newFileName = newFileName.replace("/","_")
+        newFileName = newFileName.replace(":","-")
+        #Backup
+        if os.path.exists(backupFolderName) != True:
+            os.mkdir(backupFolderName)
+        cl = os.getcwd()
+        if system == "windows":
+            newFilePath = os.path.join(".\\",backupFolderName,newFileName)
+        else:
+            newFilePath = os.path.join("./",backupFolderName,newFileName)
+        open(newFilePath,'w',encoding=encoding).write(jsonFile)
+
+        # Replace content in org file
+        open(file,'w',encoding=encoding).write(endJson)
+
+        #Done
+        if suppressMsgs != True:
+            print(prefix+text_OPhasRun)
+            os.chdir(returnPath)
+            if startLauncher == True:
+                succed = check_and_launch_appxMinecraftLauncher()
+                if succed == False:
+                    if os.path.exists(binlaunchdir):
+                        os.system(binlaunchdir)
+                    else:
+                        print(prefix+text_NoLauncher)
+        opHasRun = True
+
+    # If no param is given show help
+    if opHasRun != True: 
+        print(prefix+"MinecraftLauncher InstallAgent (GameInstalls)")
+    
+    # Go return path
+    os.chdir(returnPath)
+
+    # return content
+    if toReturn != None: return toReturn#endregion [IncludeInline: ./assets/minecraftLauncherAgent.py]: END
 
 # Create tempfolder
 fs = filesys
@@ -189,7 +1945,65 @@ fs.createDir(tempFolder)
 
 # IMPORT
 if args.imprt:
-    pass
+    # get dest
+    dest = os.path.join(tempFolder,fs.getFileName(os.path.basename(args.imprt)))
+    # get type
+    listingType = fs.getFileExtension(modpack_path)
+    # get data
+    if listingType != "package":
+        # get listing data
+        listingFile = os.path.join(dest,"listing.json")
+        if fs.doesExist(listingFile) == True:
+            listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
+        else:
+            print("Failed to retrive listing content!")
+            cleanUp(tempFolder)
+            exit()
+    else:
+        try:
+            mtaFile = os.path.join(dest,"flavor.mta")
+            listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+        except Exception as e:
+            print("Failed to retrive listing content!",e)
+            cleanUp(tempFolder)
+            exit()
+
+    modld = listingData["modloader"]
+    ldver = listingData["modloaderVer"]
+    mcver = listingData["minecraftVer"]
+
+    # handle install dest
+    install_dest = getStdInstallDest(system)
+    if listingData.get("_legacy_fld") != None:
+        _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
+        if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
+            install_dest = applyDestPref(_legacy_fld_isntLoc)
+    if args.dest:
+        install_dest = args.dest
+    fs.ensureDirPath(install_dest)
+    if args.rinth == True:
+        install_dest = getMRdir(
+            system,
+            args.rinthInstanceP
+        )
+        ## handle modrinth profile already existing
+        if args.rinth == True:
+            _p = os.path.join(install_dest,fs.getFileName(modpack))
+            if os.path.exists(_p):
+                if args.y:
+                    c = args.y
+                elif args.n:
+                    c = args.n
+                else:
+                    c = input("Modrith profile already exists, overwrite it? [y/n]")
+                if c.lower() == "n":
+                    cleanUp(tempFolder)
+                    exit()
+        fs.ensureDirPath(install_dest)
+
+    ## get modpack destination folder
+    modpack_destF = os.path.join(install_dest,fs.getFileName(os.path.basename(args.imprt)))
+    if os.path.exists(modpack_destF) != True: os.mkdir(modpack_destF)
 else:
     # get type
     listingType = fs.getFileExtension(modpack_path)
@@ -359,7 +2173,7 @@ if args.rinth == False:
             prefix=prefix_la,
             add=True,
 
-            name=fs.getFileName(modpack),
+            name=listingData["name"],
             gameDir=modpack_destF,
             icon=gicon,
             versionId=getVerId(modld,ldver,mcver),
@@ -392,7 +2206,7 @@ else:
         )
         gicon = prepMRicon(modpack_destF,gicon)
         mrInstanceFile = os.path.join(modpack_destF,"profile.json")
-        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,fs.getFileName(modpack),gicon)
+        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,listingData["name"],gicon)
         if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)
         open(mrInstanceFile,'w',encoding=encoding).write(
             json.dumps(mrInstanceDict)

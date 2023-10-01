@@ -125,37 +125,40 @@ time.sleep(2)
 
 # [Show repo]
 # IncludeInline: ./assets/ui_dict_selector.py
-# get repo
-try:
-    repoContent = requests.get(repo_url).text
-    repoData = json.loads(repoContent)
-except:
-    print("Failed to get repository")
-    exit()
-# show select
-flavors = repoData.get("flavors")
-flavorsDict = {}
-for fl in flavors:
-    n = fl["name"]
-    fl.pop("name")
-    flavorsDict[n] = fl
-flavorsDict["[Exit]"] = {"desc": "ncb:"}
-key = showDictSel(flavorsDict,selTitle="Select a flavor to install:", selSuffix="\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select\nq : Quit\n␛ : Quit\033[0m")
-if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
-    exit()
-# get modpack url
-modpack_url = flavors[key]["source"]
-# download url
-modpack_path = os.path.join(parent,os.path.basename(modpack_url))
-response = requests.get(modpack_url)
-if response.status_code == 200:
-    # Content of the file
-    cont = response.content
+if args.imprt:
+    modpack_path = args.imprt
 else:
-    cont = None
-if cont != None and cont != "":
-    if os.path.exists(modpack_path) == False:
-        open(modpack_path,'wb').write(cont)
+    # get repo
+    try:
+        repoContent = requests.get(repo_url).text
+        repoData = json.loads(repoContent)
+    except:
+        print("Failed to get repository")
+        exit()
+    # show select
+    flavors = repoData.get("flavors")
+    flavorsDict = {}
+    for fl in flavors:
+        n = fl["name"]
+        fl.pop("name")
+        flavorsDict[n] = fl
+    flavorsDict["[Exit]"] = {"desc": "ncb:"}
+    key = showDictSel(flavorsDict,selTitle="Select a flavor to install:", selSuffix="\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select\nq : Quit\n␛ : Quit\033[0m")
+    if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
+        exit()
+    # get modpack url
+    modpack_url = flavorsDict[key]["source"]
+    # download url
+    modpack_path = os.path.join(parent,os.path.basename(modpack_url))
+    response = requests.get(modpack_url)
+    if response.status_code == 200:
+        # Content of the file
+        cont = response.content
+    else:
+        cont = None
+    if cont != None and cont != "":
+        if os.path.exists(modpack_path) == False:
+            open(modpack_path,'wb').write(cont)
 
 # [Prep selected package]
 modpack = os.path.basename(modpack_path)
@@ -189,7 +192,65 @@ fs.createDir(tempFolder)
 
 # IMPORT
 if args.imprt:
-    pass
+    # get dest
+    dest = os.path.join(tempFolder,fs.getFileName(os.path.basename(args.imprt)))
+    # get type
+    listingType = fs.getFileExtension(modpack_path)
+    # get data
+    if listingType != "package":
+        # get listing data
+        listingFile = os.path.join(dest,"listing.json")
+        if fs.doesExist(listingFile) == True:
+            listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
+        else:
+            print("Failed to retrive listing content!")
+            cleanUp(tempFolder)
+            exit()
+    else:
+        try:
+            mtaFile = os.path.join(dest,"flavor.mta")
+            listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+        except Exception as e:
+            print("Failed to retrive listing content!",e)
+            cleanUp(tempFolder)
+            exit()
+
+    modld = listingData["modloader"]
+    ldver = listingData["modloaderVer"]
+    mcver = listingData["minecraftVer"]
+
+    # handle install dest
+    install_dest = getStdInstallDest(system)
+    if listingData.get("_legacy_fld") != None:
+        _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
+        if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
+            install_dest = applyDestPref(_legacy_fld_isntLoc)
+    if args.dest:
+        install_dest = args.dest
+    fs.ensureDirPath(install_dest)
+    if args.rinth == True:
+        install_dest = getMRdir(
+            system,
+            args.rinthInstanceP
+        )
+        ## handle modrinth profile already existing
+        if args.rinth == True:
+            _p = os.path.join(install_dest,fs.getFileName(modpack))
+            if os.path.exists(_p):
+                if args.y:
+                    c = args.y
+                elif args.n:
+                    c = args.n
+                else:
+                    c = input("Modrith profile already exists, overwrite it? [y/n]")
+                if c.lower() == "n":
+                    cleanUp(tempFolder)
+                    exit()
+        fs.ensureDirPath(install_dest)
+
+    ## get modpack destination folder
+    modpack_destF = os.path.join(install_dest,fs.getFileName(os.path.basename(args.imprt)))
+    if os.path.exists(modpack_destF) != True: os.mkdir(modpack_destF)
 else:
     # get type
     listingType = fs.getFileExtension(modpack_path)
@@ -359,7 +420,7 @@ if args.rinth == False:
             prefix=prefix_la,
             add=True,
 
-            name=fs.getFileName(modpack),
+            name=listingData["name"],
             gameDir=modpack_destF,
             icon=gicon,
             versionId=getVerId(modld,ldver,mcver),
@@ -392,7 +453,7 @@ else:
         )
         gicon = prepMRicon(modpack_destF,gicon)
         mrInstanceFile = os.path.join(modpack_destF,"profile.json")
-        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,fs.getFileName(modpack),gicon)
+        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,listingData["name"],gicon)
         if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)
         open(mrInstanceFile,'w',encoding=encoding).write(
             json.dumps(mrInstanceDict)
