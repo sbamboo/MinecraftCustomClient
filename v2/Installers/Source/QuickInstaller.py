@@ -73,6 +73,7 @@ parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore l
 #parser.add_argument('-curseInstanceP', type=str, help='A custom path to curseforge/minecraft/Instances')
 parser.add_argument('--rinth', help='Should the installer attempt to install into modrinth instead?', action="store_true")
 parser.add_argument('-rinthInstanceP', type=str, help='A custom path to com.modrinth.theseus/profiles')
+parser.add_argument('-excurse', type=str, help='Should the installer export to a curseforge pack instead of installing? (Takes a filepath to the zip to export to [non-existing])')
 parser.add_argument('--y', help='always answer with Yes', action="store_true")
 parser.add_argument('--n', help='always answer with No', action="store_true")
 parser.add_argument('-exprt', help='Exports a copy of the unpacked tempdata, takes the zip to export to. (its created so give path to non-existent file)', type=str)
@@ -348,7 +349,24 @@ fs.copyFolder2(dest,modpack_destF)
 
 # Create profile
 print(prefix+f"Creating profile for: {modpack}")
-if args.rinth == False:
+# Export to curse file
+if args.excurse:
+    print(prefix+f"Exporting to curseforge file: '{args.excurse}'")
+    # fix .zip double
+    if args.excurse.endswith(".zip") != True:
+        args.excurse = args.excurse + ".zip"
+    # create manifest file
+    print(prefix+f"Creating manifest...")
+    manifest = os.path.join(tempFolder,"manifest.json")
+    createCFmanifest(manifest,mcver,modld,ldver,listingData["name"],listingData["version"],encoding)
+    # export
+    print(prefix+f"Exporting...")
+    zipCFexport(dest,manifest,args.excurse)
+    print(prefix+f"Done!")
+    # cleanup
+    cleanUp(tempFolder,modpack_path)
+    exit()
+elif args.rinth == False:
     try:
         gicon = getIcon(
             getIconFromListing(listingData),
@@ -383,6 +401,7 @@ if args.rinth == False:
     #    open(cfInstanceFile,'w',encoding=encoding).write(
     #        json.dumps(cfInstanceDict)
     #    )
+# Install to launcher
 else:
     try:
         gicon = getIcon(

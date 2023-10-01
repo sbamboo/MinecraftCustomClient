@@ -544,6 +544,40 @@ def getCFinstanceDict(modld,ldver,mcver):
             }
         }
 
+def createCFmanifest(manifestFile,mcver,modld,ldver,name,ver,encoding="utf-8"):
+    manifest = {
+        "minecraft": {
+            "version": mcver,
+            "modLoaders": [
+            {
+                "id": f"{modld.lower()}-{ldver}",
+                "primary": True
+            }
+            ]
+        },
+        "manifestType": "minecraftModpack",
+        "manifestVersion": 1,
+        "name": name,
+        "version": ver,
+        "author": "",
+        "files": [],
+        "overrides": "overrides"
+    }
+    open(manifestFile,'w',encoding=encoding).write(json.dumps(manifest))
+
+def zipCFexport(modpackFolder, manifest, exportZip):
+    # Create a new zip file
+    with zipfile.ZipFile(exportZip, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        # Add the contents of the folder to the zip file
+        for folder_root, _, files in os.walk(modpackFolder):
+            for file in files:
+                file_to_zip = os.path.join(folder_root, file)
+                arcname = os.path.relpath(file_to_zip, modpackFolder)
+                arcname = os.path.join('overrides', arcname)  # Place files under "overrides" folder
+                zipf.write(file_to_zip, arcname=arcname)
+        # Add the specified file to the zip file
+        zipf.write(manifest, arcname=os.path.basename(manifest))
+
 # [Modrinth]
 def getMRdir(system,ovv=None):
     if ovv != None:
