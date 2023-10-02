@@ -70,6 +70,7 @@ parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore l
 parser.add_argument('--rinth', help='Should the installer attempt to install into modrinth instead?', action="store_true")
 parser.add_argument('-rinthInstanceP', type=str, help='A custom path to com.modrinth.theseus/profiles')
 parser.add_argument('-excurse', type=str, help='Should the installer export to a curseforge pack instead of installing? (Takes a filepath to the zip to export to [non-existing])')
+parser.add_argument('--excurse', dest="excurse_parent", help='Same as -excurse but takes no arguments and places in <parent>/<modpack>.zip', action="store_true")
 parser.add_argument('--y', help='always answer with Yes', action="store_true")
 parser.add_argument('--n', help='always answer with No', action="store_true")
 parser.add_argument('-exprt', help='Exports a copy of the unpacked tempdata, takes the zip to export to. (its created so give path to non-existent file)', type=str)
@@ -390,7 +391,16 @@ fs.copyFolder2(dest,modpack_destF)
 # Create profile
 print(prefix+f"Creating profile for: {modpack}")
 # Export to curse file
-if args.excurse == True:
+if (args.excurse != None and args.excurse != False and args.excurse != "") or args.excurse_parent == True:
+    # Handle --excurse
+    if args.excurse_parent == True:
+        if "MinecraftCustomClient" in str(sys.executable):
+            _parent = os.path.dirname(str(sys.executable))
+        else:
+            _parent = os.path.dirname(__file__)
+        args.excurse = os.path.join(_parent,listingData["name"]+"_excurse.zip")
+        if os.path.exists(args.excurse): os.remove(args.excurse)
+    # Msg
     print(prefix+f"Exporting to curseforge file: '{args.excurse}'")
     # fix .zip double
     if args.excurse.endswith(".zip") != True:
