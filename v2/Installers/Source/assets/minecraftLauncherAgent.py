@@ -19,14 +19,18 @@ def getLauncherDir(preset=None):
             raise ValueError("Unsupported operating system")
 
 # terminateMc
-def terminateMC():
+def terminateMC(excProcNameList=None):
     import psutil
     # Get a list of all running processes
     for process in psutil.process_iter(['pid', 'name']):
         try:
             process_name = process.info['name']
+            valid = True
+            if excProcNameList != None:
+                if process_name.lower() in excProcNameList:
+                    valid = False
             # Check if the process name contains "Minecraft"
-            if 'minecraft' in process_name.lower():
+            if 'minecraft' in process_name.lower() and valid == True:
                 # Terminate the process
                 pid = process.info['pid']
                 psutil.Process(pid).terminate()
@@ -140,7 +144,8 @@ def MinecraftLauncherAgent(
     overWriteBinExe=str,
 
     ## extraAdditions
-    dontbreak=False
+    dontbreak=False,
+    excProcNameList=None
 ):
     # [Setup]
     ## Variables
@@ -176,7 +181,7 @@ def MinecraftLauncherAgent(
             print(prefix+"Non-windows platform identified, won't kill launcher.")
             _ = input(prefix+"Kill the minecraft/launcher processes manually and then press ENTER to continue...")
         # kill
-        terminateMC()
+        terminateMC(excProcNameList)
 
     # [Add]
     if add == True:

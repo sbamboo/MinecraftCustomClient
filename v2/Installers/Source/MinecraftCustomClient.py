@@ -164,6 +164,9 @@ else:
     if cont != None and cont != "":
         if os.path.exists(modpack_path) == False:
             open(modpack_path,'wb').write(cont)
+    else:
+        print(prefix+"Failed to get modpack!")
+        exit()
 
 # [Prep selected package]
 modpack = os.path.basename(modpack_path)
@@ -387,7 +390,7 @@ fs.copyFolder2(dest,modpack_destF)
 # Create profile
 print(prefix+f"Creating profile for: {modpack}")
 # Export to curse file
-if args.excurse:
+if args.excurse == True:
     print(prefix+f"Exporting to curseforge file: '{args.excurse}'")
     # fix .zip double
     if args.excurse.endswith(".zip") != True:
@@ -403,7 +406,25 @@ if args.excurse:
     # cleanup
     cleanUp(tempFolder,modpack_path)
     exit()
-elif args.rinth == False:
+elif args.rinth == True:
+    try:
+        gicon = getIcon(
+            getIconFromListing(listingData),
+            icon_base64_icon128,
+            icon_base64_legacy,
+            icon_base64_modded,
+            icon_base64_default
+        )
+        gicon = prepMRicon(modpack_destF,gicon)
+        mrInstanceFile = os.path.join(modpack_destF,"profile.json")
+        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,listingData["name"],gicon)
+        if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)
+        open(mrInstanceFile,'w',encoding=encoding).write(
+            json.dumps(mrInstanceDict)
+        )
+    except Exception as e:
+        print(prefix+"Failed to create profile in modrinth app!",e)
+else:
     try:
         gicon = getIcon(
             getIconFromListing(listingData),
@@ -425,7 +446,9 @@ elif args.rinth == False:
             startLauncher=args.autostart,
             overWriteLoc=args.mcf,
             overWriteFile=args.cLnProfFileN,
-            overWriteBinExe=args.cLnBinPath
+            overWriteBinExe=args.cLnBinPath,
+
+            excProcNameList=["minecraftcustomclient.exe"]
         )
     except Exception as e:
         print(prefix+"Failed to create profile in minecraft launcher",e)
@@ -438,24 +461,6 @@ elif args.rinth == False:
     #    open(cfInstanceFile,'w',encoding=encoding).write(
     #        json.dumps(cfInstanceDict)
     #    )
-else:
-    try:
-        gicon = getIcon(
-            getIconFromListing(listingData),
-            icon_base64_icon128,
-            icon_base64_legacy,
-            icon_base64_modded,
-            icon_base64_default
-        )
-        gicon = prepMRicon(modpack_destF,gicon)
-        mrInstanceFile = os.path.join(modpack_destF,"profile.json")
-        mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,listingData["name"],gicon)
-        if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)
-        open(mrInstanceFile,'w',encoding=encoding).write(
-            json.dumps(mrInstanceDict)
-        )
-    except Exception as e:
-        print(prefix+"Failed to create profile in modrinth app!",e)
 
 # Add to installed-list
 mcc_installed_file = os.path.join(getStdInstallDest(system),"modpacks.json")
