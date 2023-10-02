@@ -228,6 +228,7 @@ if gitsp != None:
             entry = {
                 "name": compyml['name'],
                 "desc": compyml['desc'],
+                "author": compyml['author'],
                 "id": listuuid,
                 "hidden": autoBool(compyml['hidden']),
                 "supported": True,

@@ -1,1 +1,17 @@
-{"format": 1, "author": "MinecraftCustomClient / SimonKC", "version": "1.0", "created": "2023-09-22", "lastUpdated": "2023-10-02", "flavors": [{"name": "1.20_Community-Client_Lite_Vicy", "desc": "Lite version, not done :)", "id": "9cfc0c63-3b3c-4397-bf06-b214c245f12e", "hidden": false, "supported": true, "sourceType": "mlisting", "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20_Community-Client_Lite_Vicy_2023-10-02_15-31-25-quickcompile.mListing"}]}
+{
+    "format": 1,
+    "author": "MinecraftCustomClient / SimonKC",
+    "version": "1.0",
+    "created": "2023-09-22",
+    "lastUpdated": "2023-10-02",
+    "flavors": [{
+        "name": "1.20_Community-Client_Lite_Vicy",
+        "desc": "Lite version, not done :)",
+        "id": "9cfc0c63-3b3c-4397-bf06-b214c245f12e",
+        "author": "SimonKC",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20_Community-Client_Lite_Vicy_2023-10-02_15-31-25-quickcompile.mListing"
+    }]
+}
