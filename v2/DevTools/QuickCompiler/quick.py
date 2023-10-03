@@ -225,7 +225,7 @@ if gitsp != None:
             # get id
             listuuid = generate_uuid() 
             # make entry
-            entry = {
+            entryWa = {
                 "name": compyml['name'],
                 "desc": compyml['desc'],
                 "author": compyml['author'],
@@ -242,7 +242,7 @@ if gitsp != None:
                     exists = True
                     break
             if exists == False:
-                dRepo["flavors"].append(entry)
+                dRepo["flavors"].append(entryWa)
             # save repo
             if dRepo.get("lastUpdated") != None:
                 dRepo["lastUpdated"] = datetime.now().strftime('%Y-%m-%d')

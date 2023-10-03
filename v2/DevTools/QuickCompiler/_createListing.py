@@ -78,6 +78,19 @@ d = debugOut(debugEnabled, debugPrefix)
 # Retrive URLS
 d.pr(f"\033[33mScanning mods directory of: '{modpack.split(os.sep)[-1]}'")
 pathObjects = scantree(mods)
+possProfile = os.path.join(modpack,"profile.json")
+profileData = {}
+filename_to_slug = {}
+if os.path.exists(possProfile):
+    profileData = json.loads(open(possProfile,'r',encoding="utf-8").read())
+    projs = profileData.get("projects")
+    if projs != None:
+        for key,value in projs.items():
+            fn = os.path.basename(key)
+            if value.get("metadata") != None:
+                if value["metadata"].get("project") != None:
+                    if value["metadata"]["project"].get("slug") != None:
+                        filename_to_slug[fn] = value["metadata"]["project"]["slug"]
 for obj in pathObjects:
     if obj.name.endswith(".jar"):
         # From modrinth
@@ -90,6 +103,14 @@ for obj in pathObjects:
             nameHits = modrinth.SearchForQuery(suggestedProject, suggestedProject)
             if len(nameHits) > 0:
                 retrivedUrls = modrinth.GetLinksPerFilename(suggestedProject,obj.name)
+                if len(retrivedUrls) > 0:
+                    lookedAtFiles.append(obj.name)
+                    for url in retrivedUrls:
+                        urls.append({"type":"modrinth","url":url,"filename":obj.name})
+                        d.pr(f"\033[32mFound url on modrinth \033[90m: \033[32m{url}")
+            else:
+                # check slugs
+                retrivedUrls = modrinth.GetLinksPerFilename(filename_to_slug[obj.name],obj.name)
                 if len(retrivedUrls) > 0:
                     lookedAtFiles.append(obj.name)
                     for url in retrivedUrls:
