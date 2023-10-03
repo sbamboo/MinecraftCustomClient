@@ -1,1 +1,26 @@
-{"format": 1, "author": "MinecraftCustomClient / SimonKC", "version": "1.0", "created": "2023-09-22", "lastUpdated": "2023-10-03", "flavors": [{"name": "1.20_Community-Client_Lite_Vicy", "desc": "Lite version, not done :)", "id": "9cfc0c63-3b3c-4397-bf06-b214c245f12e", "author": "SimonKC", "hidden": false, "supported": true, "sourceType": "mlisting", "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20_Community-Client_Lite_Vicy_2023-10-02_15-31-25-quickcompile.mListing"}, {"name": "1.20.2_Community-Client_Lite", "desc": "In development version, things may be wonky but should work :)", "author": "SimonKC", "id": "3c395c8a-1565-4a38-9b69-08c3194e2660", "hidden": false, "supported": true, "sourceType": "mlisting", "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.2_Community-Client_Lite_2023-10-03_20-35-39-quickcompile.mListing"}]}
+{
+    "format": 1,
+    "author": "MinecraftCustomClient / SimonKC",
+    "version": "1.0",
+    "created": "2023-09-22",
+    "lastUpdated": "2023-10-03",
+    "flavors": [{
+        "name": "1.20_Community-Client_Lite_Vicy",
+        "desc": "Lite version, not done :)",
+        "id": "9cfc0c63-3b3c-4397-bf06-b214c245f12e",
+        "author": "SimonKC",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20_Community-Client_Lite_Vicy_2023-10-02_15-31-25-quickcompile.mListing"
+    }, {
+        "name": "1.20.2_Community-Client_Lite",
+        "desc": "In development version, things may be wonky but should work :)",
+        "author": "SimonKC",
+        "id": "3c395c8a-1565-4a38-9b69-08c3194e2660",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.2_Community-Client_Lite_2023-10-03_20-35-39-quickcompile.mListing"
+    }]
+}
