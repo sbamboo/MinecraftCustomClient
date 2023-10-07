@@ -112,7 +112,7 @@ elif modpack_path == None:
     selTitle  = "Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:"
     selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
     if platform.system() == "Darwin":
-        selSuffix = "\033[90m\nUse your keyboard to select:\nb : Up\na : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
+        selSuffix = "\033[90m\nUse your keyboard to select:\na : Up\nb : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
     if args.modpack:
         key = args.modpack
     else:

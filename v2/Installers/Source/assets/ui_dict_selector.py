@@ -20,7 +20,10 @@ def display_items(selected_index, items, selkey, selTitle="Select an option:", s
     # get the length of the longest key
     max_key_length = max(len(key) for key in items.keys())
     # print
-    print(selTitle)
+    if stripAnsi == True:
+        print(selTitle)
+    else:
+        print("\x1b[0m"+selTitle) # include reset to fix wrong-coloring
     for i, key in enumerate(list(items.keys())):
         # get the org-value based on selkey
         if selkey == "" or selkey == None:

@@ -596,7 +596,9 @@ def getMRdir(system,ovv=None):
         if system == "windows":
             return applyDestPref("Appdata\\Roaming\\com.modrinth.theseus\\profiles")
         elif system == "darwin":
-            return fs.ensureDirPath(os.path.abspath(f"{getTilde()}/Library/Application Support/com.modrinth.theseus/profiles"))
+            p = os.path.abspath(f"{getTilde()}/Library/Application Support/com.modrinth.theseus/profiles")
+            fs.ensureDirPath(p)
+            return p
         else:
             return applyDestPref(f"com.modrinth.theseus/profiles")
 
