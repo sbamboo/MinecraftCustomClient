@@ -4,6 +4,7 @@ from lib_filesys import filesys as fs
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
 parser.add_argument('-destzip', type=str, help='The final zip to bundle to')
 parser.add_argument('--prepbuild', help='Should the bundler prep the script for build?', action="store_true")
+parser.add_argument('--inclScripts', help='Add scripts?', action="store_true")
 args = parser.parse_args()
 
 parent = os.path.dirname(__file__)
@@ -82,6 +83,12 @@ with zipfile.ZipFile(args.destzip, 'w') as zipf:
     # Add packages.txt
     if packages != []:
         zipf.write(pkgs, arcname=os.path.basename(pkgs))
+
+    # Add scripts
+    if args.inclScripts:
+        scriptFolder = os.path.join(parent,"bundle_scripts")
+        zipf.write(os.path.join(scriptFolder,"linux.sh"), arcname="linux.sh")
+        zipf.write(os.path.join(scriptFolder,"mac.sh"), arcname="mac.sh")
 
     # Add build script
     if args.prepbuild:

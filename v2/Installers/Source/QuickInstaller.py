@@ -30,6 +30,20 @@ modpack = "<replaceble:modpack_relative_path_to_parent>"
 # BuildPrep: ST-excl
 # IncludeInline: ./assets/lib_crshpiptools.py
 
+# Handle cusPip
+import sys,os
+cusPip = None
+for i,a in enumerate(sys.argv):
+    if a == "-cusPip":
+        try:
+            cusPip = sys.argv[i+1]
+        except: pass
+if cusPip != None:
+    if os.path.exists(cusPip):
+        int_autopipImport = autopipImport
+        def autopipImport(*args,**kwargs):
+            int_autopipImport(*args,**kwargs,cusPip=cusPip)
+
 # [Imports]
 try:
     _ = autopipImport("argparse")
@@ -80,6 +94,7 @@ parser.add_argument('--n', help='always answer with No', action="store_true")
 parser.add_argument('-exprt', help='Exports a copy of the unpacked tempdata, takes the zip to export to. (its created so give path to non-existent file)', type=str)
 parser.add_argument('-imprt', help='Imports a copy of the unpacked tempdata, takes the zip to import from.', type=str)
 parser.add_argument('--nopause', help="Won't pause on exit/finish", action="store_true")
+parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc

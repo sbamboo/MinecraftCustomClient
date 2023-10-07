@@ -162,7 +162,7 @@ def MinecraftLauncherAgent(
     defa_MCProfFileN = "launcher_profiles.json"
     backupFolderName = ".installAgentBackups"
     familyName = "Microsoft.4297127D64EC6_8wekyb3d8bbwe"
-    binlaunchdir = "C:\Program Files (x86)\Minecraft Launcher\MinecraftLauncher.exe"
+    binlaunchdir = "C:\\Program Files (x86)\\Minecraft Launcher\\MinecraftLauncher.exe"
     if overWriteBinExe != None and overWriteBinExe != str:
         binlaunchdir = overWriteBinExe
     opHasRun = False

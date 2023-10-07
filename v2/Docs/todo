@@ -1,0 +1,7 @@
+add tool to rebuild al clients
+
+uninstall feature using the modpacks.json (only for launcher installs)
+
+migration tool and/or data-copy
+
+modrinth profile.json file support in compiler

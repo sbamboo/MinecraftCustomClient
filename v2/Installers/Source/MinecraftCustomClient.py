@@ -29,6 +29,20 @@ repo_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main
 
 # IncludeInline: ./assets/lib_crshpiptools.py
 
+# Handle cusPip
+import sys,os
+cusPip = None
+for i,a in enumerate(sys.argv):
+    if a == "-cusPip":
+        try:
+            cusPip = sys.argv[i+1]
+        except: pass
+if cusPip != None:
+    if os.path.exists(cusPip):
+        int_autopipImport = autopipImport
+        def autopipImport(*args,**kwargs):
+            int_autopipImport(*args,**kwargs,cusPip=cusPip)
+
 # BuildPrep: ST-excl
 # [Imports]
 try:
@@ -78,6 +92,7 @@ parser.add_argument('-imprt', help='Imports a copy of the unpacked tempdata, tak
 parser.add_argument('--nopause', help="Won't pause on exit/finish", action="store_true")
 parser.add_argument('-modpack', type=str, help="Preselect modpack (str)")
 parser.add_argument('-modpackFile', type=str, help="Forced custom modpack file (path)")
+parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc

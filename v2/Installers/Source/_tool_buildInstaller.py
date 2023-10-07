@@ -9,7 +9,7 @@ fs.ensureDirPath(destfolder)
 bundleFile = os.path.join(destfolder,"bundle.zip")
 bundleScript = os.path.join(parent,"assets","_bundleInstaller.py")
 # create bundle
-os.system(f'{sys.executable} {bundleScript} -destzip "{bundleFile}"')
+os.system(f'{sys.executable} {bundleScript} -destzip "{bundleFile}" --inclScripts')
 print("Done!")
 
 # Build src
