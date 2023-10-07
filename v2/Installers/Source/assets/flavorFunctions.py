@@ -51,6 +51,8 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             elif relpathToDest.startswith("./"):
                 relpathToDest = relpathToDest.replace("./","",1)
             fpath = os.path.join(destinationDirPath,relpathToDest)
+            fpath = fpath.replace("\\",os.sep)
+            fpath = fpath.replace("/",os.sep)
             fs.ensureDirPath(os.path.dirname(fpath))
             downUrlFile(url,fpath)
     
@@ -392,9 +394,9 @@ def getLauncherDir(preset=None):
         if system == "windows":
             return f"C:\\Users\\{user}\\AppData\\Roaming\\.minecraft"
         elif system == "darwin":  # macOS
-            return f"~/Library/Application Support/minecraft"
+            return f"{getTilde()}/Library/Application Support/minecraft"
         elif system == "linux":
-            return f"~/.minecraft"
+            return f"{getTilde()}/.minecraft"
         else:
             raise ValueError("Unsupported operating system")
 
@@ -476,6 +478,16 @@ def convFromLegacy(flavorMTAfile,legacyRepoUrl,encoding="utf-8") -> dict:
     }
     return listing
 
+# Function for Mac to get eqv to ~
+def getTilde():
+    user = getpass.getuser()
+    system = platform.system().lower()
+    if system == "darwin":
+        return f"/Users/{user}"
+    else:
+        return f"/home/{user}"
+        
+
 # Apply user directory to a path
 def applyDestPref(shortDest) -> str:
     user = getpass.getuser()
@@ -483,9 +495,7 @@ def applyDestPref(shortDest) -> str:
     if system == "windows":
         p = os.path.join(f"C:\\users\\{user}\\",shortDest)
     elif system == "darwin":
-        p = os.path.join(f"~/Users/{user}/",shortDest)
-        if os.path.exists(p) != True:
-            p = os.path.join(f"/home/{user}/",shortDest)
+        p = os.path.join(getTilde(),shortDest)
     else:
         p = os.path.join(f"/home/{user}/",shortDest)
     return fs.replaceSeps(p)
@@ -586,7 +596,7 @@ def getMRdir(system,ovv=None):
         if system == "windows":
             return applyDestPref("Appdata\\Roaming\\com.modrinth.theseus\\profiles")
         elif system == "darwin":
-            return fs.ensureDirPath(os.path.abspath(f"~/Library/Application Support/com.modrinth.theseus/profiles"))
+            return fs.ensureDirPath(os.path.abspath(f"{getTilde()}/Library/Application Support/com.modrinth.theseus/profiles"))
         else:
             return applyDestPref(f"com.modrinth.theseus/profiles")
 
