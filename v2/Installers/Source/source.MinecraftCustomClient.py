@@ -1583,6 +1583,15 @@ def prepMRicon(modpackDestF,icon):
 import os,platform,subprocess,json,getpass
 from datetime import datetime
 
+# Function for Mac to get eqv to ~
+def getTilde():
+    user = getpass.getuser()
+    system = platform.system().lower()
+    if system == "darwin":
+        return f"/Users/{user}"
+    else:
+        return f"/home/{user}"
+
 # launcherDirGet
 def getLauncherDir(preset=None):
     if preset is not None:
@@ -1593,9 +1602,9 @@ def getLauncherDir(preset=None):
         if system == "windows":
             return f"C:\\Users\\{user}\\AppData\\Roaming\\.minecraft"
         elif system == "darwin":  # macOS
-            return f"~/Library/Application Support/minecraft"
+            return f"{getTilde()}/Library/Application Support/minecraft"
         elif system == "linux":
-            return f"~/.minecraft"
+            return f"{getTilde()}/.minecraft"
         else:
             raise ValueError("Unsupported operating system")
 
