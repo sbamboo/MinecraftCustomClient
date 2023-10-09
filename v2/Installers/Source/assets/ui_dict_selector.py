@@ -32,13 +32,18 @@ def display_items(selected_index, items, selkey, selTitle="Select an option:", s
             ovalue = items[key][selkey]
         if "ncb:" not in ovalue:
             value = "{" + ovalue + "}"
-        else: value = ""
+        else:
+            value = ovalue.replace("ncb:","")
         # concat a string using left-adjusted keys
         string = f"  {key.ljust(max_key_length)}   {value}"
         # if over dispwidth cut with ... to correct size (indep of key-length)
         if len(string) > dispWidth-2:
-            off = 12+max_key_length                                               # numerical amnt to cut (12 is what worked and the next is so it reacts on key-len)
-            string = string.replace(value,"{"+ovalue[:dispWidth-off] + "..."+"}") # chn string basaed on cutoff
+            if "ncb:" not in ovalue:
+                off = 10+max_key_length                                               # numerical amnt to cut (10 is what worked and the next is so it reacts on key-len)
+                string = string.replace(value,ovalue[:dispWidth-off] + "...") # chn string based on cutoff
+            else:
+                off = 12+max_key_length                                               # numerical amnt to cut (12 is what worked and the next is so it reacts on key-len)
+                string = string.replace(value,"{"+ovalue[:dispWidth-off] + "..."+"}") # chn string based on cutoff
         # print the string with formatting if enabeld
         if i == int(selected_index):
             string = ">" + string[1:] # add the >

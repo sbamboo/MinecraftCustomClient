@@ -4,7 +4,7 @@ parent = os.path.dirname(__file__)
 
 # Bundle
 print("Bundling installer...")
-destfolder = os.path.join(parent,"..","Builds","win_x86")
+destfolder = os.path.join(parent,"..","Builds")
 fs.ensureDirPath(destfolder)
 bundleFile = os.path.join(destfolder,"bundle.zip")
 bundleScript = os.path.join(parent,"assets","_bundleInstaller.py")
@@ -14,7 +14,7 @@ print("Done!")
 
 # Build src
 print("Prepping build enviroment for installer...")
-destfolder = os.path.join(parent,"..","Builds","win_x86")
+destfolder = os.path.join(parent,"..","Builds")
 fs.ensureDirPath(destfolder)
 bundleFile = os.path.join(destfolder,"build_source.zip")
 bundleScript = os.path.join(parent,"assets","_bundleInstaller.py")
@@ -25,7 +25,9 @@ print("Done!")
 # Build
 print("Attempting to build quickinstaller (win_x86)...")
 # extract build env
-buildenv = os.path.join(os.path.dirname(bundleFile),"build-env")
+buidlenv_parent = os.path.join(os.path.dirname(bundleFile),"win_x86")
+fs.ensureDirPath(buidlenv_parent)
+buildenv = os.path.join(buidlenv_parent,"build-env")
 shutil.unpack_archive(bundleFile,buildenv)
 # run build-script
 buildScript = os.path.join(buildenv,"build.py")

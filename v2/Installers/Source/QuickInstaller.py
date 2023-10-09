@@ -101,4 +101,6 @@ if args.enc:
 
 # IncludeInline: MX@./partial@prep.py
 
+action_install = True # autoset to the multi-usage partial can be simplified
+
 # IncludeInline: MX@./installermain.py
