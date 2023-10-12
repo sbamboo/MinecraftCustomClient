@@ -1,8 +1,8 @@
 # This file is for creating an installer for only one modpack
 
 # [Settings]
-installer_version = "1.1"
-installer_release = "2023-10-07(0)"
+installer_version = "1.1.1"
+installer_release = "2023-10-12(0)"
 prefix    = "\033[90m[\033[35mQuickInst\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
