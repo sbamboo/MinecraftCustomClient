@@ -135,7 +135,7 @@ if action_datacopy:
     print(f"  ToCopy: '{','.join([os.path.basename(ent) for ent in ch])}'")
     print("")
     if not args.n and not args.y:
-        c = input("Is this correct? [Y/N] ")
+        c = input("Is this correct? [Y/N]: ")
     if args.n:
         c = "n"
     elif args.y:

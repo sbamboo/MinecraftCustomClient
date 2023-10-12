@@ -98,7 +98,7 @@ if action_install == True:
                     elif args.n:
                         c = args.n
                     else:
-                        c = input("Modrith profile already exists, overwrite it? [y/n]")
+                        c = input("Modrith profile already exists, overwrite it? [y/n]: ")
                     if c.lower() == "n":
                         cleanUp(tempFolder,modpack_path)
                         exit()

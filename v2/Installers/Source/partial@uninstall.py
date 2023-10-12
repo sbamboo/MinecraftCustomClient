@@ -62,7 +62,7 @@ if action_uninstall == True:
         if args.n:
             exit()
         if not args.y:
-            c = input(f"Are you sure you want to uninstall '{modpack}'? (THIS ACTION IS IRREVERSIBLE) [y/n] ")
+            c = input(f"Are you sure you want to uninstall '{modpack}'? (THIS ACTION IS IRREVERSIBLE) [y/n]: ")
             if c.lower() != "y":
                 exit()
         # remove folder
