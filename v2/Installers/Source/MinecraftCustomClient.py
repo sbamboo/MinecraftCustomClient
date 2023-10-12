@@ -72,7 +72,10 @@ os.system("")
 encoding = "utf-8"
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
-parser.add_argument('--install', type=str, help='Action: Install')
+parser.add_argument('--install', help='Action: Install', action="store_true")
+parser.add_argument('--uninstall', help='Action: Uninstall', action="store_true")
+parser.add_argument('--open', help='Action: Open', action="store_true")
+parser.add_argument('--datacopy', help='Action: Data copy', action="store_true")
 parser.add_argument('-mcf','-cMinecraftLoc', dest="mcf", type=str, help='MinecraftFolder (.minecraft)')
 parser.add_argument('-destination','-dest', dest="dest", type=str, help='Where should the client be installed?')
 parser.add_argument('--fabprofile', help='Should fabric create a profile?', action="store_true")
@@ -93,87 +96,77 @@ parser.add_argument('-imprt', help='Imports a copy of the unpacked tempdata, tak
 parser.add_argument('--nopause', help="Won't pause on exit/finish", action="store_true")
 parser.add_argument('-modpack', type=str, help="Preselect modpack (str)")
 parser.add_argument('-modpackFile', type=str, help="Forced custom modpack file (path)")
+parser.add_argument('-destmodpack', type=str, help="Datacopy destination modpack (str)")
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
+parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
 
 # IncludeInline: MX@./partial@prep.py
 
+# IncludeInline: ./assets/lib_filesys.py
+fs = filesys
+
+# IncludeInline: ./assets/flavorFunctions.py
+
 # [Set title]
-setConTitle(title)
+tst = title
+if args.modpack:
+    tst = tst.replace("<modpack>",args.modpack)
+else:
+    tst = tst.replace("<modpack>","MODPACK")
+setConTitle(tst)
 
 # IncludeInline: ./assets/ui_dict_selector.py
 
 # [Show action select]
 action_install = False
+action_uninstall = False
+action_open = False
+action_datacopy = False
 # show selector
 selTitle  = "Welcome to MinecraftCustomClient!\nSelect the action you would like to do:"
 selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
 if platform.system() == "Darwin":
     selSuffix = "\033[90m\nUse your keyboard to select:\na : Up\nb : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
-actionsDict = {"[Install]":{"desc":"ncb:Runs the installer action."}}
+actionsDict = {
+    "[Install]":{"desc":"ncb:Runs the installer action."},
+    "[Uninstall]":{"desc":"ncb:Allowes you to uninstall clients installed by this app."},
+    "[Open Install Loc]":{"desc": "ncb:Opens the default install location folder."},
+    "[Datacopy]":{"desc": "ncb:Tool for copying data between modpacks. (EXPERIMENTAL)"}
+}
 actionsDict["[Exit]"] = {"desc": "ncb:"}
-action = showDictSel(actionsDict,selTitle=selTitle,selSuffix=selSuffix)
+if args.install:
+    action = "[Install]"
+elif args.uninstall:
+    action = "[Uninstall]"
+elif args.open:
+    action = "[Open Install Loc]"
+elif args.datacopy:
+    action = "[Datacopy]"
+else:
+    action = showDictSel(actionsDict,selTitle=selTitle,selSuffix=selSuffix)
 if action == None or action not in list(actionsDict.keys()) or action == "[Exit]":
     args.nopause = True
     exit()
-if args.install or action == "[Install]":
+if action == "[Install]":
     action_install = True
+if action == "[Uninstall]":
+    action_uninstall = True
+if action == "[Open Install Loc]":
+    action_open = True
+if action == "[Datacopy]":
+    action_datacopy = True
 
-# [Show repo]
-if action_install == True:
-    modpack_path = None
-    if args.modpackFile:
-        if os.path.exists(args.modpackFile):
-            modpack_path = args.modpackFile
-    if args.imprt:
-        modpack_path = args.imprt
-    elif modpack_path == None:
-        # get repo
-        try:
-            repoContent = requests.get(repo_url).text
-            repoData = json.loads(repoContent)
-        except:
-            print("Failed to get repository")
-            exit()
-        # show select
-        flavors = repoData.get("flavors")
-        flavorsDict = {}
-        for fl in flavors:
-            n = fl["name"]
-            fl.pop("name")
-            flavorsDict[n] = fl
-        flavorsDict["[Exit]"] = {"desc": "ncb:"}
-        # show os-dep keybinds:
-        selTitle  = "Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:"
-        if args.modpack:
-            key = args.modpack
-        else:
-            key = showDictSel(flavorsDict,selTitle=selTitle,selSuffix=selSuffix)
-        if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
-            args.nopause = True
-            exit()
-        # get modpack url
-        modpack_url = flavorsDict[key]["source"]
-        # download url
-        modpack_path = os.path.join(parent,os.path.basename(modpack_url))
-        response = requests.get(modpack_url)
-        if response.status_code == 200:
-            # Content of the file
-            cont = response.content
-        else:
-            cont = None
-        if cont != None and cont != "":
-            if os.path.exists(modpack_path) == False:
-                open(modpack_path,'wb').write(cont)
-        else:
-            print(prefix+"Failed to get modpack!")
-            exit()
-
-    # [Prep selected package]
-    modpack = os.path.basename(modpack_path)
-    title = title.replace("<modpack>", modpack)
-    system = platform.system().lower()
+# IncludeInline: MX@./partial@installermenu.py
 
 # IncludeInline: MX@./partial@installermain.py
+
+# IncludeInline: MX@./partial@uninstall.py
+
+# IncludeInline: MX@./partial@datacopy.py
+
+# [Open install loc]
+if action_open == True:
+    fs.openFolder(getStdInstallDest())

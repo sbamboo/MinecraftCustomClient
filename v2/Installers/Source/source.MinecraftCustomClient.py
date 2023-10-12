@@ -122,7 +122,10 @@ os.system("")
 encoding = "utf-8"
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
-parser.add_argument('--install', type=str, help='Action: Install')
+parser.add_argument('--install', help='Action: Install', action="store_true")
+parser.add_argument('--uninstall', help='Action: Uninstall', action="store_true")
+parser.add_argument('--open', help='Action: Open', action="store_true")
+parser.add_argument('--datacopy', help='Action: Data copy', action="store_true")
 parser.add_argument('-mcf','-cMinecraftLoc', dest="mcf", type=str, help='MinecraftFolder (.minecraft)')
 parser.add_argument('-destination','-dest', dest="dest", type=str, help='Where should the client be installed?')
 parser.add_argument('--fabprofile', help='Should fabric create a profile?', action="store_true")
@@ -143,7 +146,9 @@ parser.add_argument('-imprt', help='Imports a copy of the unpacked tempdata, tak
 parser.add_argument('--nopause', help="Won't pause on exit/finish", action="store_true")
 parser.add_argument('-modpack', type=str, help="Preselect modpack (str)")
 parser.add_argument('-modpackFile', type=str, help="Forced custom modpack file (path)")
+parser.add_argument('-destmodpack', type=str, help="Datacopy destination modpack (str)")
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
+parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
@@ -217,202 +222,11 @@ def setConTitle(title):
 
 # [Pre Release softwere notice]
 print(prefix+"\033[33mNote! This is pre-release software, the installer is provided AS-IS and i take no responsibility for issues that may arrise when using it.\nIf you wish to stop this script, close it now.\033[0m")
-time.sleep(2)
+if args.skipPreRelWait:
+    pass
+else:
+    time.sleep(2)
 #endregion [IncludeInline: ./partial@prep.py]
-
-# [Set title]
-setConTitle(title)
-
-#region [IncludeInline: ./assets/ui_dict_selector.py]
-import os
-import sys
-import readchar
-
-# Function to clear the terminal screen
-def clear_screen():
-    if os.name == 'posix':
-        os.system('clear')
-    else:
-        os.system('cls')
-
-# Function to display the list of items
-def display_items(selected_index, items, selkey, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False):
-    # get dispWidth
-    width,height = os.get_terminal_size()
-    if dispWidth == "vw": dispWidth = width
-    if dispWidth == "vh": dispWidth = height
-    # clear screen (use function for os-indep)
-    clear_screen()
-    # get the length of the longest key
-    max_key_length = max(len(key) for key in items.keys())
-    # print
-    if stripAnsi == True:
-        print(selTitle)
-    else:
-        print("\x1b[0m"+selTitle) # include reset to fix wrong-coloring
-    for i, key in enumerate(list(items.keys())):
-        # get the org-value based on selkey
-        if selkey == "" or selkey == None:
-            ovalue = items[key]
-        else:
-            ovalue = items[key][selkey]
-        if "ncb:" not in ovalue:
-            value = "{" + ovalue + "}"
-        else:
-            value = ovalue.replace("ncb:","")
-        # concat a string using left-adjusted keys
-        string = f"  {key.ljust(max_key_length)}   {value}"
-        # if over dispwidth cut with ... to correct size (indep of key-length)
-        if len(string) > dispWidth-2:
-            if "ncb:" not in ovalue:
-                off = 10+max_key_length                                               # numerical amnt to cut (10 is what worked and the next is so it reacts on key-len)
-                string = string.replace(value,ovalue[:dispWidth-off] + "...") # chn string based on cutoff
-            else:
-                off = 12+max_key_length                                               # numerical amnt to cut (12 is what worked and the next is so it reacts on key-len)
-                string = string.replace(value,"{"+ovalue[:dispWidth-off] + "..."+"}") # chn string based on cutoff
-        # print the string with formatting if enabeld
-        if i == int(selected_index):
-            string = ">" + string[1:] # add the >
-            if stripAnsi == True:
-                print(f"{string}")
-            else:
-                print(f"\x1b[32m{string}\x1b[0m")
-        else:
-            print(f"{string}")
-    # print suffix msg
-    if selSuffix != None:
-        print(selSuffix)
-
-# Function to get a single keypress
-def get_keypress():
-    return readchar.readchar()
-
-# Function to get the up-key
-def getup(keylow):
-    if os.name == 'nt':
-        return keylow == "h"
-    else:
-        return keylow == "a"
-
-# Function to get the down-key
-def getdown(keylow):
-    if os.name == 'nt':
-        return keylow == "p"
-    else:
-        return keylow == "b"
-
-# Function to get the enter-key
-def getent(keylow):
-    if os.name == 'nt':
-        return keylow == "\r"
-    else:
-        return keylow == "\n"
-
-# Main function to show a dictionary based on the dict.value.<key> / or dict.value (if selkey = ""/None)
-def showDictSel(nameDescDict=dict, selKey="desc", sti=0, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False):
-    '''
-    Add "ncb:" to your value to ommit the curly brackets.
-    '''
-    selected_index = sti # start index
-    disp = True
-    while True:
-        # display the items if disp = True
-        if disp == True:
-            display_items(selected_index, nameDescDict, selKey, selTitle, selSuffix, dispWidth, stripAnsi)
-        else:
-            disp = True
-        # check keys and change selected index depends on keys
-        key = get_keypress()
-        if getup(key.lower()):
-            selected_index = selected_index - 1
-            # roll-over
-            if selected_index < 0: selected_index = len(nameDescDict)-1
-        elif getdown(key.lower()):
-            selected_index = selected_index + 1
-            # roll-over
-            if selected_index > len(nameDescDict)-1: selected_index = 0
-        elif getent(key.lower()):
-            return list(nameDescDict.keys())[selected_index]
-        elif key.lower() == "q" or key.lower() == "\x1b":
-            return None
-        # if no key pressed set disp to false, so it wont redisp on an-uncaught key
-        else:
-            disp = False
-#endregion [IncludeInline: ./assets/ui_dict_selector.py]
-
-# [Show action select]
-action_install = False
-# show selector
-selTitle  = "Welcome to MinecraftCustomClient!\nSelect the action you would like to do:"
-selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
-if platform.system() == "Darwin":
-    selSuffix = "\033[90m\nUse your keyboard to select:\na : Up\nb : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
-actionsDict = {"[Install]":{"desc":"ncb:Runs the installer action."}}
-actionsDict["[Exit]"] = {"desc": "ncb:"}
-action = showDictSel(actionsDict,selTitle=selTitle,selSuffix=selSuffix)
-if action == None or action not in list(actionsDict.keys()) or action == "[Exit]":
-    args.nopause = True
-    exit()
-if args.install or action == "[Install]":
-    action_install = True
-
-# [Show repo]
-if action_install == True:
-    modpack_path = None
-    if args.modpackFile:
-        if os.path.exists(args.modpackFile):
-            modpack_path = args.modpackFile
-    if args.imprt:
-        modpack_path = args.imprt
-    elif modpack_path == None:
-        # get repo
-        try:
-            repoContent = requests.get(repo_url).text
-            repoData = json.loads(repoContent)
-        except:
-            print("Failed to get repository")
-            exit()
-        # show select
-        flavors = repoData.get("flavors")
-        flavorsDict = {}
-        for fl in flavors:
-            n = fl["name"]
-            fl.pop("name")
-            flavorsDict[n] = fl
-        flavorsDict["[Exit]"] = {"desc": "ncb:"}
-        # show os-dep keybinds:
-        selTitle  = "Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:"
-        if args.modpack:
-            key = args.modpack
-        else:
-            key = showDictSel(flavorsDict,selTitle=selTitle,selSuffix=selSuffix)
-        if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
-            args.nopause = True
-            exit()
-        # get modpack url
-        modpack_url = flavorsDict[key]["source"]
-        # download url
-        modpack_path = os.path.join(parent,os.path.basename(modpack_url))
-        response = requests.get(modpack_url)
-        if response.status_code == 200:
-            # Content of the file
-            cont = response.content
-        else:
-            cont = None
-        if cont != None and cont != "":
-            if os.path.exists(modpack_path) == False:
-                open(modpack_path,'wb').write(cont)
-        else:
-            print(prefix+"Failed to get modpack!")
-            exit()
-
-    # [Prep selected package]
-    modpack = os.path.basename(modpack_path)
-    title = title.replace("<modpack>", modpack)
-    system = platform.system().lower()
-
-#region [IncludeInline: ./partial@installermain.py]
-# [Code]
 
 #region [IncludeInline: ./assets/lib_filesys.py]
 # FileSys: Library to work with filesystems.
@@ -875,7 +689,7 @@ class filesys():
         return detected.mime_type
 
     # Function to open a folder in the host's filemanager
-    def openFolder(path=str()):
+    def openFolder_legacy(path=str()):
         # Local imports:
         try: import distro
         except:
@@ -888,6 +702,32 @@ class filesys():
             #Rassberry pi
             if distro.id() == "raspbian": os.system(f"pcmanfm {path}")
 
+
+    def openFolder(path=str()):
+        # Define a list of known file managers and their commands
+        linux_file_managers = {
+            "nautilus": "nautilus",
+            "nemo": "nemo",
+            "pcmanfm": "pcmanfm",
+            "thunar": "thunar",
+            # Add more file managers and their corresponding commands here
+        }
+
+        # Detect the Linux distribution
+        if altConUtils.IsLinux():
+            # Try to find a suitable file manager
+            for manager, command in linux_file_managers.items():
+                if os.system(f"which {command} > /dev/null 2>&1") == 0:
+                    os.system(f"{command} {path}")
+                    break
+            else:
+                print("No supported file manager found. Please install one.")
+
+        # For Windows and macOS
+        elif altConUtils.IsWindows():
+            os.system(f"explorer {path}")
+        elif altConUtils.IsMacOS():
+            os.system(f"open {path}")
 
 # Class with "powershell-styled" functions
 class pwshStyled():
@@ -908,6 +748,7 @@ class pwshStyled():
     def touchFile(filepath=str(),encoding=None):
         filesys.createFile(filepath=filepath, overwrite=False, encoding=encoding)
 #endregion [IncludeInline: ./assets/lib_filesys.py]
+fs = filesys
 
 #region [IncludeInline: ./assets/flavorFunctions.py]
 # Imports
@@ -1413,7 +1254,7 @@ def applyDestPref(shortDest) -> str:
     return fs.replaceSeps(p)
 
 # Get std final destination
-def getStdInstallDest(system):
+def getStdInstallDest():
     p = applyDestPref(f"installs\\minecraft-custom-client\\v2")
     return p
 
@@ -1577,6 +1418,236 @@ def prepMRicon(modpackDestF,icon):
     fs.copyFile(iconPath,cacheF)
     return cacheF
 #endregion [IncludeInline: ./assets/flavorFunctions.py]
+
+# [Set title]
+tst = title
+if args.modpack:
+    tst = tst.replace("<modpack>",args.modpack)
+else:
+    tst = tst.replace("<modpack>","MODPACK")
+setConTitle(tst)
+
+#region [IncludeInline: ./assets/ui_dict_selector.py]
+import os
+import sys
+import readchar
+
+# Function to clear the terminal screen
+def clear_screen():
+    if os.name == 'posix':
+        os.system('clear')
+    else:
+        os.system('cls')
+
+# Function to display the list of items
+def display_items(selected_index, items, selkey, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False, formatting={"item_selected":"\x1b[32m","item_normal":"","selector":""}):
+    # get dispWidth
+    width,height = os.get_terminal_size()
+    if dispWidth == "vw": dispWidth = width
+    if dispWidth == "vh": dispWidth = height
+    # clear screen (use function for os-indep)
+    clear_screen()
+    # get the length of the longest key
+    max_key_length = max(len(key) for key in items.keys())
+    # print
+    if stripAnsi == True:
+        print(selTitle)
+    else:
+        print("\x1b[0m"+selTitle) # include reset to fix wrong-coloring
+    for i, key in enumerate(list(items.keys())):
+        # get the org-value based on selkey
+        if selkey == "" or selkey == None:
+            ovalue = items[key]
+        else:
+            ovalue = items[key][selkey]
+        if "ncb:" not in ovalue:
+            value = "{" + ovalue + "}"
+        else:
+            value = ovalue.replace("ncb:","")
+        # concat a string using left-adjusted keys
+        string = f"  {key.ljust(max_key_length)}   {value}"
+        # if over dispwidth cut with ... to correct size (indep of key-length)
+        if len(string) > dispWidth-2:
+            if "ncb:" not in ovalue:
+                off = 10+max_key_length                                               # numerical amnt to cut (10 is what worked and the next is so it reacts on key-len)
+                string = string.replace(value,ovalue[:dispWidth-off] + "...") # chn string based on cutoff
+            else:
+                off = 12+max_key_length                                               # numerical amnt to cut (12 is what worked and the next is so it reacts on key-len)
+                string = string.replace(value,"{"+ovalue[:dispWidth-off] + "..."+"}") # chn string based on cutoff
+        # print the string with formatting if enabeld
+        if i == int(selected_index):
+            if stripAnsi == True:
+                string = ">" + string[1:] # add the >
+            else:
+                string = f"{formatting['selector']}>" + string[1:] # add the >
+            if stripAnsi == True:
+                print(f"{string}")
+            else:
+                print(f"{formatting['item_selected']}{string}\x1b[0m")
+        else:
+            if stripAnsi == True:
+                print(f"{string}")
+            else:
+                print(f"{formatting['item_normal']}{string}\x1b[0m")
+    # print suffix msg
+    if selSuffix != None:
+        print(selSuffix)
+
+# Function to get a single keypress
+def get_keypress():
+    return readchar.readchar()
+
+# Function to get the up-key
+def getup(keylow):
+    if os.name == 'nt':
+        return keylow == "h"
+    else:
+        return keylow == "a"
+
+# Function to get the down-key
+def getdown(keylow):
+    if os.name == 'nt':
+        return keylow == "p"
+    else:
+        return keylow == "b"
+
+# Function to get the enter-key
+def getent(keylow):
+    if os.name == 'nt':
+        return keylow == "\r"
+    else:
+        return keylow == "\n"
+
+# Main function to show a dictionary based on the dict.value.<key> / or dict.value (if selkey = ""/None)
+def showDictSel(nameDescDict=dict, selKey="desc", sti=0, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False, formatting={"item_selected":"\x1b[32m","item_normal":"","selector":""}):
+    '''
+    Add "ncb:" to your value to ommit the curly brackets.
+    '''
+    selected_index = sti # start index
+    disp = True
+    while True:
+        # display the items if disp = True
+        if disp == True:
+            display_items(selected_index, nameDescDict, selKey, selTitle, selSuffix, dispWidth, stripAnsi, formatting)
+        else:
+            disp = True
+        # check keys and change selected index depends on keys
+        key = get_keypress()
+        if getup(key.lower()):
+            selected_index = selected_index - 1
+            # roll-over
+            if selected_index < 0: selected_index = len(nameDescDict)-1
+        elif getdown(key.lower()):
+            selected_index = selected_index + 1
+            # roll-over
+            if selected_index > len(nameDescDict)-1: selected_index = 0
+        elif getent(key.lower()):
+            return list(nameDescDict.keys())[selected_index]
+        elif key.lower() == "q" or key.lower() == "\x1b":
+            return None
+        # if no key pressed set disp to false, so it wont redisp on an-uncaught key
+        else:
+            disp = False
+#endregion [IncludeInline: ./assets/ui_dict_selector.py]
+
+# [Show action select]
+action_install = False
+action_uninstall = False
+action_open = False
+action_datacopy = False
+# show selector
+selTitle  = "Welcome to MinecraftCustomClient!\nSelect the action you would like to do:"
+selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
+if platform.system() == "Darwin":
+    selSuffix = "\033[90m\nUse your keyboard to select:\na : Up\nb : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
+actionsDict = {
+    "[Install]":{"desc":"ncb:Runs the installer action."},
+    "[Uninstall]":{"desc":"ncb:Allowes you to uninstall clients installed by this app."},
+    "[Open Install Loc]":{"desc": "ncb:Opens the default install location folder."},
+    "[Datacopy]":{"desc": "ncb:Tool for copying data between modpacks. (EXPERIMENTAL)"}
+}
+actionsDict["[Exit]"] = {"desc": "ncb:"}
+if args.install:
+    action = "[Install]"
+elif args.uninstall:
+    action = "[Uninstall]"
+elif args.open:
+    action = "[Open Install Loc]"
+elif args.datacopy:
+    action = "[Datacopy]"
+else:
+    action = showDictSel(actionsDict,selTitle=selTitle,selSuffix=selSuffix)
+if action == None or action not in list(actionsDict.keys()) or action == "[Exit]":
+    args.nopause = True
+    exit()
+if action == "[Install]":
+    action_install = True
+if action == "[Uninstall]":
+    action_uninstall = True
+if action == "[Open Install Loc]":
+    action_open = True
+if action == "[Datacopy]":
+    action_datacopy = True
+
+#region [IncludeInline: ./partial@installermenu.py]
+if action_install == True:
+    # [Show repo]
+    modpack_path = None
+    if args.modpackFile:
+        if os.path.exists(args.modpackFile):
+            modpack_path = args.modpackFile
+    if args.imprt:
+        modpack_path = args.imprt
+    elif modpack_path == None:
+        # get repo
+        try:
+            repoContent = requests.get(repo_url).text
+            repoData = json.loads(repoContent)
+        except:
+            print("Failed to get repository")
+            exit()
+        # show select
+        flavors = repoData.get("flavors")
+        flavorsDict = {}
+        for fl in flavors:
+            n = fl["name"]
+            fl.pop("name")
+            flavorsDict[n] = fl
+        flavorsDict["[Exit]"] = {"desc": "ncb:"}
+        # show os-dep keybinds:
+        selTitle  = "Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:"
+        if args.modpack:
+            key = args.modpack
+        else:
+            key = showDictSel(flavorsDict,selTitle=selTitle,selSuffix=selSuffix)
+        if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
+            args.nopause = True
+            exit()
+        # get modpack url
+        modpack_url = flavorsDict[key]["source"]
+        # download url
+        modpack_path = os.path.join(parent,os.path.basename(modpack_url))
+        response = requests.get(modpack_url)
+        if response.status_code == 200:
+            # Content of the file
+            cont = response.content
+        else:
+            cont = None
+        if cont != None and cont != "":
+            if os.path.exists(modpack_path) == False:
+                open(modpack_path,'wb').write(cont)
+        else:
+            print(prefix+"Failed to get modpack!")
+            exit()
+
+    # [Prep selected package]
+    modpack = os.path.basename(modpack_path)
+    title = title.replace("<modpack>", modpack)
+    system = platform.system().lower()
+#endregion [IncludeInline: ./partial@installermenu.py]
+
+#region [IncludeInline: ./partial@installermain.py]
+# [Install]
 
 #region [IncludeInline: ./assets/minecraftLauncherAgent.py]
 # import
@@ -2065,10 +2136,10 @@ def MinecraftLauncherAgent(
 
 if action_install == True:
 
+    # [Install]
     print(prefix+f"Starting install for '{modpack}'...")
 
     # Create tempfolder
-    fs = filesys
     print(prefix+"Creating temp folder...")
     tempFolder = os.path.join(parent,temp_foldername)
     try:
@@ -2129,7 +2200,7 @@ if action_install == True:
             exit()
 
         # handle install dest
-        install_dest = getStdInstallDest(system)
+        install_dest = getStdInstallDest()
         if listingData.get("_legacy_fld") != None:
             _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
             if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
@@ -2355,9 +2426,9 @@ if action_install == True:
         #    )
 
     # Add to installed-list
-    mcc_installed_file = os.path.join(getStdInstallDest(system),"modpacks.json")
+    mcc_installed_file = os.path.join(getStdInstallDest(),"modpacks.json")
     mcc_installed = {
-        "DefaultInstallDirectory": getStdInstallDest(system),
+        "DefaultInstallDirectory": getStdInstallDest(),
         "Installs":[]
     }
     ## handle existing
@@ -2397,3 +2468,539 @@ if action_install == True:
 
     cli_pause("Received exit, press any key to continue...")
 #endregion [IncludeInline: ./partial@installermain.py]
+
+#region [IncludeInline: ./partial@uninstall.py]
+# [Uninstall]
+if action_uninstall == True:
+
+    def safeNone(v):
+        if type(v) == str:
+            v = v.replace("<uuid>","Unknown")
+        if v == None:
+            return str("None")
+        else:
+            return str(v)
+    # get modpacks
+    mcc_installed_file = os.path.join(getStdInstallDest(),"modpacks.json")
+    if not os.path.exists(mcc_installed_file):
+        print("No modpacks.json file found, can't read installed modpacks!")
+        exit()
+    else:
+        try:
+            modpacks = json.loads(open(mcc_installed_file,'r',encoding=encoding).read())
+        except:
+            modpacks = {
+                "DefaultInstallDirectory": getStdInstallDest(),
+                "Installs":[]
+            }
+    # show modpacks
+    selTitle  = f"Welcome to MinecraftCustomClient!\n\033[90mShowing installed modpacks for:\n  {modpacks['DefaultInstallDirectory']}\033[0m\nSelect the modpack to uninstall:"
+    formatting={"item_selected":"\x1b[33m","item_normal":"","selector":""}
+    modpacksDict = {}
+    installs = modpacks.get("Installs")
+    namedModpacks = {}
+    if installs != None and installs != [] and type(installs) == list:
+        for iter_modpack in modpacks["Installs"]:
+            # add to lists
+            name = safeNone(iter_modpack.get('name'))
+            if "-quickcompile." in name:
+                _name = name.split("_")
+                _name.pop(-1)
+                _name.pop(-1)
+                name = '_'.join(_name)
+            namedModpacks[name] = iter_modpack
+            modpacksDict[name] = {"desc":f"ID: {safeNone(iter_modpack.get('id'))}"}
+    modpacksDict["[Exit]"] = {"desc": "ncb:"}
+    if args.modpack:
+        modpack = args.modpack
+    else:
+        modpack = showDictSel(modpacksDict,selTitle=selTitle,selSuffix=selSuffix,formatting=formatting)
+    if modpack == None or modpack not in list(namedModpacks.keys()) or modpack == "[Exit]":
+        args.nopause = True
+        if modpack != "[Exit]":
+            print(f"Modpack '{modpack}' is not installed/found.")
+        exit()
+    print(f"Attempting uninstallation of '{modpack}'.")
+    # get path
+    mp_data = namedModpacks.get(modpack)
+    if modpack == None:
+        print(f"Failed to get modpack data for {modpack}!")
+        exit()
+    else:
+        mp_path = mp_data.get("path")
+        mp_name = mp_data.get("name")
+        mp_id = mp_data.get("id")
+        # are you sure with --y & --n support
+        if args.n:
+            exit()
+        if not args.y:
+            c = input(f"Are you sure you want to uninstall '{modpack}'? (THIS ACTION IS IRREVERSIBLE) [y/n] ")
+            if c.lower() != "y":
+                exit()
+        # remove folder
+        try:
+            if os.path.exists(mp_path):
+                shutil.rmtree(mp_path)
+            else:
+                print("Modpack path dosen't exist, wont attempt removal.")
+        except Exception as e:
+            print("Failed to remove modpack, this might lead to a partially-installed modpack.")
+            print(e)
+            exit()
+        # remove from modpacks.json
+        try:
+            cur_modpacks_d = json.loads(open(mcc_installed_file,'r',encoding=encoding).read())
+            cur_modpacks = cur_modpacks_d.get("Installs")
+            if cur_modpacks == None:
+                cur_modpacks_d["Installs"] = []
+        except Exception as e:
+            print(f"Failed to get current modpacks!\n{e}")
+            exit()
+        try:
+            if cur_modpacks != None:
+                for i,pack in enumerate(cur_modpacks):
+                    if pack.get("name") == mp_name:
+                        cur_modpacks_d["Installs"].pop(i)
+                        break
+        except Exception as e:
+            print(f"Failed to remove path from installed-modpack data!\n{e}")
+            exit()
+        try:
+            open(mcc_installed_file,'w',encoding=encoding).write(json.dumps(cur_modpacks_d))
+        except Exception as e:
+            print(f"Failed to remove path from installed-modpack file!\n{e}")
+            exit()
+        # done
+        print(f"Uninstalled {modpack}!")
+        exit()
+#endregion [IncludeInline: ./partial@uninstall.py]
+
+#region [IncludeInline: ./partial@datacopy.py]
+#region [IncludeInline: ./assets/ui_fs_selector.py]
+import os
+import sys
+import readchar
+
+# Function to clear the terminal screen
+def clear_screen():
+    if os.name == 'posix':
+        os.system('clear')
+    else:
+        os.system('cls')
+
+def getItemFormatting(stripAnsi=bool,checked=bool,selected=bool,formatting=dict):
+    v = None
+    if stripAnsi == True:
+        v = ""
+    else:
+        if checked == True:
+            if selected == True:
+                v = formatting.get("item_selected_checked")
+            else:
+                v = formatting.get("item_normal_checked")
+        else:
+            if selected == True:
+                v = formatting.get("item_selected")
+            else:
+                v = formatting.get("item_normal")
+        if formatting.get("partial_name") != None and formatting.get("partial_name") != "" and selected == False:
+            v += formatting.get("partial_name")
+    if v == None:
+        v = ""
+    return v
+
+def getDescFormatting(stripAnsi=bool,selected=bool,formatting=dict):
+    v = None
+    if stripAnsi == True:
+        v = ""
+    else:
+        if formatting.get("partial_desc") != None and formatting.get("partial_desc") != "" and selected == False:
+            v = formatting.get("partial_desc")
+    if v == None:
+        v = ""
+    return v
+
+def getBoxFormatting(stripAnsi=bool,checked=bool,selected=bool,formatting=dict):
+    v = None
+    if stripAnsi == True:
+        v = ""
+    else:
+        if selected == False:
+            if checked == True:
+                v = formatting.get("box_checked")
+            else:
+                v = formatting.get("box_unchecked")
+    if v == None:
+        v = ""
+    return v
+
+# Function to display the list of items with checkboxes
+def multisel_display_items(selected_index, items, selkey, checked_states, selTitle="Select options (press Enter to toggle):", selSuffix=None, dispWidth="vw", stripAnsi=False, formatting=None):
+    def_formatting = {"item_selected":"\x1b[32m","item_selected_checked":"\x1b[32m","item_normal":"","item_normal_checked":"","box_unchecked":"","box_checked":""}
+    if formatting != None and type(formatting) == dict:
+        _formatting = def_formatting.copy()
+        _formatting.update(formatting)
+        formatting = _formatting
+    # Get terminal width
+    width, _ = os.get_terminal_size()
+    if dispWidth == "vw":
+        dispWidth = width
+
+    clear_screen()
+    if selTitle != None:
+        print(selTitle)
+    max_key_length = max(len(key) for key in items.keys())
+    for i, key in enumerate(list(items.keys())):
+        selected = i==selected_index
+        if checked_states[i]:
+            checkbox = f"{getBoxFormatting(stripAnsi,True,selected,formatting)}[x] "
+        else:
+            checkbox = f"{getBoxFormatting(stripAnsi,False,selected,formatting)}[ ] "
+        if selkey == "" or selkey == None:
+            item_desc = items[key]
+        else:
+            item_desc = items[key]["desc"]
+        # check for ncb:
+        ncb = False
+        if "ncb:" in item_desc:
+            ncb = True
+            item_desc = item_desc.replace("ncb:","")
+        else:
+            item_desc = '{'+item_desc+'}'
+        # check for btn:
+        if "btn:" in item_desc:
+            item_desc = "    " + item_desc.replace("btn:","")
+            checkbox = ""
+        # create string
+        checked = True if checked_states[i] else False
+        if stripAnsi == False:
+            checkbox += "\033[0m"
+        string = f"{checkbox}{getItemFormatting(stripAnsi,checked,selected,formatting)}{key.ljust(max_key_length)}  {getDescFormatting(stripAnsi,selected,formatting)}{item_desc}"
+        if stripAnsi == False:
+            string += "\033[0m"
+
+        # Truncate and fill with ellipsis if the string is too long
+        off = 12 + max_key_length  # Numerical amount to cut (12 is what worked)
+        if len(string) > dispWidth - 2:
+            string = string.replace(item_desc, f"{item_desc[:dispWidth - off]}...")
+            if ncb == False and string.endswith("..."):
+                string += "}"
+
+        # handle newline
+        if "prenl:" in item_desc:
+            string = "\n" + string[::-1].replace(":lnerp","",1)[::-1]
+        if "posnl:" in item_desc:
+            string = string[::-1].replace(":lnsop","",1)[::-1] + "\n"
+
+        if i == selected_index:
+            print(f"\x1b[32m{string}\x1b[0m")
+        else:
+            print(string)
+    if selSuffix is not None:
+        print(selSuffix)
+
+# Function to get a single keypress
+def get_keypress():
+    return readchar.readchar()
+
+# Function to get the up-key
+def getup(keylow):
+    if os.name == 'nt':
+        return keylow == "h"
+    else:
+        return keylow == "a"
+
+# Function to get the down-key
+def getdown(keylow):
+    if os.name == 'nt':
+        return keylow == "p"
+    else:
+        return keylow == "b"
+
+# Function to get the enter-key
+def getent(keylow):
+    if os.name == 'nt':
+        return keylow == "\r"
+    else:
+        return keylow == "\n"
+
+# Function to get the space-key
+def getspc(keylow):
+    if os.name == 'nt':
+        return keylow == " "
+    else:
+        return keylow == " "
+
+# Main function to show a dictionary and allow multiple selections
+def showMultiSelectMenu(nameDescDict=dict, selKey="desc", sti=0, selTitle="Select an option:", selSuffix=None, dispWidth="vw", prechecked=[], stripAnsi=False, formatting=None):
+    checked_states = [False] * len(nameDescDict)
+    selected_index = sti
+
+    for i in prechecked:
+        if i >= 0 and i < len(nameDescDict):
+            checked_states[i] = True
+    disp = True
+    while True:
+        if disp == True:
+            multisel_display_items(selected_index, nameDescDict, selKey, checked_states, selTitle, selSuffix, dispWidth, stripAnsi, formatting)
+        else:
+            disp = True
+        key = get_keypress()
+
+        if getup(key.lower()):
+            selected_index -= 1
+            # roll-over
+            if selected_index < 0: selected_index = len(nameDescDict)-1
+        elif getdown(key.lower()):
+            selected_index += 1
+            # roll-over
+            if selected_index > len(nameDescDict)-1: selected_index = 0
+        elif getent(key.lower()) or getspc(key.lower()):
+            idx = selected_index
+            if "btn:" in list(nameDescDict.values())[idx]:
+                # handle button
+                return [key for i, key in enumerate(nameDescDict.keys()) if checked_states[i]],list(nameDescDict.keys())[idx]
+            else:
+                checked_states[idx] = not checked_states[idx]
+        elif key.lower() == "q" or key.lower() == "\x1b":
+            break
+        else:
+            disp = False
+
+    selected_options = [key for i, key in enumerate(nameDescDict.keys()) if checked_states[i]]
+    return selected_options,None
+
+def format_size(size):
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB']
+    suffix_index = 0
+    while size >= 1024 and suffix_index < len(suffixes)-1:
+        suffix_index += 1   # increment the index of the suffix
+        size /= 1024.0      # apply the division
+    return f"{size:.2f}{suffixes[suffix_index]}"
+
+def displayForDir(dirpath, sti=0, selTitle="Select an option:", selSuffix=None, dispWidth="vw", prechecked=[], stripAnsi=False, formatting=None, extraElems=None):
+    if os.path.exists(dirpath):
+        items = os.listdir(dirpath)
+        ditems = {}
+        for item in items:
+            itempath = os.path.join(dirpath,item)
+            if os.path.isdir(itempath):
+                subitems = os.listdir(itempath)
+                subs = {"files":[],"folders":[]}
+                for i in subitems:
+                    ip = os.path.join(itempath,i)
+                    if os.path.isfile(ip):
+                        subs["files"].append(ip)
+                    else:
+                        subs["folders"].append(ip)
+                files_str = None
+                folders_str = None
+                files_len = len(subs["files"])
+                folders_len = len(subs["folders"])
+                if files_len > 0:
+                    if files_len == 1:
+                        files_str = " 1 file"
+                    else:
+                        files_str = f" {files_len} files"
+                if folders_len > 0:
+                    if folders_len == 1:
+                        folders_str = " 1 folder"
+                    else:
+                        folders_str = f" {folders_len} folders"
+                final_str = ""
+                if files_str != None:
+                    if folders_str != None:
+                        final_str = f"ncb:Has{files_str} and{folders_str}."
+                    else:
+                        final_str = f"ncb:Has{files_str}."
+                else:
+                    if folders_str != None:
+                        final_str = f"ncb:Has{folders_str}."
+                ditems[item] = final_str
+            else: ditems[item] = f"ncb:Size: {str(format_size(os.path.getsize(itempath)))}"
+
+        if extraElems != None:
+            ditems.update(extraElems)
+
+        sels,selbtn = showMultiSelectMenu(
+            nameDescDict=ditems,
+            selKey=None,
+            selTitle=selTitle,
+            selSuffix=selSuffix,
+            dispWidth=dispWidth,
+            prechecked=prechecked,
+            stripAnsi=stripAnsi,
+            formatting=formatting
+        )
+        nsels = []
+        for sel in sels:
+            nsels.append(os.path.join(dirpath,sel))
+        return nsels,selbtn
+    else:
+        return [],selbtn
+#endregion [IncludeInline: ./assets/ui_fs_selector.py]
+
+if action_datacopy:
+    def safeNone(v):
+        if type(v) == str:
+            v = v.replace("<uuid>","Unknown")
+        if v == None:
+            return str("None")
+        else:
+            return str(v)
+
+    # get modpacks
+    mcc_installed_file = os.path.join(getStdInstallDest(),"modpacks.json")
+    if not os.path.exists(mcc_installed_file):
+        print("No modpacks.json file found, can't read installed modpacks!")
+        exit()
+    else:
+        try:
+            modpacks = json.loads(open(mcc_installed_file,'r',encoding=encoding).read())
+        except:
+            modpacks = {
+                "DefaultInstallDirectory": getStdInstallDest(),
+                "Installs":[]
+            }
+    # [Select source]
+    selTitle  = f"Welcome to MinecraftCustomClient!\n\033[90mShowing installed modpacks for:\n  {modpacks['DefaultInstallDirectory']}\033[0m\nSelect the modpack to copy data FROM:"
+    formatting={"item_selected":"\x1b[33m","item_normal":"","selector":""}
+    modpacksDict = {}
+    installs = modpacks.get("Installs")
+    namedModpacks = {}
+    if installs != None and installs != [] and type(installs) == list:
+        for iter_modpack in modpacks["Installs"]:
+            # add to lists
+            name = safeNone(iter_modpack.get('name'))
+            if "-quickcompile." in name:
+                _name = name.split("_")
+                _name.pop(-1)
+                _name.pop(-1)
+                name = '_'.join(_name)
+            namedModpacks[name] = iter_modpack
+            modpacksDict[name] = {"desc":f"ID: {safeNone(iter_modpack.get('id'))}"}
+    modpacksDict["[Exit]"] = {"desc": "ncb:"}
+    if len(namedModpacks) < 2:
+        print(f"The datacopier needs more then two installed modpacks, {len(namedModpacks)} found!")
+        exit()
+    if args.modpack:
+        modpack = args.modpack
+    else:
+        modpack = showDictSel(modpacksDict,selTitle=selTitle,selSuffix=selSuffix,formatting=formatting)
+    if modpack == None or modpack not in list(namedModpacks.keys()) or modpack == "[Exit]":
+        args.nopause = True
+        if modpack != "[Exit]":
+            print(f"Modpack '{modpack}' is not installed/found.")
+        exit()
+    # get data
+    mp_data = namedModpacks.get(modpack)
+    if modpack == None:
+        print(f"Failed to get modpack data for {modpack}!")
+        exit()
+    else:
+        mp_path = mp_data.get("path")
+        mp_name = mp_data.get("name")
+        mp_id = mp_data.get("id")
+    if os.path.exists(mp_path) == False:
+        print(f"Failed to find folder for source-modpack: '{modpack}'!")
+        exit()
+
+    # [Choose files]
+    selTitle  = "Welcome to MinecraftCustomClient's datacopier!\nCheck the items you want to copy using your keyboard:"
+    selSuffix = "\033[90m\nUse your keyboard to select/check:\n↑ : Up\n↓ : Down\n↲ : Select/Toggle (ENTER)\nq : Quit/Done\n␛ : Quit/Done (ESC)\033[0m"
+    if platform.system() == "Darwin":
+        selSuffix = "\033[90m\nUse your keyboard to select/check:\na : Up\nb : Down\n↲ : Select/Toggle (ENTER)\nq : Quit/Done\n␛ : Quit/Done (ESC)\033[0m"
+    ch,selbtn = displayForDir(
+        mp_path,
+        selTitle=selTitle,
+        selSuffix=selSuffix,
+        extraElems={"[Done]":"btn:prenl:Selects your checked items","[Exit]":"btn:Exits the datacopier"},
+        formatting={"partial_desc":"\033[90m","box_unchecked":"\033[90m","box_checked":"\033[33m"}
+    )
+    if selbtn == "[Exit]":
+        ch = []
+    # handle no-sel
+    if ch == [] or ch == None:
+        print("No items selected for copy, skipping...")
+        exit()
+
+    # [Select dest]
+    selTitle  = f"Welcome to MinecraftCustomClient!\n\033[90mShowing installed modpacks for:\n  {modpacks['DefaultInstallDirectory']}\n\033[90mSelected source-modpack: {modpack}\033[0m\nSelect the modpack to copy data TO:"
+    formatting={"item_selected":"\x1b[33m","item_normal":"","selector":""}
+    modpacksDict = {}
+    installs = modpacks.get("Installs")
+    namedModpacks = {}
+    if installs != None and installs != [] and type(installs) == list:
+        for iter_modpack in modpacks["Installs"]:
+            # add to lists
+            name = safeNone(iter_modpack.get('name'))
+            if "-quickcompile." in name:
+                _name = name.split("_")
+                _name.pop(-1)
+                _name.pop(-1)
+                name = '_'.join(_name)
+            namedModpacks[name] = iter_modpack
+            modpacksDict[name] = {"desc":f"ID: {safeNone(iter_modpack.get('id'))}"}
+    modpacksDict["[Exit]"] = {"desc": "ncb:"}
+    if args.destmodpack:
+        modpackd = args.destmodpack
+    else:
+        modpackd = showDictSel(modpacksDict,selTitle=selTitle,selSuffix=selSuffix,formatting=formatting)
+    if modpackd == None or modpackd not in list(namedModpacks.keys()) or modpackd == "[Exit]":
+        args.nopause = True
+        if modpack != "[Exit]":
+            print(f"Modpack '{modpackd}' is not installed/found.")
+        exit()
+    # get data
+    mpd_data = namedModpacks.get(modpackd)
+    if modpackd == None:
+        print(f"Failed to get modpack data for {modpackd}!")
+        exit()
+    else:
+        mpd_path = mpd_data.get("path")
+        mpd_name = mpd_data.get("name")
+        mpd_id = mpd_data.get("id")
+    if os.path.exists(mpd_path) == False:
+        print(f"Failed to find folder for dest-modpack: '{modpackd}'!")
+        exit()
+    
+    if modpack == modpackd:
+        print("Source modpack can't be the same as the destination!")
+        exit()
+
+    # [Copy]
+    print(f"You have selected:")
+    print(f"  Source      = '{modpack}'")
+    print(f"  Destination = '{modpackd}'")
+    print(f"  ToCopy: '{','.join([os.path.basename(ent) for ent in ch])}'")
+    print("")
+    if not args.n and not args.y:
+        c = input("Is this correct? [Y/N] ")
+    if args.n:
+        c = "n"
+    elif args.y:
+        c = "y"
+    if c.lower() == "n":
+        print("Okay, wont copy!")
+        exit()
+    else:
+        print("Copying...")
+        for ent in ch:
+            ent_n = os.path.basename(ent)
+            dest = ent.replace(mp_path,mpd_path)
+            print(f"\033[90m{modpack}:{ent_n} -> {modpackd}:{ent_n}\033[0m")
+            if os.path.isdir(ent):
+                # copy fol
+                fs.copyFolder2(ent,dest)
+            else:
+                # copy fil
+                if os.path.exists(dest) and os.path.exists(ent):
+                    os.remove(dest)
+                    print("Overwriting org..")
+                fs.copyFile(ent,dest)
+            
+#endregion [IncludeInline: ./partial@datacopy.py]
+
+# [Open install loc]
+if action_open == True:
+    fs.openFolder(getStdInstallDest())

@@ -1,17 +1,13 @@
-# [Code]
-
-# IncludeInline: ./assets/lib_filesys.py
-
-# IncludeInline: ./assets/flavorFunctions.py
+# [Install]
 
 # IncludeInline: ./assets/minecraftLauncherAgent.py
 
 if action_install == True:
 
+    # [Install]
     print(prefix+f"Starting install for '{modpack}'...")
 
     # Create tempfolder
-    fs = filesys
     print(prefix+"Creating temp folder...")
     tempFolder = os.path.join(parent,temp_foldername)
     try:
@@ -72,7 +68,7 @@ if action_install == True:
             exit()
 
         # handle install dest
-        install_dest = getStdInstallDest(system)
+        install_dest = getStdInstallDest()
         if listingData.get("_legacy_fld") != None:
             _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
             if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
@@ -298,9 +294,9 @@ if action_install == True:
         #    )
 
     # Add to installed-list
-    mcc_installed_file = os.path.join(getStdInstallDest(system),"modpacks.json")
+    mcc_installed_file = os.path.join(getStdInstallDest(),"modpacks.json")
     mcc_installed = {
-        "DefaultInstallDirectory": getStdInstallDest(system),
+        "DefaultInstallDirectory": getStdInstallDest(),
         "Installs":[]
     }
     ## handle existing

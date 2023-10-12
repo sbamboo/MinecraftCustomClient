@@ -10,7 +10,7 @@ def clear_screen():
         os.system('cls')
 
 # Function to display the list of items
-def display_items(selected_index, items, selkey, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False):
+def display_items(selected_index, items, selkey, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False, formatting={"item_selected":"\x1b[32m","item_normal":"","selector":""}):
     # get dispWidth
     width,height = os.get_terminal_size()
     if dispWidth == "vw": dispWidth = width
@@ -46,13 +46,19 @@ def display_items(selected_index, items, selkey, selTitle="Select an option:", s
                 string = string.replace(value,"{"+ovalue[:dispWidth-off] + "..."+"}") # chn string based on cutoff
         # print the string with formatting if enabeld
         if i == int(selected_index):
-            string = ">" + string[1:] # add the >
+            if stripAnsi == True:
+                string = ">" + string[1:] # add the >
+            else:
+                string = f"{formatting['selector']}>" + string[1:] # add the >
             if stripAnsi == True:
                 print(f"{string}")
             else:
-                print(f"\x1b[32m{string}\x1b[0m")
+                print(f"{formatting['item_selected']}{string}\x1b[0m")
         else:
-            print(f"{string}")
+            if stripAnsi == True:
+                print(f"{string}")
+            else:
+                print(f"{formatting['item_normal']}{string}\x1b[0m")
     # print suffix msg
     if selSuffix != None:
         print(selSuffix)
@@ -83,7 +89,7 @@ def getent(keylow):
         return keylow == "\n"
 
 # Main function to show a dictionary based on the dict.value.<key> / or dict.value (if selkey = ""/None)
-def showDictSel(nameDescDict=dict, selKey="desc", sti=0, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False):
+def showDictSel(nameDescDict=dict, selKey="desc", sti=0, selTitle="Select an option:", selSuffix=None, dispWidth="vw", stripAnsi=False, formatting={"item_selected":"\x1b[32m","item_normal":"","selector":""}):
     '''
     Add "ncb:" to your value to ommit the curly brackets.
     '''
@@ -92,7 +98,7 @@ def showDictSel(nameDescDict=dict, selKey="desc", sti=0, selTitle="Select an opt
     while True:
         # display the items if disp = True
         if disp == True:
-            display_items(selected_index, nameDescDict, selKey, selTitle, selSuffix, dispWidth, stripAnsi)
+            display_items(selected_index, nameDescDict, selKey, selTitle, selSuffix, dispWidth, stripAnsi, formatting)
         else:
             disp = True
         # check keys and change selected index depends on keys

@@ -501,7 +501,7 @@ def applyDestPref(shortDest) -> str:
     return fs.replaceSeps(p)
 
 # Get std final destination
-def getStdInstallDest(system):
+def getStdInstallDest():
     p = applyDestPref(f"installs\\minecraft-custom-client\\v2")
     return p
 

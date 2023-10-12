@@ -66,4 +66,7 @@ def setConTitle(title):
 
 # [Pre Release softwere notice]
 print(prefix+"\033[33mNote! This is pre-release software, the installer is provided AS-IS and i take no responsibility for issues that may arrise when using it.\nIf you wish to stop this script, close it now.\033[0m")
-time.sleep(2)
+if args.skipPreRelWait:
+    pass
+else:
+    time.sleep(2)

@@ -95,6 +95,7 @@ parser.add_argument('-exprt', help='Exports a copy of the unpacked tempdata, tak
 parser.add_argument('-imprt', help='Imports a copy of the unpacked tempdata, takes the zip to import from.', type=str)
 parser.add_argument('--nopause', help="Won't pause on exit/finish", action="store_true")
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
+parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
