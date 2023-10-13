@@ -458,7 +458,7 @@ class filesys():
         return detected.mime_type
 
     # Function to open a folder in the host's filemanager
-    def openFolder(path=str()):
+    def openFolder_legacy(path=str()):
         # Local imports:
         try: import distro
         except:
@@ -471,6 +471,32 @@ class filesys():
             #Rassberry pi
             if distro.id() == "raspbian": os.system(f"pcmanfm {path}")
 
+
+    def openFolder(path=str()):
+        # Define a list of known file managers and their commands
+        linux_file_managers = {
+            "nautilus": "nautilus",
+            "nemo": "nemo",
+            "pcmanfm": "pcmanfm",
+            "thunar": "thunar",
+            # Add more file managers and their corresponding commands here
+        }
+
+        # Detect the Linux distribution
+        if altConUtils.IsLinux():
+            # Try to find a suitable file manager
+            for manager, command in linux_file_managers.items():
+                if os.system(f"which {command} > /dev/null 2>&1") == 0:
+                    os.system(f"{command} {path}")
+                    break
+            else:
+                print("No supported file manager found. Please install one.")
+
+        # For Windows and macOS
+        elif altConUtils.IsWindows():
+            os.system(f"explorer {path}")
+        elif altConUtils.IsMacOS():
+            os.system(f"open {path}")
 
 # Class with "powershell-styled" functions
 class pwshStyled():

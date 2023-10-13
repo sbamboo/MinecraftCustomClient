@@ -20,6 +20,9 @@ inln = os.path.abspath(os.path.join(parent,"tool_includeInline.py"))
 # copy
 fs.copyFile(installer,ninstaller)
 
+# compile ninstaller
+os.system(f"{sys.executable} {inln} -path {ninstaller}")
+
 # get content
 c = open(ninstaller,'r',encoding="utf-8").read()
 
@@ -72,9 +75,6 @@ open(ninstaller,'w',encoding="utf-8").write(c)
 if packages != []:
     open(pkgs,'w',encoding="utf-8").write('\n'.join(packages))
 
-# compile ninstaller
-os.system(f"{sys.executable} {inln} -path {ninstaller}")
-
 # Create a ZipFile object in write mode
 with zipfile.ZipFile(args.destzip, 'w') as zipf:
     # Add the file specified by the 'nquick' variable to the .zip archive
@@ -95,6 +95,6 @@ with zipfile.ZipFile(args.destzip, 'w') as zipf:
         zipf.write(buildScript, arcname="build.py")
         zipf.write(ilogo, arcname="logo.ico")
 
-os.remove(ninstaller)
+#os.remove(ninstaller)
 if packages != []:
     os.remove(pkgs)

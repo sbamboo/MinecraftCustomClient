@@ -1,8 +1,8 @@
 # This file is for creating an installer for only one modpack
 
 # [Settings]
-installer_version = "1.1"
-installer_release = "2023-10-07(0)"
+installer_version = "1.1.1"
+installer_release = "2023-10-12(0)"
 prefix    = "\033[90m[\033[35mQuickInst\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -95,10 +95,13 @@ parser.add_argument('-exprt', help='Exports a copy of the unpacked tempdata, tak
 parser.add_argument('-imprt', help='Imports a copy of the unpacked tempdata, takes the zip to import from.', type=str)
 parser.add_argument('--nopause', help="Won't pause on exit/finish", action="store_true")
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
+parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
 
 # IncludeInline: MX@./partial@prep.py
+
+action_install = True # autoset to the multi-usage partial can be simplified
 
 # IncludeInline: MX@./installermain.py
