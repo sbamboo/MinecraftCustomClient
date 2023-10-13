@@ -128,7 +128,7 @@ action_datacopy = False
 # show selector
 selTitle  = "Welcome to MinecraftCustomClient!\nSelect the action you would like to do:"
 selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
-if platform.system() == "Darwin":
+if platform.system() != "Windows":
     selSuffix = "\033[90m\nUse your keyboard to select:\na : Up\nb : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
 actionsDict = {
     "[Install]":{"desc":"ncb:Runs the installer action."},

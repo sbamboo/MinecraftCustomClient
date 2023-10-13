@@ -24,6 +24,9 @@ if action_datacopy:
             }
     # [Select source]
     selTitle  = f"Welcome to MinecraftCustomClient!\n\033[90mShowing installed modpacks for:\n  {modpacks['DefaultInstallDirectory']}\033[0m\nSelect the modpack to copy data FROM:"
+    selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
+    if platform.system() != "Windows":
+        selSuffix = "\033[90m\nUse your keyboard to select:\na : Up\nb : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
     formatting={"item_selected":"\x1b[33m","item_normal":"","selector":""}
     modpacksDict = {}
     installs = modpacks.get("Installs")
@@ -68,7 +71,7 @@ if action_datacopy:
     # [Choose files]
     selTitle  = "Welcome to MinecraftCustomClient's datacopier!\nCheck the items you want to copy using your keyboard:"
     selSuffix = "\033[90m\nUse your keyboard to select/check:\n↑ : Up\n↓ : Down\n↲ : Select/Toggle (ENTER)\nq : Quit/Done\n␛ : Quit/Done (ESC)\033[0m"
-    if platform.system() == "Darwin":
+    if platform.system() != "Windows":
         selSuffix = "\033[90m\nUse your keyboard to select/check:\na : Up\nb : Down\n↲ : Select/Toggle (ENTER)\nq : Quit/Done\n␛ : Quit/Done (ESC)\033[0m"
     ch,selbtn = displayForDir(
         mp_path,
@@ -86,6 +89,9 @@ if action_datacopy:
 
     # [Select dest]
     selTitle  = f"Welcome to MinecraftCustomClient!\n\033[90mShowing installed modpacks for:\n  {modpacks['DefaultInstallDirectory']}\n\033[90mSelected source-modpack: {modpack}\033[0m\nSelect the modpack to copy data TO:"
+    selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
+    if platform.system() != "Windows":
+        selSuffix = "\033[90m\nUse your keyboard to select:\na : Up\nb : Down\n↲ : Select (ENTER)\nq : Quit (ESC)"
     formatting={"item_selected":"\x1b[33m","item_normal":"","selector":""}
     modpacksDict = {}
     installs = modpacks.get("Installs")
