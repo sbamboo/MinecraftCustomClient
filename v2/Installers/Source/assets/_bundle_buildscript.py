@@ -7,7 +7,10 @@ packagesF = os.path.join(parent,"packages.txt")
 pkgs_str = ""
 if os.path.exists(packagesF):
     packages = ','.join(open(packagesF,'r',encoding="utf-8").read().split("\n"))
-    pkgs_str = f'--add-data "{packagesF};." --hidden-import={packages}'
+    if platform.system() == "Windows":
+        pkgs_str = f'--add-data "{packagesF};." --hidden-import={packages}'
+    else:
+        pkgs_str = f'--add-data "{packagesF}:." --hidden-import={packages}'
     # ensure pkgs in build envir
     for package in packages.split(","):
         os.system(f"{sys.executable} -m pip install {package}")
@@ -20,9 +23,15 @@ if "--debug" in sys.argv:
     print(command)
 os.system(command)
 
-exeName = "source.MinecraftCustomClient.exe"
-build = os.path.join(parent,"dist",exeName)
-final = os.path.join(parent,"..","MinecraftCustomClient.exe")
+if platform.system() == "Windows":
+    exeName = "source.MinecraftCustomClient.exe"
+    build = os.path.join(parent,"dist",exeName)
+    final = os.path.join(parent,"..","MinecraftCustomClient.exe")
+else:
+    exeName = "source.MinecraftCustomClient"
+    build = os.path.join(parent,"dist",exeName)
+    final = os.path.join(parent,"..","MinecraftCustomClient")
+
 shutil.copyfile(build, final)
 # remove build folders
 os.remove("source.MinecraftCustomClient.spec")
