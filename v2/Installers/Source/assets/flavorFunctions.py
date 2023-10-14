@@ -37,12 +37,12 @@ def downUrlFile(url,filepath):
             open(filepath,'wb').write(cont)
 
 # [Functionos]
-def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix=""):
+def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False):
     sources = listingData.get("sources")
     webinclude = listingData.get("webInclude")
 
     # handle webinclude
-    if webinclude != None:
+    if webinclude != None and skipWebIncl == False:
         for incl in webinclude:
             url = list(incl.keys())[0]
             relpathToDest = list(incl.values())[0]
@@ -135,7 +135,7 @@ def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
         fs.renameFile(oldname,newname)
     return dest
 
-def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix=""):
+def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix="",skipWebIncl=False):
     dest = extractedPackFolderPath
     # get data
     poss = os.path.join(dest,"listing.json")
@@ -143,7 +143,7 @@ def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",
     if fs.doesExist(poss):
         content = open(poss,'r',encoding=encoding).read()
         listing = json.loads(content)
-        installListing(listing,extractedPackFolderPath,encoding,prefix)
+        installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl)
 
 def _getJvb(path):
     java_binary = os.path.join(path, "java")

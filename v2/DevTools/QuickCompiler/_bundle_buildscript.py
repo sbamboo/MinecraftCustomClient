@@ -6,12 +6,26 @@
 
 
 import os,sys,shutil,platform
+
+if "--pyinstallerPath" in sys.argv:
+    pyinst = "pyinstaller"
+    ind = sys.argv.index("--pyinstallerPath")
+    try:
+        pyinst = sys.argv[ind+1]
+        sys.argv.pop(ind+1)
+        sys.argv.pop(ind)
+    except:
+        pass
+
 parent = os.path.dirname(__file__)
 packagesF = os.path.join(parent,"packages.txt")
 pkgs_str = ""
 if os.path.exists(packagesF):
     packages = ','.join(open(packagesF,'r',encoding="utf-8").read().split("\n"))
-    pkgs_str = f' --add-data "{packagesF};." --hidden-import={packages}'
+    if platform.system() == "Windows":
+        pkgs_str = f' --add-data "{packagesF};." --hidden-import={packages}'
+    else:
+        pkgs_str = f' --add-data "{packagesF}:." --hidden-import={packages}'
     # ensure pkgs in build envir
     for package in packages.split(","):
         os.system(f"{sys.executable} -m pip install {package}")
@@ -26,14 +40,19 @@ mainfile = os.path.join(parent,"source.QuickInstaller.py")
 modpack = os.path.join(parent,modpack)
 logo = os.path.join(parent,"logo.ico")
 
-command = f'pyinstaller --onefile --add-data "{modpack};."{pkgs_str} --icon="{logo}" "{mainfile}"'
+command = f'{pyinst} --onefile --add-data "{modpack};."{pkgs_str} --icon="{logo}" "{mainfile}"'
 if "--debug" in sys.argv:
     print(command)
 os.system(command)
 
-exeName = "source.QuickInstaller.exe"
-build = os.path.join(parent,"dist",exeName)
-final = os.path.join(parent,"QuickInstaller.exe")
+if platform.system() == "Windows":
+    exeName = "source.QuickInstaller.exe"
+    build = os.path.join(parent,"dist",exeName)
+    final = os.path.join(parent,"QuickInstaller.exe")
+else:
+    exeName = "source.QuickInstaller"
+    build = os.path.join(parent,"dist",exeName)
+    final = os.path.join(parent,"QuickInstaller")
 shutil.copyfile(build, final)
 # remove build folders
 os.remove("source.QuickInstaller.spec")

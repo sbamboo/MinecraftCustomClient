@@ -52,7 +52,7 @@ if action_install == True:
         # get data
         print(prefix+f"Downloading listing content... (type: {listingType})")
         try:
-            downListingCont(dest,tempFolder,encoding,prefix_dl)
+            downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl)
         except Exception as e:
             print(prefix+"Failed to download listing content!",e)
             cleanUp(tempFolder,modpack_path)

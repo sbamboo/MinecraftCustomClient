@@ -1,7 +1,17 @@
-# Build-script: 2023-10-02(1)
-
+# Build-script: 2023-10-14(1)
 
 import os,sys,shutil,platform
+
+if "--pyinstallerPath" in sys.argv:
+    pyinst = "pyinstaller"
+    ind = sys.argv.index("--pyinstallerPath")
+    try:
+        pyinst = sys.argv[ind+1]
+        sys.argv.pop(ind+1)
+        sys.argv.pop(ind)
+    except:
+        pass
+
 parent = os.path.dirname(__file__)
 packagesF = os.path.join(parent,"packages.txt")
 pkgs_str = ""
@@ -18,7 +28,7 @@ if os.path.exists(packagesF):
 mainfile = os.path.join(parent,"source.MinecraftCustomClient.py")
 logo = os.path.join(parent,"logo.ico")
 
-command = f'pyinstaller --onefile {pkgs_str} --icon="{logo}" "{mainfile}"'
+command = f'{pyinst} --onefile {pkgs_str} --icon="{logo}" "{mainfile}"'
 if "--debug" in sys.argv:
     print(command)
 os.system(command)

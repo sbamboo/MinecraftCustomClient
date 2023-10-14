@@ -99,6 +99,7 @@ parser.add_argument('-modpackFile', type=str, help="Forced custom modpack file (
 parser.add_argument('-destmodpack', type=str, help="Datacopy destination modpack (str)")
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
+parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
