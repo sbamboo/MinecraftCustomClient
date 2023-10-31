@@ -39,7 +39,7 @@ def terminateMC(excProcNameList=None):
                 if process_name.lower() in excProcNameList:
                     valid = False
             # Check if the process name contains "Minecraft"
-            if 'minecraft' in process_name.lower() and valid == True:
+            if 'minecraft.exe' in process_name.lower() and valid == True:
                 # Terminate the process
                 pid = process.info['pid']
                 psutil.Process(pid).terminate()
