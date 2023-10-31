@@ -103,6 +103,11 @@ if args.enc:
 
 # IncludeInline: MX@./partial@prep.py
 
+# IncludeInline: ./assets/lib_filesys.py
+fs = filesys
+
+# IncludeInline: ./assets/flavorFunctions.py
+
 action_install = True # autoset to the multi-usage partial can be simplified
 
-# IncludeInline: MX@./installermain.py
+# IncludeInline: MX@./partial@installermain.py

@@ -364,11 +364,13 @@ def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUr
                 late = urlL.get("latest")
                 reco = urlL.get("recommended")
                 if forForgeInstType.lower() == "latest":
+                    print(prefix+"Found latest for (forForgeMcVer)")
                     if late != "":
                         url = late
                     elif reco != "":
                         url = reco
                 else:
+                    print(prefix+"Found recommended for (forForgeMcVer)")
                     if reco != "":
                         url = reco
                     elif late != "":

@@ -7,8 +7,8 @@
 
 import os,sys,shutil,platform
 
+pyinst = "pyinstaller"
 if "--pyinstallerPath" in sys.argv:
-    pyinst = "pyinstaller"
     ind = sys.argv.index("--pyinstallerPath")
     try:
         pyinst = sys.argv[ind+1]
@@ -36,7 +36,7 @@ for file in files:
     if os.path.basename(file) not in excludeFiles:
         modpack = os.path.basename(file)
 
-mainfile = os.path.join(parent,"source.QuickInstaller.py")
+mainfile = os.path.abspath(os.path.join(parent,"source.QuickInstaller.py"))
 modpack = os.path.join(parent,modpack)
 logo = os.path.join(parent,"logo.ico")
 

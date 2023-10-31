@@ -119,7 +119,7 @@ if action_install == True:
             print(prefix+f"Retriving loader-install url... ({modld}: {ldver} for {mcver})")
             tryMakeFrgUrl = True
             reScrapeFrgLst = False
-            loaderURL = getLoaderUrl(prefix,modld,tempFolder,fabric_url,forge_url,tryMakeFrgUrl,mcver,ldver,"latest",forForgeList,reScrapeFrgLst)
+            loaderURL = getLoaderUrl(prefix,modld,tempFolder,fabric_url,forge_url,tryMakeFrgUrl,"installer",mcver,ldver,"latest",forForgeList,reScrapeFrgLst)
             print(prefix+f"Using: {loaderURL}")
 
             print(prefix+f"Downloading loader...")

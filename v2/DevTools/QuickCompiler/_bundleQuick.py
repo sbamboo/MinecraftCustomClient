@@ -50,14 +50,15 @@ if args.prepbuild:
     # check for sp (save-pkg)
     for line in excludes:
         if "autopipImport" in line:
-            line = line.split("autopipImport(")[-1]
-            line = line.split(")")[0]
-            line = line.split(",")
-            for i,p in enumerate(line):
-                p = p.replace('"',"")
-                p = p.replace("'","")
-                line[i] = p
-            packages.append(line[-1])
+            if "def autopipImport" not in line and "autopipImport = " not in line and not "**kwargs" in line:
+                line = line.split("autopipImport(")[-1]
+                line = line.split(")")[0]
+                line = line.split(",")
+                for i,p in enumerate(line):
+                    p = p.replace('"',"")
+                    p = p.replace("'","")
+                    line[i] = p
+                packages.append(line[-1])
     # include includes
     toinclude = []
     for i,line in enumerate(lines):

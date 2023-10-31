@@ -110,7 +110,10 @@ for obj in pathObjects:
                         d.pr(f"\033[32mFound url on modrinth \033[90m: \033[32m{url}")
             else:
                 # check slugs
-                retrivedUrls = modrinth.GetLinksPerFilename(filename_to_slug[obj.name],obj.name)
+                try:
+                    retrivedUrls = modrinth.GetLinksPerFilename(filename_to_slug[obj.name],obj.name)
+                except:
+                    retrivedUrls = []
                 if len(retrivedUrls) > 0:
                     lookedAtFiles.append(obj.name)
                     for url in retrivedUrls:

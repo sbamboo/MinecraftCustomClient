@@ -41,7 +41,7 @@ listing = f"{tempFolder}{os.sep}listing.json"
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser(description='Quick compiler')
-parser.add_argument('-path', type=str, help='The path to the modsfolder')
+parser.add_argument('-path', type=str, help='The path to the modpacks folder')
 parser.add_argument('-cmpl', type=str, help='The compile.yml file')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
 args = parser.parse_args()
@@ -280,7 +280,7 @@ if gitsp != None:
                     raise Exception("No build script found, invalid build-env!")
                 olddir = os.getcwd()
                 os.chdir(buildenv)
-                os.system(f"{sys.executable} {buildScript}")
+                os.system(f'{sys.executable} "{buildScript}" --debug')
                 os.chdir(buildenv)
                 # get exe for quickInstaller
                 quickInstExe = os.path.join(buildenv,"QuickInstaller.exe")
