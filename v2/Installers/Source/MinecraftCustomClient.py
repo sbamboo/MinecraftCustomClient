@@ -1,13 +1,13 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.2"
-installer_release = "2023-10-12(0)"
+installer_version = "1.2.1"
+installer_release = "2023-10-31(0)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
 prefix_la = "\033[90m[\033[94mLnch-Agnt\033[90m]\033[0m "
-title = f"MinecraftCustomClient - Installer {installer_version}: <modpack>"
+title = f"MinecraftCustomClient - Installer {installer_version}: <modpack> - (Spooky Halloween!)"
 temp_foldername = "MCC_Installer_Temp"
 
 win_java_url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.8.1-windows-x64.zip"

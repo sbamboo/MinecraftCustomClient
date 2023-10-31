@@ -2,8 +2,8 @@
 
 import os,sys,shutil,platform
 
+pyinst = "pyinstaller"
 if "--pyinstallerPath" in sys.argv:
-    pyinst = "pyinstaller"
     ind = sys.argv.index("--pyinstallerPath")
     try:
         pyinst = sys.argv[ind+1]
