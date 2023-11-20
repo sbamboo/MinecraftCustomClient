@@ -611,7 +611,7 @@ def getMRloaderURL(modld,ldver,mcver):
         return f"https://meta.modrinth.com/forge/v0/versions/{mcver}-forge-{ldver}.json"
 
 def getMRinstanceDict(modld,ldver,mcver,modDestF,name,icon):
-    return {
+    data = {
         "uuid": str(uuid.uuid4()),
         "install_stage": "installed",
         "path": os.path.basename(modDestF),
@@ -631,6 +631,9 @@ def getMRinstanceDict(modld,ldver,mcver,modDestF,name,icon):
         "projects": {},
         "modrinth_update_version": None
     }
+    if modld == "forge":
+        data["loader_version"]["id"] = f"{mcver}-{ldver}"
+    return data
 
 def sha1_hash_file(filepath):
     sha1 = hashlib.sha1()
