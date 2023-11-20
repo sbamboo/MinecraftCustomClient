@@ -1,0 +1,9 @@
+argparse
+scandir
+requests
+getpass
+subprocess
+datetime
+json
+psutil
+readchar
