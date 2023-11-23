@@ -38,6 +38,7 @@ timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 tempFolder = f"{parent}{os.sep}{timestamp}-quickcompile"
 lister = f"{parent}{os.sep}_createListing.py"
 listing = f"{tempFolder}{os.sep}listing.json"
+iconTmp = f"{tempFolder}{os.sep}icon.tmp"
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser(description='Quick compiler')
@@ -93,6 +94,12 @@ if compyml.get('gitsync') == True:
         print("")
         os.chdir(olddir)
 
+# To long icon
+iconTx = compyml["icon"]
+if "data:image/png;base64" in iconTx:
+    open(iconTmp,'x',encoding="utf-8").write(iconTx)
+    iconTx = "iconTmp:" + iconTmp
+
 # Run jar retriver
 nonAllowed = ["",None]
 command = f' -modpack "{args.path}" -dest "{listing}"'
@@ -103,7 +110,7 @@ command += f' -name "{compyml["name"]}"'
 if compyml.get("ver") not in nonAllowed:
     command += f' -ver "{compyml["version"]}"'
 if compyml.get("icon") not in nonAllowed:
-    command += f' -icon "{compyml["icon"]}"'
+    command += f' -icon "{iconTx}"'
 if compyml.get("lister") not in nonAllowed:
     if compyml["lister"].get("silent") == True:
         command += " --silent"
@@ -111,6 +118,7 @@ if compyml.get("lister") not in nonAllowed:
         command += f' -missingActionStr "{compyml["lister"]["missingLinkAction"]}"'
     if compyml["lister"].get("archiveFoundAction") not in nonAllowed:
         command += f' -archiveActionStr "{compyml["lister"]["archiveFoundAction"]}"'
+
 os.system(f"python3 {lister} {command}")
 print("")
 

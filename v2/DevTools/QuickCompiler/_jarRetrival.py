@@ -70,8 +70,8 @@ class MJRL():
 
 # Curseforge Jar Retrival Library
 class CJRL():
-    def __init__(self,manifestFilePath):
-        self.manifestData = json.loads(open(manifestFilePath,'r').read())
+    def __init__(self,manifestFilePath,encoding="utf-8"):
+        self.manifestData = json.loads(open(manifestFilePath,'r',encoding=encoding).read())
     def GetUrlPerFilename(self,Filename):
         Addons = self.manifestData["installedAddons"] # Points to locally installed files
         Matches = []

@@ -41,9 +41,15 @@ argus = cparser.parse_args()
 modpack  = argus.modpack
 mods     = os.path.join(modpack,"mods")
 manifest = os.path.join(modpack,f"minecraftinstance.json")
+
 urls = []
 lookedAtFiles = []
 if argus.silent == True: debugEnabled = False
+
+if "iconTmp:" in argus.launcherIcon:
+    iconTmp = argus.launcherIcon.replace("iconTmp:","",1)
+    if os.path.exists(iconTmp):
+        argus.launcherIcon = open(iconTmp,'r',encoding="utf-8").read()
 
 # [Functions]
 # Function to yeild a iterable of pathobjects
