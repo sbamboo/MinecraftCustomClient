@@ -34,6 +34,7 @@ cparser.add_argument('-launcherIcon','-icon','-li', dest="launcherIcon", help='B
 cparser.add_argument('-missingActionStr', dest="missingActionStr", help='An action string to use for missing links.')
 cparser.add_argument('-archiveActionStr', dest="archiveActionStr", help='An action string to use for archives.')
 cparser.add_argument('--silent', dest="silent", help='If given the script will only prompt the user and not print anything else.', action='store_true')
+cparser.add_argument('--prioCF', dest="prio_curseforge", help='If given the script will prioritize looking at curseforge.', action='store_true')
 # Create main arguments object
 argus = cparser.parse_args()
 
@@ -71,6 +72,30 @@ def has_connection(override_url=None) -> bool:
     except:
         return False
 
+# Function to get progress str
+def getProgStr(_amntFiles=int,_scannedFiles=int):
+    proc = str((_scannedFiles/_amntFiles)*100)[:3]
+    padding = (len(str(_amntFiles))-len(str(_scannedFiles)))*" "
+    if proc.endswith("."):
+        proc = proc.rstrip(".")
+        padding += " "
+    proc += "%"
+    build = f"{padding}\033[90m({_scannedFiles}/{_amntFiles}, {proc})\033[0m "
+    _scannedFiles += 1
+    return build,_scannedFiles
+
+# Function to check curseforge manifest
+def checkmanifest(manifest,name,_lookedAtFiles,_urls,_amntFiles,_scannedFiles):
+    if os.path.exists(manifest) and name not in _lookedAtFiles:
+        retrivedUrls = getJarByFilename("curseforge",name,curseforgeManifest=manifest)
+        if len(retrivedUrls) > 0:
+            _lookedAtFiles.append(name)
+            for url in retrivedUrls:
+                _urls.append({"type":"curseforgeManifest","url":url,"filename":name})
+                prog,_scannedFiles = getProgStr(_amntFiles,_scannedFiles)
+                d.pr(f"{prog}\033[34mFound url in manifest \033[90m: \033[34m{url}")
+    return _lookedAtFiles,_urls,_scannedFiles
+
 # [Classes]
 class debugOut():
     def __init__(self,enabled,prefix):
@@ -97,50 +122,63 @@ if os.path.exists(possProfile):
                 if value["metadata"].get("project") != None:
                     if value["metadata"]["project"].get("slug") != None:
                         filename_to_slug[fn] = value["metadata"]["project"]["slug"]
+# get list of al jarfiles
+entries = []
 for obj in pathObjects:
-    if obj.name.endswith(".jar"):
+    if os.path.isfile(obj.path):
+        entries.append(obj.path)
+amntFiles = len(entries)
+d.pr(f"\033[34mFound {amntFiles} files.")
+scannedFiles = 0
+
+# retrive links
+for _path in entries:
+    _name = os.path.basename(_path)
+    if _name.endswith(".jar"):
+        # Prio curseforge?
+        if argus.prio_curseforge == True:
+            lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles)
         # From modrinth
-        if has_connection() == True and obj.name not in lookedAtFiles:
+        if has_connection() == True and _name not in lookedAtFiles:
             modrinth = MJRL("sbamboo/MinecraftCustomClient")
-            name = obj.name
+            name = _name
             name = name.replace("-", " ")
             name = name.replace("_", " ")
             suggestedProject = name.split(" ")[0]
             nameHits = modrinth.SearchForQuery(suggestedProject, suggestedProject)
             if len(nameHits) > 0:
-                retrivedUrls = modrinth.GetLinksPerFilename(suggestedProject,obj.name)
+                retrivedUrls = modrinth.GetLinksPerFilename(suggestedProject,_name)
                 if len(retrivedUrls) > 0:
-                    lookedAtFiles.append(obj.name)
+                    lookedAtFiles.append(_name)
                     for url in retrivedUrls:
-                        urls.append({"type":"modrinth","url":url,"filename":obj.name})
-                        d.pr(f"\033[32mFound url on modrinth \033[90m: \033[32m{url}")
+                        urls.append({"type":"modrinth","url":url,"filename":_name})
+                        prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
+                        d.pr(f"{prog}\033[32mFound url on modrinth \033[90m: \033[32m{url}")
             else:
                 # check slugs
                 try:
-                    retrivedUrls = modrinth.GetLinksPerFilename(filename_to_slug[obj.name],obj.name)
+                    retrivedUrls = modrinth.GetLinksPerFilename(filename_to_slug[_name],_name)
                 except:
                     retrivedUrls = []
                 if len(retrivedUrls) > 0:
-                    lookedAtFiles.append(obj.name)
+                    lookedAtFiles.append(_name)
                     for url in retrivedUrls:
-                        urls.append({"type":"modrinth","url":url,"filename":obj.name})
-                        d.pr(f"\033[32mFound url on modrinth \033[90m: \033[32m{url}")
-        # From curseforgeManifest
-        if os.path.exists(manifest) and obj.name not in lookedAtFiles:
-            retrivedUrls = getJarByFilename("curseforge",obj.name,curseforgeManifest=manifest)
-            if len(retrivedUrls) > 0:
-                lookedAtFiles.append(obj.name)
-                for url in retrivedUrls:
-                    urls.append({"type":"curseforgeManifest","url":url,"filename":obj.name})
-                    d.pr(f"\033[34mFound url in manifest \033[90m: \033[34m{url}")
-        elif obj.name not in lookedAtFiles:
-            d.pr(f"\033[31mNo network, modrinth?  \033[90m: \033[31m{obj.name}")
+                        urls.append({"type":"modrinth","url":url,"filename":_name})
+                        prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
+                        d.pr(f"{prog}\033[32mFound url on modrinth \033[90m: \033[32m{url}")
+        # From curseforgeManifest (no prio)
+        if argus.prio_curseforge != True:
+            lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles)
+        elif _name not in lookedAtFiles:
+            prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
+            d.pr(f"{prog}\033[31mNo network, modrinth? \033[90m: \033[31m{_name}")
     # Non jar files
     else:
-        if obj.name.split(".")[-1] in archiveExtensions:
-            urls.append({"type":"temp:archive","url":obj.path,"filename":obj.name})
+        if _name.split(".")[-1] in archiveExtensions:
+            urls.append({"type":"temp:archive","url":_path,"filename":_name})
         else:
-            d.pr(f"\033[93mFound non-jar file    \033[90m: \033[93m{obj.name}")
+            prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
+            d.pr(f"{prog}\033[93mFound non-jar file    \033[90m: \033[93m{_name}")
 
 # Not looked over files
 d.pr(f"\033[33mListing non founds...")

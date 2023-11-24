@@ -45,6 +45,7 @@ parser = argparse.ArgumentParser(description='Quick compiler')
 parser.add_argument('-path', type=str, help='The path to the modpacks folder')
 parser.add_argument('-cmpl', type=str, help='The compile.yml file')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
+parser.add_argument('--prioCF', dest="prio_curseforge", help='If given the script will prioritize looking at curseforge.', action='store_true')
 args = parser.parse_args()
 
 # Handle enc
@@ -118,6 +119,8 @@ if compyml.get("lister") not in nonAllowed:
         command += f' -missingActionStr "{compyml["lister"]["missingLinkAction"]}"'
     if compyml["lister"].get("archiveFoundAction") not in nonAllowed:
         command += f' -archiveActionStr "{compyml["lister"]["archiveFoundAction"]}"'
+if args.prio_curseforge == True:
+    command += " --prioCF"
 
 os.system(f"python3 {lister} {command}")
 print("")
