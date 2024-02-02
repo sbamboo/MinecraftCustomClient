@@ -27,7 +27,7 @@
         "desc": "In development version, things may be wonky but should work :)",
         "author": "SimonKC",
         "id": "3c395c8a-1565-4a38-9b69-08c3194e2660",
-        "hidden": false,
+        "hidden": true,
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.2_Community-Client_Lite_2023-10-03_20-35-39-quickcompile.mListing"
