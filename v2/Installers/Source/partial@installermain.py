@@ -71,7 +71,7 @@ if action_install == True:
         install_dest = getStdInstallDest()
         if listingData.get("_legacy_fld") != None:
             _legacy_fld_isntLoc = listingData["_legacy_fld"].get("install_location")
-            if _legacy_fld_isntLoc != None and listingData["_legacy_fld"].get("install_location") != "":
+            if _legacy_fld_isntLoc != None and _legacy_fld_isntLoc != "":
                 install_dest = applyDestPref(_legacy_fld_isntLoc)
         if args.dest:
             install_dest = args.dest

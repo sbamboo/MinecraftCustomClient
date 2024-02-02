@@ -49,5 +49,26 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update1_2023-10-31_21-20-51-quickcompile.mListing"
+    }, {
+        "name": "LegacyTestClient",
+        "desc": "Lite version, not done :)",
+        "author": "MinecraftCustomClient",
+        "id": "84545270-e762-4a6e-8a9b-45df72ed35d8",
+        "hidden": false,
+        "supported": false,
+        "sourceType": "legacy",
+        "source": {
+            "url": "https://github.com/sbamboo/MinecraftCustomClient/raw/main/v1_legacy/Repo/Flavors/testclient.package",
+            "archiveType": "package.zip",
+            "flavorDataFile": "flavor.mta",
+            "launcherIcon": "https://st2.depositphotos.com/2398103/5516/v/950/depositphotos_55167265-stock-illustration-vector-test-icon.jpg",
+            "modLoader": "Fabric",
+            "modLoaderVer": "0.14.8",
+            "minecraftVer": "1.19",
+            "backwardsCompat": {
+                "installLocation": "installs/minecraft-custom-client/custom",
+                "allowCopy": true
+            }
+        }
     }]
 }
