@@ -6,6 +6,7 @@ modloaderVer: "0.14.20"
 
 name: "Example modpack"
 desc: "My little modpack"
+author: "Me"
 version: "1.0"
 icon: ""
 hidden: False

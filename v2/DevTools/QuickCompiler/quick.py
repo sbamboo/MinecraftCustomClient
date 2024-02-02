@@ -127,8 +127,9 @@ print("")
 
 # Check for manual includes and prompt user regarding it:
 content = open(listing,'r',encoding=encoding).read()
-if "<ManualUrlWaitingToBeFilledIn>" in content and compyml.get("promptOnManual") == True:
-    print("Found files selected for manual include, do you want to open the modpack to be able to include the files?")
+if "<ManualUrlWaitingToBeFilledIn>" in content and compyml["lister"].get("promptOnManual") == True:
+    print("Found files selected for manual include, do you want to open the modpack here to be able to include the files?")
+    print(f"File: {listing}")
     c = input("(Obs! You can make changes to the file yourself, if you wait with answering this prompt) [Y/N] ")
     if c.lower() == "y":
         print("Lovely, opening in configTUI... (Creds: https://github.com/Prudhvi-pln/ConfigTUI)")
