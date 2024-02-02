@@ -21,7 +21,10 @@ if action_install == True:
             if fl["hidden"] == False:
                 n = fl["name"]
                 fl.pop("name")
-                flavorsDict[n] = fl
+                if fl["supported"] == False:
+                    flavorsDict[n] = fl + " \033[33m[NoSup]\033[0m"
+                else:
+                    flavorsDict[n] = fl
         flavorsDict["[Exit]"] = {"desc": "ncb:"}
         # show os-dep keybinds:
         selTitle  = "Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:"

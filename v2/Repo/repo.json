@@ -27,19 +27,10 @@
         "desc": "In development version, things may be wonky but should work :)",
         "author": "SimonKC",
         "id": "3c395c8a-1565-4a38-9b69-08c3194e2660",
-        "hidden": true,
+        "hidden": false,
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.2_Community-Client_Lite_2023-10-03_20-35-39-quickcompile.mListing"
-    }, {
-        "name": "TrainsAndChains+ (1.19) Update1",
-        "desc": "A new expanded version of my TrainsAndChains modpack!",
-        "author": "SimonKC",
-        "id": "03e2c914-c0cb-4592-93ca-7ce2c98c2f1d",
-        "hidden": false,
-        "supported": true,
-        "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update1_2023-10-31_21-20-51-quickcompile.mListing"
     }, {
         "name": "TrainsAndChains+ (1.19) Update2",
         "desc": "A new expanded version of my TrainsAndChains modpack! (U2)",
@@ -49,5 +40,14 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update2_2023-11-24_18-17-36-quickcompile.mListing"
+    }, {
+        "name": "TrainsAndChains+ (1.19) Update1",
+        "desc": "A new expanded version of my TrainsAndChains modpack!",
+        "author": "SimonKC",
+        "id": "03e2c914-c0cb-4592-93ca-7ce2c98c2f1d",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update1_2023-10-31_21-20-51-quickcompile.mListing"
     }]
 }
