@@ -22,12 +22,11 @@ if action_install == True:
                 n = fl["name"]
                 fl.pop("name")
                 if fl["supported"] == False:
-                    flavorsDict[n] = fl + " \033[33m[NoSup]\033[0m"
-                else:
-                    flavorsDict[n] = fl
+                    fl["desc"] += " \033[33m[NoSup]\033[0m"
+                flavorsDict[n] = fl
         flavorsDict["[Exit]"] = {"desc": "ncb:"}
         # show os-dep keybinds:
-        selTitle  = "Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:"
+        selTitle  = "Welcome to MinecraftCustomClient installer!\n\033[90mAny clients with [NoSup] have no support offered, use on your own risk.\033[0m\nSelect a flavor to install:"
         if args.modpack:
             key = args.modpack
         else:
