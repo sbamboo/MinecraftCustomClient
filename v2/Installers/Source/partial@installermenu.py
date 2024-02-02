@@ -18,9 +18,10 @@ if action_install == True:
         flavors = repoData.get("flavors")
         flavorsDict = {}
         for fl in flavors:
-            n = fl["name"]
-            fl.pop("name")
-            flavorsDict[n] = fl
+            if fl["hidden"] == False:
+                n = fl["name"]
+                fl.pop("name")
+                flavorsDict[n] = fl
         flavorsDict["[Exit]"] = {"desc": "ncb:"}
         # show os-dep keybinds:
         selTitle  = "Welcome to MinecraftCustomClient installer!\nSelect a flavor to install:"

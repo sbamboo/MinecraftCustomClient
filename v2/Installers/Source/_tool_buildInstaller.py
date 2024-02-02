@@ -30,12 +30,15 @@ fs.ensureDirPath(buidlenv_parent)
 buildenv = os.path.join(buidlenv_parent,"build-env")
 shutil.unpack_archive(bundleFile,buildenv)
 # run build-script
+possibleBuildArgs = ""
+if len(sys.argv) > 1:
+    possibleBuildArgs = ' '.join(sys.argv[1:])
 buildScript = os.path.join(buildenv,"build.py")
 if os.path.exists(buildScript) != True:
     raise Exception("No build script found, invalid build-env!")
 olddir = os.getcwd()
 os.chdir(buildenv)
-os.system(f"{sys.executable} {buildScript}")
+os.system(f"{sys.executable} {buildScript} {possibleBuildArgs}")
 os.chdir(buildenv)
 # clean up
 import time

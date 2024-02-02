@@ -1,13 +1,13 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.2.2"
-installer_release = "2023-11-20(0)"
+installer_version = "1.3"
+installer_release = "2023-12-12(0)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
 prefix_la = "\033[90m[\033[94mLnch-Agnt\033[90m]\033[0m "
-title = f"MinecraftCustomClient - Installer {installer_version}: <modpack> - (Spooky Halloween!)"
+title = f"MinecraftCustomClient - Installer {installer_version}: <modpack>"
 temp_foldername = "MCC_Installer_Temp"
 
 win_java_url = "https://aka.ms/download-jdk/microsoft-jdk-17.0.8.1-windows-x64.zip"
@@ -100,6 +100,7 @@ parser.add_argument('-destmodpack', type=str, help="Datacopy destination modpack
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
+parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer", action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
@@ -122,10 +123,12 @@ setConTitle(tst)
 # IncludeInline: ./assets/ui_dict_selector.py
 
 # [Show action select]
+action = None
 action_install = False
 action_uninstall = False
 action_open = False
 action_datacopy = False
+action_update = False
 # show selector
 selTitle  = "Welcome to MinecraftCustomClient!\nSelect the action you would like to do:"
 selSuffix = "\033[90m\nUse your keyboard to select:\n↑ : Up\n↓ : Down\n↲ : Select (ENTER)\nq : Quit\n␛ : Quit (ESC)\033[0m"
@@ -138,6 +141,8 @@ actionsDict = {
     "[Datacopy]":{"desc": "ncb:Tool for copying data between modpacks. (EXPERIMENTAL)"}
 }
 actionsDict["[Exit]"] = {"desc": "ncb:"}
+acceptedActions = ["[Update]"]
+acceptedActions.extend(list(actionsDict.keys()))
 if args.install:
     action = "[Install]"
 elif args.uninstall:
@@ -146,9 +151,12 @@ elif args.open:
     action = "[Open Install Loc]"
 elif args.datacopy:
     action = "[Datacopy]"
+elif args.update:
+    action = "[Update]"
+    action_update = True
 else:
     action = showDictSel(actionsDict,selTitle=selTitle,selSuffix=selSuffix)
-if action == None or action not in list(actionsDict.keys()) or action == "[Exit]":
+if action == None or action not in acceptedActions or action == "[Exit]":
     args.nopause = True
     exit()
 if action == "[Install]":
@@ -167,6 +175,8 @@ if action == "[Datacopy]":
 # IncludeInline: MX@./partial@uninstall.py
 
 # IncludeInline: MX@./partial@datacopy.py
+
+# IncludeInline: MX@./partial@update.py
 
 # [Open install loc]
 if action_open == True:
