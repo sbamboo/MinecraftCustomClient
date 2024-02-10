@@ -37,6 +37,7 @@ if action_install == True:
             exit()
         # get modpack url
         modpack_source = flavorsDict[key]["source"]
+        __modpack = key
         # download url
         ## check for legacy
         if type(modpack_source) == dict:
@@ -45,6 +46,9 @@ if action_install == True:
             modpack_url = modpack_source
         ## download & install
         modpack_path = os.path.join(parent,os.path.basename(modpack_url))
+        ## fix for invalid urls
+        if "." not in modpack_url.split("/")[-1]:
+            modpack_path = os.path.join(parent,key+".zip")
         print(prefix+"Downloading modpack file...")
         response = requests.get(modpack_url)
         if response.status_code == 200:

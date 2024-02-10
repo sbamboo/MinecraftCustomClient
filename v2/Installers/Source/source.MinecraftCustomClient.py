@@ -1,8 +1,8 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.3.1"
-installer_release = "2024-02-10(1)"
+installer_version = "1.3.3"
+installer_release = "2024-02-10(3)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -1706,6 +1706,7 @@ if action_install == True:
             exit()
         # get modpack url
         modpack_source = flavorsDict[key]["source"]
+        __modpack = key
         # download url
         ## check for legacy
         if type(modpack_source) == dict:
@@ -1714,6 +1715,9 @@ if action_install == True:
             modpack_url = modpack_source
         ## download & install
         modpack_path = os.path.join(parent,os.path.basename(modpack_url))
+        ## fix for invalid urls
+        if "." not in modpack_url.split("/")[-1]:
+            modpack_path = os.path.join(parent,key+".zip")
         print(prefix+"Downloading modpack file...")
         response = requests.get(modpack_url)
         if response.status_code == 200:
@@ -2250,8 +2254,18 @@ if action_install == True:
 
         # extract archive to temp
         print(prefix+f"Extracting listing... (type: {listingType})")
-        dest = extractModpackFile(modpack_path,tempFolder,encoding)
-
+        try:
+            dest = extractModpackFile(modpack_path,tempFolder,encoding)
+        except Exception as e:
+            _ch_content = open(modpack_path,'r').read()
+            if "<html>" in _ch_content:
+                print(prefix+f"Failed to extract modpack file, found <html> in content! (Invalid Url)\n    Try again or download manually from: {modpack_url}")
+                cleanUp(tempFolder,modpack_path)
+                exit()
+            else:
+                print(prefix+f"Failed to extract modpack file!",e)
+                cleanUp(tempFolder,modpack_path)
+                exit()
         tryLegacy = False
         if listingType != "package":
             # get listing data

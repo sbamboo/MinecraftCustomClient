@@ -29,8 +29,18 @@ if action_install == True:
 
         # extract archive to temp
         print(prefix+f"Extracting listing... (type: {listingType})")
-        dest = extractModpackFile(modpack_path,tempFolder,encoding)
-
+        try:
+            dest = extractModpackFile(modpack_path,tempFolder,encoding)
+        except Exception as e:
+            _ch_content = open(modpack_path,'r').read()
+            if "<html>" in _ch_content:
+                print(prefix+f"Failed to extract modpack file, found <html> in content! (Invalid Url)\n    Try again or download manually from: {modpack_url}")
+                cleanUp(tempFolder,modpack_path)
+                exit()
+            else:
+                print(prefix+f"Failed to extract modpack file!",e)
+                cleanUp(tempFolder,modpack_path)
+                exit()
         tryLegacy = False
         if listingType != "package":
             # get listing data
