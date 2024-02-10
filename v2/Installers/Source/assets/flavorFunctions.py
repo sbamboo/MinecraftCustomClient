@@ -308,6 +308,27 @@ def scrapeUniversals(prefix,scrapedPages=dict):
             new_universals[key] = value
     return new_universals
 
+# Function to remove the https://adfoc.us/serve/sitelinks/?id=<id>&url= prefix from a url
+def _removeAdFocLinkPrefix(url):
+    if "adfoc.us/serve" in url:
+        return url.replace(url.split("&url=")[0]+"&url=","",1)
+    else:
+        return url
+
+# Function to remove the https://adfoc.us/serve/sitelinks/?id=<id>&url= prefix from each url in a forge-listings directory
+def _removeAdFocLinkPrefixDict(frgListings):
+    newDict = {}
+    for key,value in frgListings.items():
+        latVal = value.get("latest")
+        if latVal != None and latVal != "":
+            if newDict.get(key) == None: newDict[key] = {"latest":"","recommended":""}
+            newDict[key]["latest"] = _removeAdFocLinkPrefix(latVal)
+        recVal = value.get("recommended")
+        if recVal != None and recVal != "":
+            if newDict.get(key) == None: newDict[key] = {"latest":"","recommended":""}
+            newDict[key]["recommended"] = _removeAdFocLinkPrefix(recVal)
+    return newDict
+
 # Function to join together two forge-client listings
 def _joinForgeListings(stdlist,newlist):
     joinedList = stdlist
@@ -358,6 +379,7 @@ def getLoaderUrl(prefix,loaderType="fabric",tempFolder=str,fabricUrl=str,forgeUr
                 if stdlist != {} and universals != None and universals != {}:
                     print(prefix+"Joining lists...")
                     stdlist = _joinForgeListings(stdlist,universals)
+                    stdlist = _removeAdFocLinkPrefixDict(stdlist)
             # return without empty listings
             if forForgeMcVer in stdlist.keys():
                 urlL = stdlist[forForgeMcVer]
