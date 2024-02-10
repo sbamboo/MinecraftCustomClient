@@ -1,5 +1,5 @@
 # Imports
-import base64,os,shutil,requests,json,platform
+import base64,os,shutil,requests,json,platform,re
 import subprocess
 import zipfile
 import tarfile
@@ -35,6 +35,29 @@ def downUrlFile(url,filepath):
     if cont != None and cont != "":
         if fs.notExist(filepath):
             open(filepath,'wb').write(cont)
+
+def is_valid_url(url):
+    # Regular expression pattern for matching URLs
+    url_pattern = re.compile(
+        r'^(?:http|ftp)s?://'  # http:// or https:// or ftp://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return re.match(url_pattern, url) is not None
+
+def download_file_and_get_base64(url):
+    try:
+        # Fetch the file content
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
+        # Encode the content as Base64
+        base64_content = base64.b64encode(response.content)
+        return base64_content.decode('utf-8')  # Convert bytes to string
+    except Exception as e:
+        print(f"Error downloading and encoding file: {e}")
+        return None
 
 # [Functionos]
 def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False):
@@ -492,6 +515,7 @@ def convFromLegacy(flavorMTAfile,legacyRepoUrl,encoding="utf-8") -> dict:
     listing = {
         "format": 1,
         "name": nameFound,
+        "desc": f'{flavorData["desc"]} (This listing was converted from legacy by the v2 installer.)',
         "version": "0.0",
         "modloader": "fabric",
         "modloaderVer": flavorData["fabric_loader"],
@@ -526,7 +550,7 @@ def applyDestPref(shortDest) -> str:
 
 # Get std final destination
 def getStdInstallDest():
-    p = applyDestPref(f"installs\\minecraft-custom-client\\v2")
+    p = applyDestPref("installs\\minecraft-custom-client\\v2")
     return p
 
 # Function to handle icon
@@ -638,16 +662,16 @@ def getMRinstanceDict(modld,ldver,mcver,modDestF,name,icon):
         "install_stage": "installed",
         "path": os.path.basename(modDestF),
         "metadata": {
-        "name": name,
-        "icon": str(icon),
-        "groups": [],
-        "game_version": mcver,
-        "loader": modld,
-        "loader_version": {
-            "id": ldver,
-            "url": getMRloaderURL(modld,ldver,mcver),
-            "stable": True
-        }
+            "name": name,
+            "icon": str(icon),
+            "groups": [],
+            "game_version": mcver,
+            "loader": modld,
+            "loader_version": {
+                "id": ldver,
+                "url": getMRloaderURL(modld,ldver,mcver),
+                "stable": True
+            }
         },
         "fullscreen": None,
         "projects": {},
@@ -691,3 +715,16 @@ def prepMRicon(modpackDestF,icon):
     cacheF = os.path.abspath(cacheF)
     fs.copyFile(iconPath,cacheF)
     return cacheF
+
+def resolveUrlLauncherIcon(prefix,listingData):
+    icon = listingData.get("icon")
+    dest = "icon"
+    if icon == None:
+        icon = listingData.get("launcherIcon")
+        dest = "launcherIcon"
+
+    if is_valid_url(icon.strip()):
+        print(prefix+f"Resolving base64 from launcherIcon url... (icon: {os.path.basename(icon)})")
+        b64 = download_file_and_get_base64(icon.strip())
+        listingData[dest] = f"data:image/png;base64,{b64}"
+    return listingData

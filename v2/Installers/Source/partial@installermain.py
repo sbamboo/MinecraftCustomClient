@@ -42,8 +42,17 @@ if action_install == True:
                 exit()
         else:
             try:
-                mtaFile = os.path.join(dest,"flavor.mta")
-                listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+                try:
+                    legacySourceFlavorDataFile = modpack_source.get("flavorDataFile")
+                    if legacySourceFlavorDataFile == None or type(legacySourceFlavorDataFile) != str:
+                        legacySourceFlavorDataFile = legacySourceFlavorDataFile_default
+                    mtaFile = os.path.join(dest,legacySourceFlavorDataFile)
+                    print(prefix+f"Converting from legacy... (mta: {legacySourceFlavorDataFile})")
+                    listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+                except:
+                    mtaFile = os.path.join(dest,legacySourceFlavorDataFile_default)
+                    print(prefix+f"Converting from legacy... (mta: {legacySourceFlavorDataFile_default})")
+                    listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
             except Exception as e:
                 print("Failed to retrive listing content!",e)
                 cleanUp(tempFolder,modpack_path)
@@ -75,6 +84,7 @@ if action_install == True:
                 install_dest = applyDestPref(_legacy_fld_isntLoc)
         if args.dest:
             install_dest = args.dest
+        install_dest = fs.replaceSeps(install_dest) # make sure path-separators are correct on legacy install locations
         fs.ensureDirPath(install_dest)
         ## handle curse
         #if args.curse == True:
@@ -148,6 +158,7 @@ if action_install == True:
         modpackInfo = {
             "modpack": modpack,
             "modpack_path": modpack_path,
+            "modpack_source": modpack_source,
             "dest": dest,
             "listingData": listingData,
             "listingType": listingType,
@@ -179,6 +190,7 @@ if action_install == True:
             exit()
         modpack = impData["modpack"]
         modpack_path = impData["modpack_path"]
+        modpack_source = impData["modpack_source"],
         dest = impData["dest"]
         listingData = impData["listingData"]
         listingType = impData["listingType"]
@@ -208,6 +220,14 @@ if action_install == True:
 
     # Copy content to final dest
     fs.copyFolder2(dest,modpack_destF)
+
+    # Resolve url-launcher-icons
+    if args.rinth == True:
+        if args.resolveUrlIconMR == True:
+            listingData = resolveUrlLauncherIcon(prefix,listingData)
+    elif args.dontResolveUrlIcons != True:
+        listingData = resolveUrlLauncherIcon(prefix,listingData)
+
 
     # Create profile
     print(prefix+f"Creating profile for: {modpack}")
@@ -246,7 +266,7 @@ if action_install == True:
                 icon_base64_modded,
                 icon_base64_default
             )
-            gicon = prepMRicon(modpack_destF,gicon)
+            if is_valid_url(gicon) == False: gicon = prepMRicon(modpack_destF,gicon)
             mrInstanceFile = os.path.join(modpack_destF,"profile.json")
             mrInstanceDict = getMRinstanceDict(modld,ldver,mcver,modpack_destF,listingData["name"],gicon)
             if os.path.exists(mrInstanceFile): os.remove(mrInstanceFile)

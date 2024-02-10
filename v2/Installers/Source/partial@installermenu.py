@@ -1,6 +1,7 @@
 if action_install == True:
     # [Show repo]
     modpack_path = None
+    modpack_source = None
     if args.modpackFile:
         if os.path.exists(args.modpackFile):
             modpack_path = args.modpackFile
@@ -35,8 +36,14 @@ if action_install == True:
             args.nopause = True
             exit()
         # get modpack url
-        modpack_url = flavorsDict[key]["source"]
+        modpack_source = flavorsDict[key]["source"]
         # download url
+        ## check for legacy
+        if type(modpack_source) == dict:
+            modpack_url = modpack_source["url"]
+        else:
+            modpack_url = modpack_source
+        ## download & install
         modpack_path = os.path.join(parent,os.path.basename(modpack_url))
         response = requests.get(modpack_url)
         if response.status_code == 200:
@@ -53,5 +60,6 @@ if action_install == True:
 
     # [Prep selected package]
     modpack = os.path.basename(modpack_path)
+    modpack_source = modpack_source
     title = title.replace("<modpack>", modpack)
     system = platform.system().lower()
