@@ -45,6 +45,7 @@ if action_install == True:
             modpack_url = modpack_source
         ## download & install
         modpack_path = os.path.join(parent,os.path.basename(modpack_url))
+        print(prefix+"Downloading modpack file...")
         response = requests.get(modpack_url)
         if response.status_code == 200:
             # Content of the file

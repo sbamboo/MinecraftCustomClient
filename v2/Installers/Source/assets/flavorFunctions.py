@@ -150,7 +150,7 @@ def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
             shutil.unpack_archive(newfile,dest)
             fs.deleteFile(newfile)
         else:
-            shutil.unpack_archive(modpack_,dest)
+            shutil.unpack_archive(modpack_path,dest)
     else:
         oldname = os.path.join(dest,os.path.basename(modpack_path))
         newname = os.path.join(dest,"listing.json")

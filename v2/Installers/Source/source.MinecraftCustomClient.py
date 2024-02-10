@@ -909,7 +909,7 @@ def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
             shutil.unpack_archive(newfile,dest)
             fs.deleteFile(newfile)
         else:
-            shutil.unpack_archive(modpack_,dest)
+            shutil.unpack_archive(modpack_path,dest)
     else:
         oldname = os.path.join(dest,os.path.basename(modpack_path))
         newname = os.path.join(dest,"listing.json")
@@ -1714,6 +1714,7 @@ if action_install == True:
             modpack_url = modpack_source
         ## download & install
         modpack_path = os.path.join(parent,os.path.basename(modpack_url))
+        print(prefix+"Downloading modpack file...")
         response = requests.get(modpack_url)
         if response.status_code == 200:
             # Content of the file
@@ -2251,16 +2252,17 @@ if action_install == True:
         print(prefix+f"Extracting listing... (type: {listingType})")
         dest = extractModpackFile(modpack_path,tempFolder,encoding)
 
+        tryLegacy = False
         if listingType != "package":
             # get listing data
             listingFile = os.path.join(dest,"listing.json")
             if fs.doesExist(listingFile) == True:
                 listingData = json.loads(open(listingFile,'r',encoding=encoding).read())
             else:
-                print("Failed to retrive listing content!")
-                cleanUp(tempFolder,modpack_path)
-                exit()
+                tryLegacy = True
         else:
+            tryLegacy = True
+        if tryLegacy == True:
             try:
                 try:
                     legacySourceFlavorDataFile = modpack_source.get("flavorDataFile")
@@ -2268,11 +2270,49 @@ if action_install == True:
                         legacySourceFlavorDataFile = legacySourceFlavorDataFile_default
                     mtaFile = os.path.join(dest,legacySourceFlavorDataFile)
                     print(prefix+f"Converting from legacy... (mta: {legacySourceFlavorDataFile})")
-                    listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+                    if os.path.exists(mtaFile) == True:
+                        listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+                    else:
+                        listingData = listing = {
+                            "format": 1,
+                            "name": modpack,
+                            "desc": f'(This listing was generated automaticly by the v2 installer)',
+                            "version": "0.0",
+                            "modloader": modpack_source["modLoader"].lower(),
+                            "modloaderVer": modpack_source["modLoaderVer"].lower(),
+                            "minecraftVer": modpack_source["minecraftVer"].lower(),
+                            "created": datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+                            "launcherIcon": modpack_source["launcherIcon"],
+                        }
+                        try:
+                            listingData["_legacy_fld"] = {
+                                "install_location": modpack_source["backwardsCompat"]["installLocation"],
+                                "allowcopy": modpack_source["backwardsCompat"]["allowCopy"]
+                            }
+                        except: pass
                 except:
                     mtaFile = os.path.join(dest,legacySourceFlavorDataFile_default)
                     print(prefix+f"Converting from legacy... (mta: {legacySourceFlavorDataFile_default})")
-                    listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+                    if os.path.exists(mtaFile) == True:
+                        listingData = convFromLegacy(mtaFile,legacy_repo_url,encoding=encoding)
+                    else:
+                        listingData = listing = {
+                            "format": 1,
+                            "name": modpack,
+                            "desc": f'(This listing was generated automaticly by the v2 installer)',
+                            "version": "0.0",
+                            "modloader": modpack_source["modLoader"].lower(),
+                            "modloaderVer": modpack_source["modLoaderVer"].lower(),
+                            "minecraftVer": modpack_source["minecraftVer"].lower(),
+                            "created": datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+                            "launcherIcon": modpack_source["launcherIcon"],
+                        }
+                        try:
+                            listingData["_legacy_fld"] = {
+                                "install_location": modpack_source["backwardsCompat"]["installLocation"],
+                                "allowcopy": modpack_source["backwardsCompat"]["allowCopy"]
+                            }
+                        except: pass
             except Exception as e:
                 print("Failed to retrive listing content!",e)
                 cleanUp(tempFolder,modpack_path)
