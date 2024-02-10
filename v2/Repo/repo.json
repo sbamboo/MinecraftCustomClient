@@ -5,11 +5,20 @@
     "created": "2023-09-22",
     "lastUpdated": "2024-02-10",
     "flavors": [{
+        "name": "1.20.4_Community-Client_Lite U1",
+        "desc": "Lite version, not done :)",
+        "author": "SimonKC",
+        "id": "1c8463ab-a8a2-4ead-adeb-505dacddf094",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U1_2024-02-10_17-57-42-quickcompile.mListing"
+    }, {
         "name": "1.20.4_Community-Client_Lite",
         "desc": "Lite version, not done :)",
         "author": "SimonKC",
         "id": "5e2b0d27-212c-444c-ae11-bce94cc51ab9",
-        "hidden": false,
+        "hidden": true,
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite_2024-02-02_05-26-09-quickcompile.mListing"
@@ -364,14 +373,5 @@
                 "allowCopy": true
             }
         }
-    }, {
-        "name": "1.20.4_Community-Client_Lite U1",
-        "desc": "Lite version, not done :)",
-        "author": "SimonKC",
-        "id": "1c8463ab-a8a2-4ead-adeb-505dacddf094",
-        "hidden": false,
-        "supported": true,
-        "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U1_2024-02-10_17-57-42-quickcompile.mListing"
     }]
 }
