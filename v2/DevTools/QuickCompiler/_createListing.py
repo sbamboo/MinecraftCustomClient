@@ -35,6 +35,7 @@ cparser.add_argument('-missingActionStr', dest="missingActionStr", help='An acti
 cparser.add_argument('-archiveActionStr', dest="archiveActionStr", help='An action string to use for archives.')
 cparser.add_argument('--silent', dest="silent", help='If given the script will only prompt the user and not print anything else.', action='store_true')
 cparser.add_argument('--prioCF', dest="prio_curseforge", help='If given the script will prioritize looking at curseforge.', action='store_true')
+cparser.add_argument('--addProjId', dest="curseforge_ask_project_id", help="If given the script will include curseforge projectId's.", action='store_true')
 # Create main arguments object
 argus = cparser.parse_args()
 
@@ -85,15 +86,21 @@ def getProgStr(_amntFiles=int,_scannedFiles=int):
     return build,_scannedFiles
 
 # Function to check curseforge manifest
-def checkmanifest(manifest,name,_lookedAtFiles,_urls,_amntFiles,_scannedFiles):
+def checkmanifest(manifest,name,_lookedAtFiles,_urls,_amntFiles,_scannedFiles,curseforgeAskProjId=False):
     if os.path.exists(manifest) and name not in _lookedAtFiles:
-        retrivedUrls = getJarByFilename("curseforge",name,curseforgeManifest=manifest)
+        retrivedUrls = getJarByFilename("curseforge",name,curseforgeManifest=manifest,curseforgeAskProjId=curseforgeAskProjId)
         if len(retrivedUrls) > 0:
             _lookedAtFiles.append(name)
-            for url in retrivedUrls:
-                _urls.append({"type":"curseforgeManifest","url":url,"filename":name})
-                prog,_scannedFiles = getProgStr(_amntFiles,_scannedFiles)
-                d.pr(f"{prog}\033[34mFound url in manifest \033[90m: \033[34m{url}")
+            if curseforgeAskProjId == True:
+                for url in retrivedUrls:
+                    _urls.append({"type":"curseforgeManifest","url":url[0],"filename":name,"curseforgeProjId":url[1]})
+                    prog,_scannedFiles = getProgStr(_amntFiles,_scannedFiles)
+                    d.pr(f"{prog}\033[34mFound url in manifest \033[90m: \033[34m{url[0]}")
+            else:
+                for url in retrivedUrls:
+                    _urls.append({"type":"curseforgeManifest","url":url,"filename":name})
+                    prog,_scannedFiles = getProgStr(_amntFiles,_scannedFiles)
+                    d.pr(f"{prog}\033[34mFound url in manifest \033[90m: \033[34m{url}")
     return _lookedAtFiles,_urls,_scannedFiles
 
 # [Classes]
@@ -137,7 +144,7 @@ for _path in entries:
     if _name.endswith(".jar"):
         # Prio curseforge?
         if argus.prio_curseforge == True:
-            lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles)
+            lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles,curseforgeAskProjId=argus.curseforge_ask_project_id)
         # From modrinth
         if has_connection() == True and _name not in lookedAtFiles:
             modrinth = MJRL("sbamboo/MinecraftCustomClient")
@@ -168,7 +175,7 @@ for _path in entries:
                         d.pr(f"{prog}\033[32mFound url on modrinth \033[90m: \033[32m{url}")
         # From curseforgeManifest (no prio)
         if argus.prio_curseforge != True:
-            lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles)
+            lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles,curseforgeAskProjId=argus.curseforge_ask_project_id)
         elif _name not in lookedAtFiles:
             prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
             d.pr(f"{prog}\033[31mNo network, modrinth? \033[90m: \033[31m{_name}")

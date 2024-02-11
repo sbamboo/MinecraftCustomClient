@@ -66,8 +66,6 @@ class MJRL():
                     NameHits.append(Name)
             return NameHits
 
-
-
 # Curseforge Jar Retrival Library
 class CJRL():
     def __init__(self,manifestFilePath,encoding="utf-8"):
@@ -79,13 +77,28 @@ class CJRL():
             if Addon["fileNameOnDisk"] == Filename:
                 Matches.append(Addon["installedFile"]["downloadUrl"])
         return Matches
+    def GetUrlPerFilenameGiveProjId(self,Filename):
+        Addons = self.manifestData["installedAddons"] # Points to locally installed files
+        Matches = []
+        for Addon in Addons:
+            if Addon["fileNameOnDisk"] == Filename:
+                instFile = Addon.get("installedFile")
+                pid = None
+                if instFile != None:
+                    pid = Addon["installedFile"].get("projectId")
+                if pid == None: pid = ""
+                Matches.append( [Addon["installedFile"]["downloadUrl"], pid] )
+        return Matches
 
 # Main class
-def getJarByFilename(source="modrith",Filename=str,curseforgeManifest=None, modrithUserAgent=None,modrithProject=None) -> list:
+def getJarByFilename(source="modrith",Filename=str,curseforgeManifest=None, modrithUserAgent=None,modrithProject=None,curseforgeAskProjId=False) -> list:
     # Curseforge
     if source.lower() == "curseforge" and Filename != None and curseforgeManifest != None:
         RetrivalClassInstance = CJRL(curseforgeManifest)
-        return RetrivalClassInstance.GetUrlPerFilename(Filename)
+        if curseforgeAskProjId == True:
+            return RetrivalClassInstance.GetUrlPerFilenameGiveProjId(Filename)
+        else:
+            return RetrivalClassInstance.GetUrlPerFilename(Filename)
     # Modrith
     elif source.lower() == "modrith" and Filename != None and modrithUserAgent != None and modrithProject != None:
         RetrivalClassInstance = MJRL(modrithUserAgent)

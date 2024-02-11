@@ -46,6 +46,7 @@ parser.add_argument('-path', type=str, help='The path to the modpacks folder')
 parser.add_argument('-cmpl', type=str, help='The compile.yml file')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
 parser.add_argument('--prioCF', dest="prio_curseforge", help='If given the script will prioritize looking at curseforge.', action='store_true')
+parser.add_argument('--skipProjId', dest="curseforge_skip_project_id", help="If given the script will not include curseforge projectId's.", action='store_true')
 args = parser.parse_args()
 
 # Handle enc
@@ -121,6 +122,8 @@ if compyml.get("lister") not in nonAllowed:
         command += f' -archiveActionStr "{compyml["lister"]["archiveFoundAction"]}"'
 if args.prio_curseforge == True:
     command += " --prioCF"
+if args.curseforge_skip_project_id != True:
+    command += " --addProjId"
 
 os.system(f"python3 {lister} {command}")
 print("")
