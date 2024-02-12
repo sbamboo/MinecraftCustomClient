@@ -1,0 +1,2 @@
+Hello world!
+# If this file is readable then its valid.
