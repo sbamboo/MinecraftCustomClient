@@ -373,5 +373,106 @@
                 "allowCopy": true
             }
         }
+    }, {
+        "name": "TestingPkg_urlListing",
+        "desc": "Internal test pgk for urlListing sourceType.",
+        "author": "MinecraftCustomClient",
+        "id": "832c9d93-1eec-43ed-ac9c-93916d864994",
+        "hidden": true,
+        "supported": false,
+        "sourceType": "urlListing",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/listingPkg.mlisting"
+    }, {
+        "name": "TestingPkg_included",
+        "desc": "Internal test pgk for included sourceType.",
+        "author": "MinecraftCustomClient",
+        "id": "541598dc-b746-44ac-8859-4ee5f8486a15",
+        "hidden": true,
+        "supported": false,
+        "sourceType": "included",
+        "source": {
+            "format": 1,
+            "name": "ListingTestingPkg",
+            "version": "1.0",
+            "modloader": "fabric",
+            "modloaderVer": "0.15.6",
+            "minecraftVer": "1.20.4",
+            "created": "2024-02-12",
+            "launcherIcon": "mcc:icon128",
+            "sources": [{
+                "type": "modrinth",
+                "url": "https://cdn.modrinth.com/data/g96Z4WVZ/versions/tfPcVhXP/BadOptimizations-1.6.3.jar",
+                "filename": "BadOptimizations-1.6.3.jar"
+            }, {
+                "type": "curseforgeManifest",
+                "url": "https://edge.forgecdn.net/files/4574/355/bettermounthud-1.2.2.jar",
+                "filename": "bettermounthud-1.2.2.jar"
+            }, {
+                "type": "custom",
+                "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/invalidTestJar.jar",
+                "filename": "invalidTestJar.jar"
+            }, {
+                "type": "customArchive",
+                "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/invalidTestJar.zip",
+                "filename": "invalidTestJar.zip"
+            }, {
+                "type": "customArchive",
+                "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/invalidTestJar.package",
+                "filename": "invalidTestJar.package"
+            }, {
+                "type": "customB64",
+                "url": "",
+                "filename": "invalidTestJar.jar",
+                "base64": "UEsDBAoAAAAAAO+/vWxMWAQr77+977+9OAAAADgAAAALAAAAaXN2YWxpZC50eHRIZWxsbyB3b3JsZCENCiMgSWYgdGhpcyBmaWxlIGlzIHJlYWRhYmxlIHRoZW4gaXRzIHZhbGlkLlBLAQI/AAoAAAAAAO+/vWxMWAQr77+977+9OAAAADgAAAALACQAAAAAAAAAIAAAAAAAAABpc3ZhbGlkLnR4dAoAIAAAAAAAAQAYAFXvv71LH++/vV3vv70BAAAAAAAAAAAAAAAAAAAAAFBLBQYAAAAAAQABAF0AAABhAAAAAAA="
+            }, {
+                "type": "customArchiveB64",
+                "url": "",
+                "filename": "invalidTestJar.zip",
+                "base64": "UEsDBBQAAAAIAO+/vWxMWAQr77+977+9NwAAADgAAAALAAAAaXN2YWxpZC50eHTvv71I77+977+977+9Vyjvv70v77+9SVHvv73vv71SVu+/vUxTKO+/ve+/vSxWSO+/ve+/vUlVAO+/vUXvv73vv70p77+9SUB2SUZq77+9QmZJ77+9QlliTmbvv70eAFBLAQIUABQAAAAIAO+/vWxMWAQr77+977+9NwAAADgAAAALAAAAAAAAAAEAIAAAAAAAAABpc3ZhbGlkLnR4dFBLBQYAAAAAAQABADkAAABgAAAAAAA="
+            }],
+            "sourceLength": 8
+        }
+    }, {
+        "name": "TestingPkg_legacy",
+        "desc": "Internal test pgk for legacy sourceType.",
+        "author": "MinecraftCustomClient",
+        "id": "664876de-7cf7-45b3-88d8-5c7ff668f8fd",
+        "hidden": true,
+        "supported": false,
+        "sourceType": "legacy",
+        "source": {
+            "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/legacyPkg.zip",
+            "archiveType": "package.zip",
+            "flavorDataFile": "flavor.mta",
+            "launcherIcon": "mcc:icon128",
+            "modLoader": "Fabric",
+            "modLoaderVer": "0.15.6",
+            "minecraftVer": "1.20.4",
+            "backwardsCompat": {
+                "installLocation": "installs/minecraft-custom-client/custom",
+                "allowCopy": true
+            }
+        }
+    }, {
+        "name": "TestingPkg_legacyB64",
+        "desc": "Internal test pgk for legacyB64 sourceType.",
+        "author": "MinecraftCustomClient",
+        "id": "1d5ba7f6-33fd-41ea-a69b-e88ab151a281",
+        "hidden": true,
+        "supported": false,
+        "sourceType": "legacyB64",
+        "source": {
+            "base64": "UEsDBBQAAAAIAC+ITFgE9ga6hgAAAKcAAAAKAAAAZmxhdm9yLm10YT3MsQrCMBSF4b3Qdyh3NhCSELVzF0HEoVvpcBtvgpg2ohEppe9uNdL1O/xnggojQtnkWVFMcMKeoIQjOTRjTc94Hdz55mDepP1QLatCrjlxzSwqwZQwlu223DC7l2SNFCR19y+KlKH34W3CfVzq+HjR+ncJQ0zetF9L2lPEGjtPP86zdv4AUEsDBAoAAAAAAHaHTFiNTPz9BAAAAAQAAAANAAAAaW1DbGllbnQuc2lnbnRydWVQSwMEFAAAAAAARodMWAAAAAAAAAAAAAAAAAUAAABtb2RzL1BLAwQUAAAACABDhUxYz9gZOZQAAADUAAAAFwAAAG1vZHMvaW52YWxpZFRlc3RKYXIuamFydU0xCgIxENzoaRGxt3NFO8HazlaJRRrB5opIclxg8eAS1Bf4Al/gC2z9iq9xc2ej4CyzMwy7jFbdTELCjbb7bP68LtknDpg+nAx5u4iXuHZEFZ6rmuxkKKe4KTCWPmDhySFr7Yw1B/axdEf0MWD7qpXorOBfxQxaYFrfhfITChjB7q7Gj/wl4Ada9frNDU/Oapr0DVBLAQI/ABQAAAAIAC+ITFgE9ga6hgAAAKcAAAAKACQAAAAAAAAAIAAAAAAAAABmbGF2b3IubXRhCgAgAAAAAAABABgAc4d0vcxd2gFzh3S9zF3aAVSEsU7MXdoBUEsBAj8ACgAAAAAAdodMWI1M/P0EAAAABAAAAA0AJAAAAAAAAAAgAAAArgAAAGltQ2xpZW50LnNpZ24KACAAAAAAAAEAGADKHJ1+zF3aAcocnX7MXdoBY/nWdcxd2gFQSwECPwAUAAAAAABGh0xYAAAAAAAAAAAAAAAABQAkAAAAAAAAABAAAADdAAAAbW9kcy8KACAAAAAAAAEAGADn+7pGzF3aAef7ukbMXdoB61c3Rcxd2gFQSwECPwAUAAAACABDhUxYz9gZOZQAAADUAAAAFwAkAAAAAAAAACAAAAAAAQAAbW9kcy9pbnZhbGlkVGVzdEphci5qYXIKACAAAAAAAAEAGAAKt6MHyl3aAeGfyUbMXdoB5/u6Rsxd2gFQSwUGAAAAAAQABAB7AQAAyQEAAAAA",
+            "archiveType": "package.zip",
+            "flavorDataFile": "flavor.mta",
+            "launcherIcon": "mcc:icon128",
+            "modLoader": "Fabric",
+            "modLoaderVer": "0.15.6",
+            "minecraftVer": "1.20.4",
+            "backwardsCompat": {
+                "installLocation": "installs/minecraft-custom-client/custom",
+                "allowCopy": true
+            }
+        }
     }]
 }
