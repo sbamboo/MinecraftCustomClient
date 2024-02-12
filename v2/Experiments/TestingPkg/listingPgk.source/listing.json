@@ -1,0 +1,42 @@
+{
+    "format": 1,
+    "name": "ListingTestingPkg",
+    "version": "1.0",
+    "modloader": "fabric",
+    "modloaderVer": "0.15.6",
+    "minecraftVer": "1.20.4",
+    "created": "2024-02-12",
+    "launcherIcon": "mcc:icon128",
+    "sources": [{
+        "type": "modrinth",
+        "url": "https://cdn.modrinth.com/data/g96Z4WVZ/versions/tfPcVhXP/BadOptimizations-1.6.3.jar",
+        "filename": "BadOptimizations-1.6.3.jar"
+    }, {
+        "type": "curseforgeManifest",
+        "url": "https://edge.forgecdn.net/files/4574/355/bettermounthud-1.2.2.jar",
+        "filename": "bettermounthud-1.2.2.jar"
+    }, {
+        "type": "custom",
+        "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/invalidTestJar.jar",
+        "filename": "invalidTestJar.jar"
+    }, {
+        "type": "customArchive",
+        "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/invalidTestJar.zip",
+        "filename": "invalidTestJar.zip"
+    }, {
+        "type": "customArchive",
+        "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/invalidTestJar.package",
+        "filename": "invalidTestJar.package"
+    }, {
+        "type": "customB64",
+        "url": "",
+        "filename": "invalidTestJar.jar",
+        "base64": "UEsDBAoAAAAAAO+/vWxMWAQr77+977+9OAAAADgAAAALAAAAaXN2YWxpZC50eHRIZWxsbyB3b3JsZCENCiMgSWYgdGhpcyBmaWxlIGlzIHJlYWRhYmxlIHRoZW4gaXRzIHZhbGlkLlBLAQI/AAoAAAAAAO+/vWxMWAQr77+977+9OAAAADgAAAALACQAAAAAAAAAIAAAAAAAAABpc3ZhbGlkLnR4dAoAIAAAAAAAAQAYAFXvv71LH++/vV3vv70BAAAAAAAAAAAAAAAAAAAAAFBLBQYAAAAAAQABAF0AAABhAAAAAAA="
+    }, {
+        "type": "customArchiveB64",
+        "url": "",
+        "filename": "invalidTestJar.zip",
+        "base64": "UEsDBBQAAAAIAO+/vWxMWAQr77+977+9NwAAADgAAAALAAAAaXN2YWxpZC50eHTvv71I77+977+977+9Vyjvv70v77+9SVHvv73vv71SVu+/vUxTKO+/ve+/vSxWSO+/ve+/vUlVAO+/vUXvv73vv70p77+9SUB2SUZq77+9QmZJ77+9QlliTmbvv70eAFBLAQIUABQAAAAIAO+/vWxMWAQr77+977+9NwAAADgAAAALAAAAAAAAAAEAIAAAAAAAAABpc3ZhbGlkLnR4dFBLBQYAAAAAAQABADkAAABgAAAAAAA="
+    }],
+    "sourceLength": 8
+}
