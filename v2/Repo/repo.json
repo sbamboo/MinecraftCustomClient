@@ -441,7 +441,7 @@
         "supported": false,
         "sourceType": "legacy",
         "source": {
-            "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/legacyPkg.zip",
+            "url": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/legacyPkg.package",
             "archiveType": "package.zip",
             "flavorDataFile": "flavor.mta",
             "launcherIcon": "mcc:icon128",
