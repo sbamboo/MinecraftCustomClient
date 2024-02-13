@@ -60,9 +60,12 @@ def download_file_and_get_base64(url):
         return None
 
 # [Functionos]
-def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False):
+def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False) -> list:
+    '''Returns if gdrive url was found'''
     sources = listingData.get("sources")
     webinclude = listingData.get("webInclude")
+
+    hasGdrive = []
 
     # handle webinclude
     if webinclude != None and skipWebIncl == False:
@@ -77,7 +80,10 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             fpath = fpath.replace("\\",os.sep)
             fpath = fpath.replace("/",os.sep)
             fs.ensureDirPath(os.path.dirname(fpath))
+            if "https://drive.google.com/" in url:
+                hasGdrive.append(url)
             downUrlFile(url,fpath)
+    return hasGdrive
     
     # ensure mods directory
     modsF = os.path.join(destinationDirPath,"mods")
@@ -158,7 +164,11 @@ def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
         fs.renameFile(oldname,newname)
     return dest
 
-def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix="",skipWebIncl=False):
+def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix="",skipWebIncl=False) -> list:
+    '''Returns if urls if gdrive url was found'''
+
+    hasGdrive = []
+
     dest = extractedPackFolderPath
     # get data
     poss = os.path.join(dest,"listing.json")
@@ -166,7 +176,8 @@ def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",
     if fs.doesExist(poss):
         content = open(poss,'r',encoding=encoding).read()
         listing = json.loads(content)
-        installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl)
+        hasGdrive = installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl)
+    return hasGdrive
 
 def _getJvb(path):
     java_binary = os.path.join(path, "java")

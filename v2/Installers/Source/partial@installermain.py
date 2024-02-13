@@ -7,6 +7,9 @@ if action_install == True:
     # [Install]
     print(prefix+f"Starting install for '{modpack}'...")
 
+    # Preset values
+    internal_flag_hasGDriveMsg = None
+
     # Create tempfolder
     print(prefix+"Creating temp folder...")
     tempFolder = os.path.join(parent,temp_foldername)
@@ -110,7 +113,7 @@ if action_install == True:
         # get data
         print(prefix+f"Downloading listing content... (type: {listingType})")
         try:
-            downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl)
+            internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl)
         except Exception as e:
             print(prefix+"Failed to download listing content!",e)
             cleanUp(tempFolder,modpack_path)
@@ -398,6 +401,10 @@ if action_install == True:
                 os.system(f'rmdir /s /q "{tempFolder}"')
             else:
                 os.system(f'rm -rf "{tempFolder}"')
+    if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
+        print("Found webincludes from Gdrive, they probably haven't been installed correctly because of gdrive works, please install them manually:")
+        for url in internal_flag_hasGDriveMsg:
+            print(f"  -  {url}")
     if args.autostart:
         print(prefix+"Done, Enjoy!")
     else:
