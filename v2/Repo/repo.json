@@ -37,6 +37,7 @@
         "desc": "Lite version, not done :)",
         "id": "9cfc0c63-3b3c-4397-bf06-b214c245f12e",
         "author": "SimonKC",
+        "icon": "mcc:modded",
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
