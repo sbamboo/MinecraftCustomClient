@@ -402,7 +402,7 @@ if action_install == True:
             else:
                 os.system(f'rm -rf "{tempFolder}"')
     if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
-        print("Found webincludes from Gdrive, they probably haven't been installed correctly because of gdrive works, please install them manually:")
+        print("Found webincludes from Gdrive, they probably haven't been installed correctly because of how gdrive works, please install them manually:")
         for url in internal_flag_hasGDriveMsg:
             print(f"  -  {url}")
     if args.autostart:
