@@ -49,7 +49,7 @@ if cusPip != None:
 # [Imports]
 try:
     _ = autopipImport("argparse")
-    _ = autopipImport("scandir")
+    _ = autopipImport("scandir",relaunch=True,relaunchCmds=sys.argv)
     _ = autopipImport("requests")
     _ = autopipImport("getpass")
     _ = autopipImport("subprocess")
