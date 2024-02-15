@@ -11,5 +11,5 @@ support for legacy repo (convert on load)
 support for adding "mod" info like source-link and icon-link through compile.yml, this for future website support for showing a mods list.
 ofc, source-link can be retrived from listing for non-base64 entries, but this fills in the gap.
 icons can be auto-retrived from source based on listing-entry-type but once-agai fill-in and backup.
-+ also add support for this to website as a button for each entry, to get to a page for that modpack.
-  Same design as modpack list and includes buttons to curseforge/modrinth/source/etc download based on entry type, aswell as other info, buttons should have icons like the modrinth icon.
+
+https://gist.github.com/PaulCreusy/7fade8d5a8026f2228a97d31343b335e
