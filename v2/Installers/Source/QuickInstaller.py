@@ -101,6 +101,7 @@ parser.add_argument('--dontResolveUrlIcons', help="With this the installer won't
 parser.add_argument('--resolveUrlIconMR', help="With this the installer will convert launcherIcon urls to base64 when installing to modrinth.", action="store_true")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
+parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
