@@ -90,11 +90,12 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
             os.system(f"{cusPip} {command}")
         else:
             intpip(command)
-        if relaunch == True and relaunchCmds != None:
+        if relaunch == True and relaunchCmds != None and "--noPipReload" not in relaunchCmds:
+            relaunchCmds.append("--noPipReload")
+            if "python" not in relaunchCmds[0] and isPythonRuntime(relaunchCmds[0]) == False:
+                relaunchCmds = [getExecutingPython(), *relaunchCmds]
             print("Relaunching to attempt reload of path...")
             print(f"With args:\n    {relaunchCmds}")
-            if "python" not in relaunchCmds[0] and PythonRuntime(relaunchCmds[0]) == False:
-                relaunchCmds = [getExecutingPython(), *relaunchCmds]
             subprocess.run([*relaunchCmds])
         else:
             imported_module = importlib.import_module(moduleName)
