@@ -30,7 +30,7 @@ repo_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main
 legacySourceFlavorDataFile_default = "flavor.mta"
 
 #region [IncludeInline: ./assets/lib_crshpiptools.py]
-import subprocess,sys,importlib,os
+import subprocess,sys,importlib,os,platform
 
 def getExecutingPython() -> str:
     '''CSlib: Returns the path to the python-executable used to start crosshell'''
@@ -125,7 +125,7 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
         if relaunch == True and relaunchCmds != None:
             print("Relaunching to attempt reload of path...")
             print(f"With args:\n    {relaunchCmds}")
-            if isPythonRuntime(relaunchCmds[0]) == False:
+            if "python" not in relaunchCmds[0] and PythonRuntime(relaunchCmds[0]) == False:
                 relaunchCmds = [getExecutingPython(), *relaunchCmds]
             subprocess.run([*relaunchCmds])
         else:
