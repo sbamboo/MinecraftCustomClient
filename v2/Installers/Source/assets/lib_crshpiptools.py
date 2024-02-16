@@ -93,7 +93,7 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
         if relaunch == True and relaunchCmds != None:
             print("Relaunching to attempt reload of path...")
             print(f"With args:\n    {relaunchCmds}")
-            if isPythonRuntime(relaunchCmds[0]) == False:
+            if "python" not in relaunchCmds[0] and PythonRuntime(relaunchCmds[0]) == False:
                 relaunchCmds = [getExecutingPython(), *relaunchCmds]
             subprocess.run([*relaunchCmds])
         else:
