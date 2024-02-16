@@ -1,4 +1,4 @@
-import subprocess,sys,importlib,os
+import subprocess,sys,importlib,os,platform
 
 def getExecutingPython() -> str:
     '''CSlib: Returns the path to the python-executable used to start crosshell'''
