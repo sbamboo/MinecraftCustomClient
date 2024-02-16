@@ -43,6 +43,35 @@ def intpip(pip_args=str):
         print(f"Failed to execute pip command: {pip_args}")
         return False
 
+def isPythonRuntime(filepath=str(),cusPip=None):
+    exeFileEnds = [".exe"]
+    if os.path.exists(filepath):
+        try:
+            # [Code]
+            # Non Windows
+            if platform.system() != "Windows":
+                try:
+                    magic = importlib.import_module("magic")
+                except:
+                    command = "install magic"
+                    if cusPip != None:
+                        os.system(f"{cusPip} {command}")
+                    else:
+                        intpip(command)
+                    magic = importlib.import_module("magic")
+                detected = magic.detect_from_filename(filepath)
+                return "application" in str(detected.mime_type)
+            # Windows
+            else:
+                fending = str("." +''.join(filepath.split('.')[-1]))
+                if fending in exeFileEnds:
+                    return True
+                else:
+                    return False
+        except Exception as e: print("\033[31mAn error occurred!\033[0m",e)
+    else:
+        raise Exception(f"File not found: {filepath}")
+
 # Safe import function
 def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,relaunch=False,relaunchCmds=None):
     '''CSlib: Tries to import the module, if failed installes using intpip and tries again.'''
@@ -64,7 +93,7 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
         if relaunch == True and relaunchCmds != None:
             print("Relaunching to attempt reload of path...")
             print(f"With args:\n    {relaunchCmds}")
-            if "python" not in relaunchCmds[0]:
+            if isPythonRuntime(relaunchCmds[0]) == False:
                 relaunchCmds = [getExecutingPython(), *relaunchCmds]
             subprocess.run([*relaunchCmds])
         else:
