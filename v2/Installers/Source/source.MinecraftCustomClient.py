@@ -172,6 +172,7 @@ parser.add_argument('--dontkill', help='Should the install not kill minecraft pr
 parser.add_argument('--autostart', help='Should the installer attempt to start the launcher?', action="store_true")
 parser.add_argument('-cLnProfFileN', type=str, help='The filename to overwrite the profile-listing file with.')
 parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore launcher if found, overwrite launcher with this.')
+parser.add_argument('--lnchTmstampForceUTC', help='Should the code relating to the launcher be forced to UTC timestamps?', action="store_true")
 #parser.add_argument('--curse', help='Should the installer attempt to install into curseforge instead?', action="store_true")
 #parser.add_argument('-curseInstanceP', type=str, help='A custom path to curseforge/minecraft/Instances')
 parser.add_argument('--rinth', help='Should the installer attempt to install into modrinth instead?', action="store_true")
@@ -1901,13 +1902,21 @@ def pause():
     else:
         raise Exception(f"Error: Platform {platformv} not supported yet!")
 
-def get_current_datetime_mcpformat():
-    current_datetime = datetime.utcnow()
+def get_current_datetime_mcpformat(forceUTC=False):
+    '''forceUTC makes the datetime object used aware instead of naive. (This was implementet as naive datetime functions got deprecated)'''
+    if forceUTC == True:
+        current_datetime = datetime.now(timezone.utc)
+    else:
+        current_datetime = datetime.now(timezone.utc).replace(tzinfo=None)
     formatted_datetime = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
     return formatted_datetime
 
-def get_current_datetime_logformat():
-    current_datetime = datetime.utcnow()
+def get_current_datetime_logformat(forceUTC=False):
+    '''forceUTC makes the datetime object used aware instead of naive. (This was implementet as naive datetime functions got deprecated)'''
+    if forceUTC == True:
+        current_datetime = datetime.now(timezone.utc)
+    else:
+        current_datetime = datetime.now(timezone.utc).replace(tzinfo=None)
     formatted_datetime = current_datetime.strftime('%d_%m_%Y %H-%M-%S')
     return formatted_datetime
 
@@ -1917,7 +1926,7 @@ def MinecraftLauncherAgent(
     #This function helps to add/remove/list or replace minecraft launcher installs.
     #
     #Made by Simon Kalmi Claesson
-    #Version:  2023-09-25(1) 2.1 PY
+    #Version:  2024-02-16(0) 2.2 PY
     #
 
     # [Arguments]
@@ -1948,7 +1957,10 @@ def MinecraftLauncherAgent(
 
     ## extraAdditions
     dontbreak=False,
-    excProcNameList=None
+    excProcNameList=None,
+
+    ## settings
+    timestampForceUTC=False
 ):
     # [Setup]
     ## Variables
@@ -2014,7 +2026,7 @@ def MinecraftLauncherAgent(
 
         # create template profile
         template = {
-            "created": get_current_datetime_mcpformat(),
+            "created": get_current_datetime_mcpformat(timestampForceUTC),
             "gameDir": gameDir,
             "icon": icon,
             "lastVersionId": versionId,
@@ -2031,7 +2043,7 @@ def MinecraftLauncherAgent(
         endJson = json.dumps(newDict)
         
         #Prep Backup
-        newFileName = "(" + get_current_datetime_logformat() + ")" + file
+        newFileName = "(" + get_current_datetime_logformat(timestampForceUTC) + ")" + file
         newFileName = newFileName.replace("/","_")
         newFileName = newFileName.replace(":","-")
         #Backup
@@ -2097,7 +2109,7 @@ def MinecraftLauncherAgent(
         endJson = json.dumps(newDict)
         
         #Prep Backup
-        newFileName = "(" + get_current_datetime_logformat() + ")" + file
+        newFileName = "(" + get_current_datetime_logformat(timestampForceUTC) + ")" + file
         newFileName = newFileName.replace("/","_")
         newFileName = newFileName.replace(":","-")
         #Backup
@@ -2219,7 +2231,7 @@ def MinecraftLauncherAgent(
 
         # create template profile
         template = {
-            "created": get_current_datetime_mcpformat(),
+            "created": get_current_datetime_mcpformat(timestampForceUTC),
             "gameDir": gameDir,
             "icon": icon,
             "lastVersionId": versionId,
@@ -2236,7 +2248,7 @@ def MinecraftLauncherAgent(
         endJson = json.dumps(newDict)
         
         #Prep Backup
-        newFileName = "(" + get_current_datetime_logformat() + ")" + file
+        newFileName = "(" + get_current_datetime_logformat(timestampForceUTC) + ")" + file
         newFileName = newFileName.replace("/","_")
         newFileName = newFileName.replace(":","-")
         #Backup
@@ -2625,7 +2637,9 @@ if action_install == True:
                 overWriteFile=args.cLnProfFileN,
                 overWriteBinExe=args.cLnBinPath,
 
-                excProcNameList=["minecraftcustomclient.exe"]
+                excProcNameList=["minecraftcustomclient.exe"],
+
+                timestampForceUTC=args.lnchTmstampForceUTC
             )
         except Exception as e:
             print(prefix+"Failed to create profile in minecraft launcher",e)

@@ -351,7 +351,9 @@ if action_install == True:
                 overWriteFile=args.cLnProfFileN,
                 overWriteBinExe=args.cLnBinPath,
 
-                excProcNameList=["minecraftcustomclient.exe"]
+                excProcNameList=["minecraftcustomclient.exe"],
+
+                timestampForceUTC=args.lnchTmstampForceUTC
             )
         except Exception as e:
             print(prefix+"Failed to create profile in minecraft launcher",e)

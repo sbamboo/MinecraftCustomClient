@@ -57,8 +57,9 @@ try:
     _ = autopipImport("json")
     _ = autopipImport("psutil")
     _ = autopipImport("readchar")
-except NameError:
+except NameError as e:
     print("\033[31mAutoPipImport failed, has the script been run through the include-inline tool?\033[0m")
+    print(f"\033[90m{e}\033[0m")
     exit()
 # BuildPrep: END-excl
 
@@ -85,6 +86,7 @@ parser.add_argument('--dontkill', help='Should the install not kill minecraft pr
 parser.add_argument('--autostart', help='Should the installer attempt to start the launcher?', action="store_true")
 parser.add_argument('-cLnProfFileN', type=str, help='The filename to overwrite the profile-listing file with.')
 parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore launcher if found, overwrite launcher with this.')
+parser.add_argument('--lnchTmstampForceUTC', help='Should the code relating to the launcher be forced to UTC timestamps?', action="store_true")
 #parser.add_argument('--curse', help='Should the installer attempt to install into curseforge instead?', action="store_true")
 #parser.add_argument('-curseInstanceP', type=str, help='A custom path to curseforge/minecraft/Instances')
 parser.add_argument('--rinth', help='Should the installer attempt to install into modrinth instead?', action="store_true")

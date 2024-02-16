@@ -13,3 +13,9 @@ ofc, source-link can be retrived from listing for non-base64 entries, but this f
 icons can be auto-retrived from source based on listing-entry-type but once-agai fill-in and backup.
 
 https://gist.github.com/PaulCreusy/7fade8d5a8026f2228a97d31343b335e
+
+fix installed not installing listing content, because of webincl warning?
+
+test if the fix for datetime.datetime.utcnow() being deprecated has been worked
+
+add the ability with cli-params to add additional launcherAgentExeExclusions seppareated by a delim
