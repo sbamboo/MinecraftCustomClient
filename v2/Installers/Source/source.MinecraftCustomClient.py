@@ -94,7 +94,8 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
         else:
             intpip(command)
         if relaunch == True and relaunchCmds != None:
-            os.system(' '.join(relaunchCmds))
+            print("Relaunching to attempt reload of path...")
+            subprocess.run(relaunchCmds)
         else:
             imported_module = importlib.import_module(moduleName)
     return imported_module
