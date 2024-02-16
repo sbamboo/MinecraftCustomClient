@@ -96,6 +96,8 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
         if relaunch == True and relaunchCmds != None:
             print("Relaunching to attempt reload of path...")
             print(f"With args:\n    {relaunchCmds}")
+            if "python" not in relaunchCmds[0]:
+                relaunchCmds = [getExecutingPython(), *relaunchCmds]
             subprocess.run([*relaunchCmds])
         else:
             imported_module = importlib.import_module(moduleName)
