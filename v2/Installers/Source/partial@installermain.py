@@ -411,7 +411,7 @@ if action_install == True:
                 os.system(f'rmdir /s /q "{tempFolder}"')
             else:
                 os.system(f'rm -rf "{tempFolder}"')
-    if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
+    if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != [] and args.noWebInclGdriveWarns != True:
         print("\033[33mFound webincludes from Gdrive, they might not have been installed correctly because of how gdrive works, please check and install them manually:\033[0m")
         for url in internal_flag_hasGDriveMsg:
             toUrl = url[1].replace(tempFolder,install_dest)

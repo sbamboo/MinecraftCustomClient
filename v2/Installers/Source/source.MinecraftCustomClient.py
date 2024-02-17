@@ -195,6 +195,7 @@ parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced
 parser.add_argument('--dontResolveUrlIcons', help="With this the installer won't convert launcherIcon urls to base64. (This if ignored and never done when installing to modrinth unless --resolveUrlIconMR is given)", action="store_true")
 parser.add_argument('--resolveUrlIconMR', help="With this the installer will convert launcherIcon urls to base64 when installing to modrinth.", action="store_true")
 parser.add_argument('--showModLoadingBar', help="Should modfile installations show a loading bar? (Will clutter terminal output but may provide usefull info for some)", action="store_true")
+parser.add_argument('--noWebInclGdriveWarns', help="Hides google-drive webinclude warnings.", action="store_true")
 parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer", action="store_true")
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
@@ -2963,7 +2964,7 @@ if action_install == True:
                 os.system(f'rmdir /s /q "{tempFolder}"')
             else:
                 os.system(f'rm -rf "{tempFolder}"')
-    if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
+    if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != [] and args.noWebInclGdriveWarns != True:
         print("\033[33mFound webincludes from Gdrive, they might not have been installed correctly because of how gdrive works, please check and install them manually:\033[0m")
         for url in internal_flag_hasGDriveMsg:
             toUrl = url[1].replace(tempFolder,install_dest)
