@@ -1,8 +1,8 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.3.3"
-installer_release = "2024-02-10(3)"
+installer_version = "1.3.4"
+installer_release = "2024-02-17(0)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -2011,15 +2011,19 @@ if action_install == True:
         #else:
         #    print(prefix+"Failed to get modpack!")
         #    exit()
-        downloadFile_HandleGdriveVirWarn(
-            modpack_url,
-            filepath=modpack_path,
-            handleGdriveVirWarn=True,
-            loadingBar=True,
-            title=f"[cyan]Downloading {__modpack}...",
-            handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
-            encoding=encoding
-        )
+        try:
+            downloadFile_HandleGdriveVirWarn(
+                modpack_url,
+                filepath=modpack_path,
+                handleGdriveVirWarn=True,
+                loadingBar=True,
+                title=f"[cyan]Downloading {__modpack}...",
+                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                encoding=encoding
+            )
+        except Exception as e:
+            print(prefix+"Failed to get modpack!",e)
+            exit()
 
     # [Prep selected package]
     modpack = os.path.basename(modpack_path)
