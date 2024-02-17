@@ -1,8 +1,8 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.3.3"
-installer_release = "2024-02-10(3)"
+installer_version = "1.3.4"
+installer_release = "2024-02-17(0)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -57,6 +57,9 @@ try:
     _ = autopipImport("json")
     _ = autopipImport("psutil")
     _ = autopipImport("readchar")
+    _ = autopipImport("urllib3") # Need modname="urllib", pipname="urllib3"?
+    _ = autopipImport("bs4")
+    _ = autopipImport("rich")
 except NameError as e:
     print("\033[31mAutoPipImport failed, has the script been run through the include-inline tool?\033[0m")
     print(f"\033[90m{e}\033[0m")
@@ -87,6 +90,7 @@ parser.add_argument('--autostart', help='Should the installer attempt to start t
 parser.add_argument('-cLnProfFileN', type=str, help='The filename to overwrite the profile-listing file with.')
 parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore launcher if found, overwrite launcher with this.')
 parser.add_argument('--lnchTmstampForceUTC', help='Should the code relating to the launcher be forced to UTC timestamps?', action="store_true")
+parser.add_argument('-taskkillProcNameExcls', type=str, help='A list of process names to exclude from the taskkill (when trying to restart mc-launcher), they user URL-encoded syntax with semicolon sepparated names.')
 #parser.add_argument('--curse', help='Should the installer attempt to install into curseforge instead?', action="store_true")
 #parser.add_argument('-curseInstanceP', type=str, help='A custom path to curseforge/minecraft/Instances')
 parser.add_argument('--rinth', help='Should the installer attempt to install into modrinth instead?', action="store_true")
@@ -117,7 +121,7 @@ if args.enc:
 # IncludeInline: ./assets/lib_filesys.py
 fs = filesys
 
-# IncludeInline: ./assets/flavorFunctions.py
+# IncludeInline: MX@./assets/flavorFunctions.py
 
 # [Set title]
 tst = title

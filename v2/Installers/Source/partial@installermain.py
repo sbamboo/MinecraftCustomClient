@@ -4,6 +4,8 @@
 
 if action_install == True:
 
+    setConTitle(title) # set title
+
     # [Install]
     print(prefix+f"Starting install for '{modpack}'...")
 
@@ -336,6 +338,12 @@ if action_install == True:
                 icon_base64_modded,
                 icon_base64_default
             )
+            excludedProcessNames = ["minecraftcustomclient.exe"]
+            if args.taskkillProcNameExcls != None:
+                import urllib.parse
+                excludedProcessNames.extend(
+                    urllib.parse.unquote(args.taskkillProcNameExcls).split(";")
+                )
             MinecraftLauncherAgent(
                 prefix=prefix_la,
                 add=True,
@@ -351,7 +359,7 @@ if action_install == True:
                 overWriteFile=args.cLnProfFileN,
                 overWriteBinExe=args.cLnBinPath,
 
-                excProcNameList=["minecraftcustomclient.exe"],
+                excProcNameList=excludedProcessNames,
 
                 timestampForceUTC=args.lnchTmstampForceUTC
             )
@@ -404,9 +412,10 @@ if action_install == True:
             else:
                 os.system(f'rm -rf "{tempFolder}"')
     if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
-        print("Found webincludes from Gdrive, they probably haven't been installed correctly because of how gdrive works, please install them manually:")
+        print("Found webincludes from Gdrive, they might not have been installed correctly because of how gdrive works, please check and install them manually:")
         for url in internal_flag_hasGDriveMsg:
-            print(f"  -  {url}")
+            print(f"  -  From: {url[0]}")
+            print(f"     To:   {url[1]}")
     if args.autostart:
         print(prefix+"Done, Enjoy!")
     else:

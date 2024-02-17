@@ -73,7 +73,7 @@ def isPythonRuntime(filepath=str(),cusPip=None):
         raise Exception(f"File not found: {filepath}")
 
 # Safe import function
-def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,relaunch=False,relaunchCmds=None):
+def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,attr=None,relaunch=False,relaunchCmds=None):
     '''CSlib: Tries to import the module, if failed installes using intpip and tries again.'''
     try:
         imported_module = importlib.import_module(moduleName)
@@ -99,4 +99,7 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
             subprocess.run([*relaunchCmds])
         else:
             imported_module = importlib.import_module(moduleName)
-    return imported_module
+    if attr != None:
+        return getattr(imported_module, attr)
+    else:
+        return imported_module

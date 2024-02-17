@@ -1,6 +1,6 @@
 # import
 import os,platform,subprocess,json,getpass
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Function for Mac to get eqv to ~
 def getTilde():

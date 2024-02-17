@@ -8,6 +8,8 @@ import uuid
 from datetime import datetime
 import hashlib
 
+# IncludeInline: ./assets/lib_beautifulPants.py
+
 # FlavorFunctions fix missing filesys instance
 try:
     filesys.defaultencoding
@@ -81,9 +83,17 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             fpath = fpath.replace("/",os.sep)
             fs.ensureDirPath(os.path.dirname(fpath))
             if "https://drive.google.com/" in url:
-                hasGdrive.append(url)
-            downUrlFile(url,fpath)
-    return hasGdrive
+                hasGdrive.append([url,fpath])
+            #downUrlFile(url,fpath)
+            downloadFile_HandleGdriveVirWarn(
+                url,
+                filepath=fpath,
+                handleGdriveVirWarn=True,
+                loadingBar=True,
+                title="[cyan]Downloading webinclude...",
+                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                encoding=encoding
+            )
     
     # ensure mods directory
     modsF = os.path.join(destinationDirPath,"mods")
@@ -129,7 +139,17 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
         # downloadable
         if _type in downloadable:
             if "<ManualUrlWaitingToBeFilledIn>" not in _url:
-                downUrlFile(_url,os.path.join(modsF,_filename))
+                #downUrlFile(_url,os.path.join(modsF,_filename))
+                _filepath = os.path.join(modsF,_filename)
+                downloadFile_HandleGdriveVirWarn(
+                    _url,
+                    filepath=_filepath,
+                    handleGdriveVirWarn=True,
+                    loadingBar=False,
+                    title="",
+                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                    encoding=encoding
+                )
         # nameOnly
         if _type == "filenameOnly":
             listedNameOnlys.append(_filename)
@@ -141,6 +161,9 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
         nolf = os.path.join(modsF,"listedFilenames.txt")
         if fs.doesExist(nolf): fs.deleteFile(nolf)
         open(nolf,'w',encoding=encoding).write(tx)
+
+    # return
+    return hasGdrive
 
 def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
     # get type
@@ -177,6 +200,8 @@ def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",
         content = open(poss,'r',encoding=encoding).read()
         listing = json.loads(content)
         hasGdrive = installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl)
+    else:
+        raise FileNotFoundError(f"Could not find listing.json in {dest}!")
     return hasGdrive
 
 def _getJvb(path):

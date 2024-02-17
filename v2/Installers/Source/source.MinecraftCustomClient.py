@@ -105,7 +105,7 @@ def isPythonRuntime(filepath=str(),cusPip=None):
         raise Exception(f"File not found: {filepath}")
 
 # Safe import function
-def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,relaunch=False,relaunchCmds=None):
+def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,attr=None,relaunch=False,relaunchCmds=None):
     '''CSlib: Tries to import the module, if failed installes using intpip and tries again.'''
     try:
         imported_module = importlib.import_module(moduleName)
@@ -131,7 +131,10 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,rel
             subprocess.run([*relaunchCmds])
         else:
             imported_module = importlib.import_module(moduleName)
-    return imported_module
+    if attr != None:
+        return getattr(imported_module, attr)
+    else:
+        return imported_module
 #endregion [IncludeInline: ./assets/lib_crshpiptools.py]
 
 # Handle cusPip
@@ -173,6 +176,7 @@ parser.add_argument('--autostart', help='Should the installer attempt to start t
 parser.add_argument('-cLnProfFileN', type=str, help='The filename to overwrite the profile-listing file with.')
 parser.add_argument('-cLnBinPath', type=str, help='If autostart and no msstore launcher if found, overwrite launcher with this.')
 parser.add_argument('--lnchTmstampForceUTC', help='Should the code relating to the launcher be forced to UTC timestamps?', action="store_true")
+parser.add_argument('-taskkillProcNameExcls', type=str, help='A list of process names to exclude from the taskkill (when trying to restart mc-launcher), they user URL-encoded syntax with semicolon sepparated names.')
 #parser.add_argument('--curse', help='Should the installer attempt to install into curseforge instead?', action="store_true")
 #parser.add_argument('-curseInstanceP', type=str, help='A custom path to curseforge/minecraft/Instances')
 parser.add_argument('--rinth', help='Should the installer attempt to install into modrinth instead?', action="store_true")
@@ -806,6 +810,209 @@ import uuid
 from datetime import datetime
 import hashlib
 
+#region [IncludeInline: ./assets/lib_beautifulPants.py]
+# BeautifulPants 1.0 by Simon Kalmi Claesson
+# Simple python library to download files or fetch get requests, with the possibility of a progress bar.
+
+
+from bs4 import BeautifulSoup
+import requests,os
+
+from rich.progress import Progress,BarColumn,TextColumn,TimeRemainingColumn,DownloadColumn,TransferSpeedColumn,SpinnerColumn,TaskProgressColumn,RenderableColumn
+
+def get_withProgess_rich(*args, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=False, **kwargs):
+    """
+    Wrapper function for requests.get that includes a visual loading bar made with rich.
+    """
+    response = requests.get(*args, **kwargs, stream=True)
+    if raise_for_status == True: response.raise_for_status()
+    total_size = int(response.headers.get('content-length', 0))
+    block_size = 1024  # 1 KB
+
+    # Initialize the Rich progress bar
+    from rich.progress import Progress,BarColumn,TextColumn,TimeRemainingColumn,DownloadColumn,TransferSpeedColumn,SpinnerColumn,TaskProgressColumn,RenderableColumn
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        DownloadColumn(),
+        RenderableColumn("[cyan]ETA:"),
+        TimeRemainingColumn(compact=True),
+        TransferSpeedColumn(),
+    ) as progress:
+        task = progress.add_task(richTitle, total=total_size, expand=True)
+
+        try:
+            # Buffer to store downloaded content
+            content_buffer = b''
+            for data in response.iter_content(block_size):
+                progress.update(task, advance=len(data))
+                content_buffer += data
+
+            # Return the response object with downloaded content
+            response._content = content_buffer
+            if postDownTxt not in ["",None]: print(postDownTxt)
+            return response
+        except Exception as e:
+            # Ensure closing the progress bar and response in case of an exception
+            raise e
+        finally:
+            # Close the progress bar and response
+            progress.stop()
+            response.close()
+
+def get_withInfo(*args, prefTxt="", suffTxt="", raise_for_status=False, **kwargs):
+    """
+    Wrapper function for requests.get that takes strings to print before and after downloading.
+    """
+    if prefTxt not in ["",None]: print(prefTxt)
+    response = requests.get(*args, **kwargs)
+    if raise_for_status == True: response.raise_for_status()
+    if suffTxt not in ["",None]: print(suffTxt)
+    return response
+
+def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=True, **kwargs):
+    """
+    Wrapper function for requests.get that includes a visual loading bar made with rich while downloading a file.
+    To just wrap requests.get without a file use get_withProgess_rich().
+    """
+    if os.path.exists(filepath):
+        raise FileExistsError(f"Failed to download the file: '{filepath}'! File already exists.")
+    response = requests.get(*args, **kwargs, stream=True)
+    total_size = int(response.headers.get('content-length', 0))
+    block_size = 1024  # 1 KB
+
+    # Initialize the Rich progress bar
+    if response.status_code == 200:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            DownloadColumn(),
+            RenderableColumn("[cyan]ETA:"),
+            TimeRemainingColumn(compact=True),
+            TransferSpeedColumn(),
+        ) as progress:
+            task = progress.add_task(richTitle, total=total_size, expand=True)
+            try:
+                # Download to file
+                with open(filepath, 'wb') as f:
+                    for data in response.iter_content(block_size):
+                        progress.update(task, advance=len(data))
+                        f.write(data)
+                # Return the response object
+                if postDownTxt not in ["",None]: print(postDownTxt)
+                return response
+            except Exception as e:
+                # Ensure closing the progress bar and response in case of an exception
+                raise e
+            finally:
+                # Close the progress bar and response
+                progress.stop()
+                response.close()
+    else:
+        if raise_for_status == True:
+            raise Exception(f"Failed to download the file: '{filepath}'! Invalid status code ({response.status_code}) or empty content.")
+        else:
+            return response
+
+def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_status=True, **kwargs):
+    """
+    Wrapper function for requests.get that takes strings to print before and after downloading a file.
+    To just wrap requests.get without a file use get_withInfo().
+    """
+    if prefTxt not in ["",None]: print(prefTxt)
+    response = requests.get(*args, **kwargs)
+    if response.status_code == 200 and response.content not in ["",None]:
+        if not os.path.exists(filepath):
+            with open(filepath, 'wb') as file:
+                file.write(response.content)
+            if suffTxt not in ["",None]: print(suffTxt)
+        else:
+            raise FileExistsError(f"Failed to download the file: '{filepath}'! File already exists.")
+    else:
+        if raise_for_status == True:
+            raise Exception(f"Failed to download the file: '{filepath}'! Invalid status code ({response.status_code}) or empty content.")
+    return response
+
+def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there.", raise_for_status=False):
+    '''Function to send a get request to a url, and if a gdrive-virus-scan-warning apprears try to extract the link and send a get request to it instead.'''
+    if loadingBar == True: response = get_withProgess_rich(url,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
+    else:                  response = get_withInfo(url,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
+    #response = getter(url)
+    if response.status_code == 200:
+        # Content of the file
+        if "<!DOCTYPE html>" in response.text and "Google Drive - Virus scan warning" in response.text and handleGdriveVirWarn == True:
+            print(handleGdriveVirWarnText)
+            # attempt extract
+            soup = BeautifulSoup(response.text, 'html.parser')
+            form = soup.find('form')
+            linkBuild = form['action']
+            hasParams = False
+            inputs = form.find_all('input')
+            toBeFound = ["id","export","confirm","uuid"]
+            for inp in inputs:
+                name = inp.attrs.get('name')
+                value = inp.attrs.get('value')
+                if name != None and name in toBeFound and value != None:
+                    if hasParams == False:
+                        pref = "?"
+                        hasParams = True
+                    else:
+                        pref = "&"
+                    linkBuild += f"{pref}{name}={value}"
+            # Download from built link
+            if loadingBar == True: response2 = get_withProgess_rich(linkBuild,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
+            else:                  response2 = get_withInfo(linkBuild,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
+            if response2.status_code == 200:
+                return response2.content
+            else:
+                return None
+        else:
+            return response.content
+    # non 200 code
+    else:
+        return None
+
+def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there.", raise_for_status=True, encoding="utf-8"):
+    '''Function to try and download a file, and if a gdrive-virus-scan-warning apprears try to extract the link and download it from there.'''
+    if loadingBar == True: response = getFile_withProgess_rich(url,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
+    else:                  response = getFile_withInfo(url,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
+    # Get content of the file
+    text_content = None
+    if os.path.exists(filepath):
+        text_content = open(filepath, 'r', encoding=encoding, errors='replace').read()
+        if text_content != None and "<!DOCTYPE html>" in text_content and "Google Drive - Virus scan warning" in text_content and handleGdriveVirWarn == True:
+            os.remove(filepath) # clean up
+            print(handleGdriveVirWarnText)
+            # attempt extract
+            soup = BeautifulSoup(text_content, 'html.parser')
+            form = soup.find('form')
+            linkBuild = form['action']
+            hasParams = False
+            inputs = form.find_all('input')
+            toBeFound = ["id","export","confirm","uuid"]
+            for inp in inputs:
+                name = inp.attrs.get('name')
+                value = inp.attrs.get('value')
+                if name != None and name in toBeFound and value != None:
+                    if hasParams == False:
+                        pref = "?"
+                        hasParams = True
+                    else:
+                        pref = "&"
+                    linkBuild += f"{pref}{name}={value}"
+            # Download from built link
+            if loadingBar == True: response2 = getFile_withProgess_rich(linkBuild,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
+            else:                  response2 = getFile_withInfo(linkBuild,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
+            if not os.path.exists(filepath):
+                raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
+    else:
+        raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
+#endregion [IncludeInline: ./assets/lib_beautifulPants.py]
+
 # FlavorFunctions fix missing filesys instance
 try:
     filesys.defaultencoding
@@ -879,9 +1086,17 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             fpath = fpath.replace("/",os.sep)
             fs.ensureDirPath(os.path.dirname(fpath))
             if "https://drive.google.com/" in url:
-                hasGdrive.append(url)
-            downUrlFile(url,fpath)
-    return hasGdrive
+                hasGdrive.append([url,fpath])
+            #downUrlFile(url,fpath)
+            downloadFile_HandleGdriveVirWarn(
+                url,
+                filepath=fpath,
+                handleGdriveVirWarn=True,
+                loadingBar=True,
+                title="[cyan]Downloading webinclude...",
+                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                encoding=encoding
+            )
     
     # ensure mods directory
     modsF = os.path.join(destinationDirPath,"mods")
@@ -927,7 +1142,17 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
         # downloadable
         if _type in downloadable:
             if "<ManualUrlWaitingToBeFilledIn>" not in _url:
-                downUrlFile(_url,os.path.join(modsF,_filename))
+                #downUrlFile(_url,os.path.join(modsF,_filename))
+                _filepath = os.path.join(modsF,_filename)
+                downloadFile_HandleGdriveVirWarn(
+                    _url,
+                    filepath=_filepath,
+                    handleGdriveVirWarn=True,
+                    loadingBar=False,
+                    title="",
+                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                    encoding=encoding
+                )
         # nameOnly
         if _type == "filenameOnly":
             listedNameOnlys.append(_filename)
@@ -939,6 +1164,9 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
         nolf = os.path.join(modsF,"listedFilenames.txt")
         if fs.doesExist(nolf): fs.deleteFile(nolf)
         open(nolf,'w',encoding=encoding).write(tx)
+
+    # return
+    return hasGdrive
 
 def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
     # get type
@@ -975,6 +1203,8 @@ def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",
         content = open(poss,'r',encoding=encoding).read()
         listing = json.loads(content)
         hasGdrive = installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl)
+    else:
+        raise FileNotFoundError(f"Could not find listing.json in {dest}!")
     return hasGdrive
 
 def _getJvb(path):
@@ -1769,18 +1999,27 @@ if action_install == True:
         if "." not in modpack_url.split("/")[-1]:
             modpack_path = os.path.join(parent,key+".zip")
         print(prefix+"Downloading modpack file...")
-        response = requests.get(modpack_url)
-        if response.status_code == 200:
-            # Content of the file
-            cont = response.content
-        else:
-            cont = None
-        if cont != None and cont != "":
-            if os.path.exists(modpack_path) == False:
-                open(modpack_path,'wb').write(cont)
-        else:
-            print(prefix+"Failed to get modpack!")
-            exit()
+        #response = requests.get(modpack_url)
+        #if response.status_code == 200:
+        #    # Content of the file
+        #    cont = response.content
+        #else:
+        #    cont = None
+        #if cont != None and cont != "":
+        #    if os.path.exists(modpack_path) == False:
+        #        open(modpack_path,'wb').write(cont)
+        #else:
+        #    print(prefix+"Failed to get modpack!")
+        #    exit()
+        downloadFile_HandleGdriveVirWarn(
+            modpack_url,
+            filepath=modpack_path,
+            handleGdriveVirWarn=True,
+            loadingBar=True,
+            title=f"[cyan]Downloading {__modpack}...",
+            handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+            encoding=encoding
+        )
 
     # [Prep selected package]
     modpack = os.path.basename(modpack_path)
@@ -1795,7 +2034,7 @@ if action_install == True:
 #region [IncludeInline: ./assets/minecraftLauncherAgent.py]
 # import
 import os,platform,subprocess,json,getpass
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Function for Mac to get eqv to ~
 def getTilde():
@@ -2290,6 +2529,8 @@ def MinecraftLauncherAgent(
 
 if action_install == True:
 
+    setConTitle(title) # set title
+
     # [Install]
     print(prefix+f"Starting install for '{modpack}'...")
 
@@ -2622,6 +2863,12 @@ if action_install == True:
                 icon_base64_modded,
                 icon_base64_default
             )
+            excludedProcessNames = ["minecraftcustomclient.exe"]
+            if args.taskkillProcNameExcls != None:
+                import urllib.parse
+                excludedProcessNames.extend(
+                    urllib.parse.unquote(args.taskkillProcNameExcls).split(";")
+                )
             MinecraftLauncherAgent(
                 prefix=prefix_la,
                 add=True,
@@ -2637,7 +2884,7 @@ if action_install == True:
                 overWriteFile=args.cLnProfFileN,
                 overWriteBinExe=args.cLnBinPath,
 
-                excProcNameList=["minecraftcustomclient.exe"],
+                excProcNameList=excludedProcessNames,
 
                 timestampForceUTC=args.lnchTmstampForceUTC
             )
@@ -2690,9 +2937,10 @@ if action_install == True:
             else:
                 os.system(f'rm -rf "{tempFolder}"')
     if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
-        print("Found webincludes from Gdrive, they probably haven't been installed correctly because of how gdrive works, please install them manually:")
+        print("Found webincludes from Gdrive, they might not have been installed correctly because of how gdrive works, please check and install them manually:")
         for url in internal_flag_hasGDriveMsg:
-            print(f"  -  {url}")
+            print(f"  -  From: {url[0]}")
+            print(f"     To:   {url[1]}")
     if args.autostart:
         print(prefix+"Done, Enjoy!")
     else:

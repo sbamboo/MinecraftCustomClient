@@ -50,18 +50,27 @@ if action_install == True:
         if "." not in modpack_url.split("/")[-1]:
             modpack_path = os.path.join(parent,key+".zip")
         print(prefix+"Downloading modpack file...")
-        response = requests.get(modpack_url)
-        if response.status_code == 200:
-            # Content of the file
-            cont = response.content
-        else:
-            cont = None
-        if cont != None and cont != "":
-            if os.path.exists(modpack_path) == False:
-                open(modpack_path,'wb').write(cont)
-        else:
-            print(prefix+"Failed to get modpack!")
-            exit()
+        #response = requests.get(modpack_url)
+        #if response.status_code == 200:
+        #    # Content of the file
+        #    cont = response.content
+        #else:
+        #    cont = None
+        #if cont != None and cont != "":
+        #    if os.path.exists(modpack_path) == False:
+        #        open(modpack_path,'wb').write(cont)
+        #else:
+        #    print(prefix+"Failed to get modpack!")
+        #    exit()
+        downloadFile_HandleGdriveVirWarn(
+            modpack_url,
+            filepath=modpack_path,
+            handleGdriveVirWarn=True,
+            loadingBar=True,
+            title=f"[cyan]Downloading {__modpack}...",
+            handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+            encoding=encoding
+        )
 
     # [Prep selected package]
     modpack = os.path.basename(modpack_path)
