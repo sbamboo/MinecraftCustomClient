@@ -18,13 +18,16 @@ if action_install == True:
         # show select
         flavors = repoData.get("flavors")
         flavorsDict = {}
+        notShowFlavors = {}
         for fl in flavors:
+            n = fl["name"]
+            fl.pop("name")
+            if fl["supported"] == False:
+                fl["desc"] += " \033[33m[NoSup]\033[0m"
             if fl["hidden"] == False:
-                n = fl["name"]
-                fl.pop("name")
-                if fl["supported"] == False:
-                    fl["desc"] += " \033[33m[NoSup]\033[0m"
                 flavorsDict[n] = fl
+            else:
+                notShowFlavors[n] = fl
         flavorsDict["[Exit]"] = {"desc": "ncb:"}
         # show os-dep keybinds:
         selTitle  = "Welcome to MinecraftCustomClient installer!\n\033[90mAny clients with [NoSup] have no support offered, use on your own risk.\033[0m\nSelect a flavor to install:"
@@ -32,11 +35,18 @@ if action_install == True:
             key = args.modpack
         else:
             key = showDictSel(flavorsDict,selTitle=selTitle,selSuffix=selSuffix)
-        if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
+        validKeys = list(flavorsDict.keys())
+        validKeys.extend( list(notShowFlavors.keys()) )
+        if key == None or key not in validKeys or key == "[Exit]":
             args.nopause = True
             exit()
         # get modpack url
-        modpack_source = flavorsDict[key]["source"]
+        if flavorsDict.get(key) != None:
+            modpack_source = flavorsDict[key]["source"]
+            modpack_id = flavorsDict[key]["id"]
+        else:
+            modpack_source = notShowFlavors[key]["source"]
+            modpack_id = notShowFlavors[key]["id"]
         __modpack = key
         # download url
         ## check for legacy
@@ -80,5 +90,6 @@ if action_install == True:
     # [Prep selected package]
     modpack = os.path.basename(modpack_path)
     modpack_source = modpack_source
+    modpack_id = modpack_id
     title = title.replace("<modpack>", modpack)
     system = platform.system().lower()

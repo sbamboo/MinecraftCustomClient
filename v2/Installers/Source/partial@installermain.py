@@ -115,7 +115,8 @@ if action_install == True:
         # get data
         print(prefix+f"Downloading listing content... (type: {listingType})")
         try:
-            internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl,args.showModLoadingBar)
+            if listingData.get("sources") != None:
+                internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl,args.showModLoadingBar)
         except Exception as e:
             print(prefix+"Failed to download listing content!",e)
             cleanUp(tempFolder,modpack_path)
@@ -213,6 +214,7 @@ if action_install == True:
             "modpack": modpack,
             "modpack_path": modpack_path,
             "modpack_source": modpack_source,
+            "modpack_id": modpack_id,
             "dest": dest,
             "listingData": listingData,
             "listingType": listingType,
@@ -245,6 +247,7 @@ if action_install == True:
         modpack = impData["modpack"]
         modpack_path = impData["modpack_path"]
         modpack_source = impData["modpack_source"],
+        modpack_id = impData["modpack_id"]
         dest = impData["dest"]
         listingData = impData["listingData"]
         listingType = impData["listingType"]
@@ -387,6 +390,8 @@ if action_install == True:
         mcc_installed = json.loads(raw)
     ## get id
     mcc_installed_id = "<uuid>"
+    if modpack_id not in [None,""]:
+        mcc_installed_id = modpack_id
     if listingData.get("_legacy_fld") != None:
         mcc_installed_id = listingData["_legacy_fld"].get("ID")
     ## add client

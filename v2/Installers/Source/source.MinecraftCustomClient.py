@@ -1990,13 +1990,16 @@ if action_install == True:
         # show select
         flavors = repoData.get("flavors")
         flavorsDict = {}
+        notShowFlavors = {}
         for fl in flavors:
+            n = fl["name"]
+            fl.pop("name")
+            if fl["supported"] == False:
+                fl["desc"] += " \033[33m[NoSup]\033[0m"
             if fl["hidden"] == False:
-                n = fl["name"]
-                fl.pop("name")
-                if fl["supported"] == False:
-                    fl["desc"] += " \033[33m[NoSup]\033[0m"
                 flavorsDict[n] = fl
+            else:
+                notShowFlavors[n] = fl
         flavorsDict["[Exit]"] = {"desc": "ncb:"}
         # show os-dep keybinds:
         selTitle  = "Welcome to MinecraftCustomClient installer!\n\033[90mAny clients with [NoSup] have no support offered, use on your own risk.\033[0m\nSelect a flavor to install:"
@@ -2004,11 +2007,18 @@ if action_install == True:
             key = args.modpack
         else:
             key = showDictSel(flavorsDict,selTitle=selTitle,selSuffix=selSuffix)
-        if key == None or key not in list(flavorsDict.keys()) or key == "[Exit]":
+        validKeys = list(flavorsDict.keys())
+        validKeys.extend( list(notShowFlavors.keys()) )
+        if key == None or key not in validKeys or key == "[Exit]":
             args.nopause = True
             exit()
         # get modpack url
-        modpack_source = flavorsDict[key]["source"]
+        if flavorsDict.get(key) != None:
+            modpack_source = flavorsDict[key]["source"]
+            modpack_id = flavorsDict[key]["id"]
+        else:
+            modpack_source = notShowFlavors[key]["source"]
+            modpack_id = notShowFlavors[key]["id"]
         __modpack = key
         # download url
         ## check for legacy
@@ -2052,6 +2062,7 @@ if action_install == True:
     # [Prep selected package]
     modpack = os.path.basename(modpack_path)
     modpack_source = modpack_source
+    modpack_id = modpack_id
     title = title.replace("<modpack>", modpack)
     system = platform.system().lower()
 #endregion [IncludeInline: ./partial@installermenu.py]
@@ -2668,7 +2679,8 @@ if action_install == True:
         # get data
         print(prefix+f"Downloading listing content... (type: {listingType})")
         try:
-            internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl,args.showModLoadingBar)
+            if listingData.get("sources") != None:
+                internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl,args.showModLoadingBar)
         except Exception as e:
             print(prefix+"Failed to download listing content!",e)
             cleanUp(tempFolder,modpack_path)
@@ -2766,6 +2778,7 @@ if action_install == True:
             "modpack": modpack,
             "modpack_path": modpack_path,
             "modpack_source": modpack_source,
+            "modpack_id": modpack_id,
             "dest": dest,
             "listingData": listingData,
             "listingType": listingType,
@@ -2798,6 +2811,7 @@ if action_install == True:
         modpack = impData["modpack"]
         modpack_path = impData["modpack_path"]
         modpack_source = impData["modpack_source"],
+        modpack_id = impData["modpack_id"]
         dest = impData["dest"]
         listingData = impData["listingData"]
         listingType = impData["listingType"]
@@ -2940,6 +2954,8 @@ if action_install == True:
         mcc_installed = json.loads(raw)
     ## get id
     mcc_installed_id = "<uuid>"
+    if modpack_id not in [None,""]:
+        mcc_installed_id = modpack_id
     if listingData.get("_legacy_fld") != None:
         mcc_installed_id = listingData["_legacy_fld"].get("ID")
     ## add client
