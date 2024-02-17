@@ -2967,7 +2967,8 @@ if action_install == True:
     if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != [] and args.noWebInclGdriveWarns != True:
         print("\033[33mFound webincludes from Gdrive, they might not have been installed correctly because of how gdrive works, please check and install them manually:\033[0m")
         for url in internal_flag_hasGDriveMsg:
-            toUrl = url[1].replace(tempFolder,install_dest)
+            toUrl = url[1].replace(tempFolder+os.sep+os.path.basename(modpack_destF),"{modpack}")
+            toUrl = toUrl.replace(tempFolder,"{installDest}")
             print(f"\033[90m  - From: \033[35m{url[0]}\033[0m")
             print(f"\033[90m    To:   \033[34m{toUrl}\033[0m")
     if args.autostart:
