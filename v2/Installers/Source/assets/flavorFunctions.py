@@ -91,7 +91,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                 handleGdriveVirWarn=True,
                 loadingBar=True,
                 title="[cyan]Downloading webinclude...",
-                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
                 encoding=encoding,
                 onFileExiError="ignore-with-warn"
             )
@@ -148,7 +148,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                     handleGdriveVirWarn=True,
                     loadingBar=modsHaveLoadingBar,
                     title="",
-                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
                     encoding=encoding,
                     onFileExiError="ignore-with-warn"
                 )

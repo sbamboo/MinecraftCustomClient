@@ -956,7 +956,7 @@ def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_stat
             raise Exception(f"Failed to download the file: '{filepath}'! Invalid status code ({response.status_code}) or empty content.")
     return response
 
-def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there.", raise_for_status=False):
+def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=False):
     '''Function to send a get request to a url, and if a gdrive-virus-scan-warning apprears try to extract the link and send a get request to it instead.'''
     if loadingBar == True: response = get_withProgess_rich(url,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
     else:                  response = get_withInfo(url,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
@@ -995,7 +995,7 @@ def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=F
     else:
         return None
 
-def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there.", raise_for_status=True, encoding="utf-8", onFileExiError="raise"):
+def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=True, encoding="utf-8", onFileExiError="raise"):
     """Function to try and download a file, and if a gdrive-virus-scan-warning apprears try to extract the link and download it from there.
     onFileExiError: "raise"/"ignore"/"ignore-with-warn"/"remove"/"remove-with-warn"
     """
@@ -1115,7 +1115,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                 handleGdriveVirWarn=True,
                 loadingBar=True,
                 title="[cyan]Downloading webinclude...",
-                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
                 encoding=encoding,
                 onFileExiError="ignore-with-warn"
             )
@@ -1172,7 +1172,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                     handleGdriveVirWarn=True,
                     loadingBar=modsHaveLoadingBar,
                     title="",
-                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
                     encoding=encoding,
                     onFileExiError="ignore-with-warn"
                 )
@@ -2051,7 +2051,7 @@ if action_install == True:
                 handleGdriveVirWarn=True,
                 loadingBar=True,
                 title=f"[cyan]Downloading {__modpack}...",
-                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
+                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
                 encoding=encoding,
                 onFileExiError="remove"
             )
