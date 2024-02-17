@@ -70,7 +70,8 @@ if action_install == True:
                 loadingBar=True,
                 title=f"[cyan]Downloading {__modpack}...",
                 handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
-                encoding=encoding
+                encoding=encoding,
+                onFileExiError="remove"
             )
         except Exception as e:
             print(prefix+"Failed to get modpack!",e)

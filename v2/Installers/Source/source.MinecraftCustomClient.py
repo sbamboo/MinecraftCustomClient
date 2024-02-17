@@ -872,13 +872,20 @@ def get_withInfo(*args, prefTxt="", suffTxt="", raise_for_status=False, **kwargs
     if suffTxt not in ["",None]: print(suffTxt)
     return response
 
-def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=True, **kwargs):
+def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=True, onFileExiError="raise", **kwargs):
     """
     Wrapper function for requests.get that includes a visual loading bar made with rich while downloading a file.
     To just wrap requests.get without a file use get_withProgess_rich().
+    onFileExiError: "raise"/"ignore"/"ignore-with-warn"/"remove"/"remove-with-warn"
     """
     if os.path.exists(filepath):
-        raise FileExistsError(f"Failed to download the file: '{filepath}'! File already exists.")
+        onFileExiError = onFileExiError.lower()
+        if onFileExiError == "raise":
+            raise FileExistsError(f"Failed to download the file: '{filepath}'! File already exists.")
+        elif onFileExiError == "remove" or "-with-warn" in onFileExiError:
+            if "-with-warn" in onFileExiError:
+                print(f"File '{filepath}' already exists, ignoring.")
+            if "remove" in onFileExiError: os.remove(filepath)
     response = requests.get(*args, **kwargs, stream=True)
     total_size = int(response.headers.get('content-length', 0))
     block_size = 1024  # 1 KB
@@ -918,10 +925,11 @@ def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading..
         else:
             return response
 
-def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_status=True, **kwargs):
+def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_status=True, onFileExiError="raise", **kwargs):
     """
     Wrapper function for requests.get that takes strings to print before and after downloading a file.
     To just wrap requests.get without a file use get_withInfo().
+    onFileExiError: "raise"/"ignore"/"ignore-with-warn"/"remove"/"remove-with-warn"
     """
     if prefTxt not in ["",None]: print(prefTxt)
     response = requests.get(*args, **kwargs)
@@ -931,7 +939,16 @@ def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_stat
                 file.write(response.content)
             if suffTxt not in ["",None]: print(suffTxt)
         else:
-            raise FileExistsError(f"Failed to download the file: '{filepath}'! File already exists.")
+            onFileExiError = onFileExiError.lower()
+            if onFileExiError == "raise":
+                raise FileExistsError(f"Failed to download the file: '{filepath}'! File already exists.")
+            elif onFileExiError == "remove" or "-with-warn" in onFileExiError:
+                if "-with-warn" in onFileExiError:
+                    print(f"File '{filepath}' already exists, ignoring.")
+                if "remove" in onFileExiError: os.remove(filepath)
+                with open(filepath, 'wb') as file:
+                    file.write(response.content)
+                if suffTxt not in ["",None]: print(suffTxt)
     else:
         if raise_for_status == True:
             raise Exception(f"Failed to download the file: '{filepath}'! Invalid status code ({response.status_code}) or empty content.")
@@ -976,10 +993,12 @@ def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=F
     else:
         return None
 
-def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there.", raise_for_status=True, encoding="utf-8"):
-    '''Function to try and download a file, and if a gdrive-virus-scan-warning apprears try to extract the link and download it from there.'''
-    if loadingBar == True: response = getFile_withProgess_rich(url,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
-    else:                  response = getFile_withInfo(url,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
+def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there.", raise_for_status=True, encoding="utf-8", onFileExiError="raise"):
+    """Function to try and download a file, and if a gdrive-virus-scan-warning apprears try to extract the link and download it from there.
+    onFileExiError: "raise"/"ignore"/"ignore-with-warn"/"remove"/"remove-with-warn"
+    """
+    if loadingBar == True: response = getFile_withProgess_rich(url,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
+    else:                  response = getFile_withInfo(url,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
     # Get content of the file
     text_content = None
     if os.path.exists(filepath):
@@ -1005,8 +1024,8 @@ def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, 
                         pref = "&"
                     linkBuild += f"{pref}{name}={value}"
             # Download from built link
-            if loadingBar == True: response2 = getFile_withProgess_rich(linkBuild,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
-            else:                  response2 = getFile_withInfo(linkBuild,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
+            if loadingBar == True: response2 = getFile_withProgess_rich(linkBuild,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
+            else:                  response2 = getFile_withInfo(linkBuild,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
             if not os.path.exists(filepath):
                 raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
     else:
@@ -1095,7 +1114,8 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                 loadingBar=True,
                 title="[cyan]Downloading webinclude...",
                 handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
-                encoding=encoding
+                encoding=encoding,
+                onFileExiError="ignore-with-warn"
             )
     
     # ensure mods directory
@@ -1151,7 +1171,8 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                     loadingBar=False,
                     title="",
                     handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
-                    encoding=encoding
+                    encoding=encoding,
+                    onFileExiError="ignore-with-warn"
                 )
         # nameOnly
         if _type == "filenameOnly":
@@ -2019,7 +2040,8 @@ if action_install == True:
                 loadingBar=True,
                 title=f"[cyan]Downloading {__modpack}...",
                 handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
-                encoding=encoding
+                encoding=encoding,
+                onFileExiError="remove"
             )
         except Exception as e:
             print(prefix+"Failed to get modpack!",e)
