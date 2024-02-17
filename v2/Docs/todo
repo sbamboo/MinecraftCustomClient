@@ -19,3 +19,9 @@ fix installed not installing listing content, because of webincl warning?
 test if the fix for datetime.datetime.utcnow() being deprecated has been worked
 
 add the ability with cli-params to add additional launcherAgentExeExclusions seppareated by a delim
+
+Add a new option to uninstall old modpacks by looking in the directories:
+  - installs/minecraft-custom-client/custom
+  - installs/minecraft-custom-client/profile
+And the legacyRepo for names.
+(See the legacy installer code)
