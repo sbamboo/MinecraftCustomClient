@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime
 import hashlib
 
-# IncludeInline: ./assets/lib_beautifulPants.py
+# IncludeInline: ./assets/lib_fancyPants.py
 
 # FlavorFunctions fix missing filesys instance
 try:
@@ -62,7 +62,7 @@ def download_file_and_get_base64(url):
         return None
 
 # [Functionos]
-def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False) -> list:
+def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False) -> list:
     '''Returns if gdrive url was found'''
     sources = listingData.get("sources")
     webinclude = listingData.get("webInclude")
@@ -146,7 +146,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                     _url,
                     filepath=_filepath,
                     handleGdriveVirWarn=True,
-                    loadingBar=False,
+                    loadingBar=modsHaveLoadingBar,
                     title="",
                     handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
                     encoding=encoding,
@@ -189,7 +189,7 @@ def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
         fs.renameFile(oldname,newname)
     return dest
 
-def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix="",skipWebIncl=False) -> list:
+def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False) -> list:
     '''Returns if urls if gdrive url was found'''
 
     hasGdrive = []
@@ -201,7 +201,7 @@ def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",
     if fs.doesExist(poss):
         content = open(poss,'r',encoding=encoding).read()
         listing = json.loads(content)
-        hasGdrive = installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl)
+        hasGdrive = installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl,modsHaveLoadingBar)
     else:
         raise FileNotFoundError(f"Could not find listing.json in {dest}!")
     return hasGdrive

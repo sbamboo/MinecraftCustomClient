@@ -194,10 +194,11 @@ parser.add_argument('-destmodpack', type=str, help="Datacopy destination modpack
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
 parser.add_argument('--dontResolveUrlIcons', help="With this the installer won't convert launcherIcon urls to base64. (This if ignored and never done when installing to modrinth unless --resolveUrlIconMR is given)", action="store_true")
 parser.add_argument('--resolveUrlIconMR', help="With this the installer will convert launcherIcon urls to base64 when installing to modrinth.", action="store_true")
-parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
-parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
+parser.add_argument('--showModLoadingBar', help="Should modfile installations show a loading bar? (Will clutter terminal output but may provide usefull info for some)", action="store_true")
 parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer", action="store_true")
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
+parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
+parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
@@ -810,8 +811,8 @@ import uuid
 from datetime import datetime
 import hashlib
 
-#region [IncludeInline: ./assets/lib_beautifulPants.py]
-# BeautifulPants 1.0 by Simon Kalmi Claesson
+#region [IncludeInline: ./assets/lib_fancyPants.py]
+# FancyPants/BeautifulPants 1.0 by Simon Kalmi Claesson
 # Simple python library to download files or fetch get requests, with the possibility of a progress bar.
 
 
@@ -1030,7 +1031,7 @@ def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, 
                 raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
     else:
         raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
-#endregion [IncludeInline: ./assets/lib_beautifulPants.py]
+#endregion [IncludeInline: ./assets/lib_fancyPants.py]
 
 # FlavorFunctions fix missing filesys instance
 try:
@@ -1084,7 +1085,7 @@ def download_file_and_get_base64(url):
         return None
 
 # [Functionos]
-def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False) -> list:
+def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False) -> list:
     '''Returns if gdrive url was found'''
     sources = listingData.get("sources")
     webinclude = listingData.get("webInclude")
@@ -1168,7 +1169,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                     _url,
                     filepath=_filepath,
                     handleGdriveVirWarn=True,
-                    loadingBar=False,
+                    loadingBar=modsHaveLoadingBar,
                     title="",
                     handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there.\033[0m",
                     encoding=encoding,
@@ -1211,7 +1212,7 @@ def extractModpackFile(modpack_path,parent,encoding="utf-8") -> str:
         fs.renameFile(oldname,newname)
     return dest
 
-def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix="",skipWebIncl=False) -> list:
+def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False) -> list:
     '''Returns if urls if gdrive url was found'''
 
     hasGdrive = []
@@ -1223,7 +1224,7 @@ def downListingCont(extractedPackFolderPath=str,parentPath=str,encoding="utf-8",
     if fs.doesExist(poss):
         content = open(poss,'r',encoding=encoding).read()
         listing = json.loads(content)
-        hasGdrive = installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl)
+        hasGdrive = installListing(listing,extractedPackFolderPath,encoding,prefix,skipWebIncl,modsHaveLoadingBar)
     else:
         raise FileNotFoundError(f"Could not find listing.json in {dest}!")
     return hasGdrive
@@ -2666,7 +2667,7 @@ if action_install == True:
         # get data
         print(prefix+f"Downloading listing content... (type: {listingType})")
         try:
-            internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl)
+            internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl,args.showModLoadingBar)
         except Exception as e:
             print(prefix+"Failed to download listing content!",e)
             cleanUp(tempFolder,modpack_path)
@@ -2965,8 +2966,9 @@ if action_install == True:
     if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
         print("\033[33mFound webincludes from Gdrive, they might not have been installed correctly because of how gdrive works, please check and install them manually:\033[0m")
         for url in internal_flag_hasGDriveMsg:
+            toUrl = url[1].replace(tempFolder,install_dest)
             print(f"\033[90m  - From: \033[35m{url[0]}\033[0m")
-            print(f"\033[90m    To:   \033[34m{url[1]}\033[0m")
+            print(f"\033[90m    To:   \033[34m{toUrl}\033[0m")
     if args.autostart:
         print(prefix+"Done, Enjoy!")
     else:

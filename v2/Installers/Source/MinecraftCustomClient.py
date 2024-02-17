@@ -108,10 +108,11 @@ parser.add_argument('-destmodpack', type=str, help="Datacopy destination modpack
 parser.add_argument('-cuspip', type=str, help="Custom pip binary path. (Advanced)")
 parser.add_argument('--dontResolveUrlIcons', help="With this the installer won't convert launcherIcon urls to base64. (This if ignored and never done when installing to modrinth unless --resolveUrlIconMR is given)", action="store_true")
 parser.add_argument('--resolveUrlIconMR', help="With this the installer will convert launcherIcon urls to base64 when installing to modrinth.", action="store_true")
-parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
-parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
+parser.add_argument('--showModLoadingBar', help="Should modfile installations show a loading bar? (Will clutter terminal output but may provide usefull info for some)", action="store_true")
 parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer", action="store_true")
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
+parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
+parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc

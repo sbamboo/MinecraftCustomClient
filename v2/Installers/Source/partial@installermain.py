@@ -115,7 +115,7 @@ if action_install == True:
         # get data
         print(prefix+f"Downloading listing content... (type: {listingType})")
         try:
-            internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl)
+            internal_flag_hasGDriveMsg = downListingCont(dest,tempFolder,encoding,prefix_dl,args.skipWebIncl,args.showModLoadingBar)
         except Exception as e:
             print(prefix+"Failed to download listing content!",e)
             cleanUp(tempFolder,modpack_path)
@@ -414,8 +414,9 @@ if action_install == True:
     if internal_flag_hasGDriveMsg != None and type(internal_flag_hasGDriveMsg) == list and internal_flag_hasGDriveMsg != []:
         print("\033[33mFound webincludes from Gdrive, they might not have been installed correctly because of how gdrive works, please check and install them manually:\033[0m")
         for url in internal_flag_hasGDriveMsg:
+            toUrl = url[1].replace(tempFolder,install_dest)
             print(f"\033[90m  - From: \033[35m{url[0]}\033[0m")
-            print(f"\033[90m    To:   \033[34m{url[1]}\033[0m")
+            print(f"\033[90m    To:   \033[34m{toUrl}\033[0m")
     if args.autostart:
         print(prefix+"Done, Enjoy!")
     else:

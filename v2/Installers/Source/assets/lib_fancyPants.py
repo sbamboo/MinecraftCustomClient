@@ -1,4 +1,4 @@
-# BeautifulPants 1.0 by Simon Kalmi Claesson
+# FancyPants/BeautifulPants 1.0 by Simon Kalmi Claesson
 # Simple python library to download files or fetch get requests, with the possibility of a progress bar.
 
 
