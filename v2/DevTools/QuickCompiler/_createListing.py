@@ -152,7 +152,10 @@ for _path in entries:
             name = name.replace("-", " ")
             name = name.replace("_", " ")
             suggestedProject = name.split(" ")[0]
-            nameHits = modrinth.SearchForQuery(suggestedProject, suggestedProject)
+            try:
+                nameHits = modrinth.SearchForQuery(suggestedProject, suggestedProject)
+            except json.decoder.JSONDecodeError:
+                nameHits = []
             if len(nameHits) > 0:
                 retrivedUrls = modrinth.GetLinksPerFilename(suggestedProject,_name)
                 if len(retrivedUrls) > 0:
