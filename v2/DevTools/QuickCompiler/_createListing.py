@@ -157,7 +157,10 @@ for _path in entries:
             except json.decoder.JSONDecodeError:
                 nameHits = []
             if len(nameHits) > 0:
-                retrivedUrls = modrinth.GetLinksPerFilename(suggestedProject,_name)
+                try:
+                    retrivedUrls = modrinth.GetLinksPerFilename(suggestedProject,_name)
+                except json.decoder.JSONDecodeError:
+                    retrivedUrls = []
                 if len(retrivedUrls) > 0:
                     lookedAtFiles.append(_name)
                     for url in retrivedUrls:
