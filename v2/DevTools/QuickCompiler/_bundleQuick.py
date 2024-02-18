@@ -49,16 +49,23 @@ if args.prepbuild:
                 toExclude.append(i)
     # check for sp (save-pkg)
     for line in excludes:
+        # Extract pip name from autopipImport calls
+        # They are in the syntax of autopipImport("<modulename>","<optional:pipname",...)
+        # Where ... are any additional args on how autopipImport should work, but we only want a name,
+        # if pipname is defined it should use that otherwise use the modulename,
+        # to get this we split by , and iterate (This will as a safecase try to inlude both the modulename and pipname)
         if "autopipImport" in line:
             if "def autopipImport" not in line and "autopipImport = " not in line and not "**kwargs" in line:
                 line = line.split("autopipImport(")[-1]
                 line = line.split(")")[0]
                 line = line.split(",")
-                for i,p in enumerate(line):
-                    p = p.replace('"',"")
-                    p = p.replace("'","")
-                    line[i] = p
-                packages.append(line[-1])
+                _line = []
+                for p in line:
+                    if '"' in p or "'" in p:
+                        p = p.replace('"',"")
+                        p = p.replace("'","")
+                        _line.append(p)
+                packages.append(_line[-1])
     # include includes
     toinclude = []
     for i,line in enumerate(lines):
