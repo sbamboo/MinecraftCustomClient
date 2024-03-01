@@ -17,3 +17,5 @@ Add a new option to uninstall old modpacks by looking in the directories:
   - installs/minecraft-custom-client/profile
 And the legacyRepo for names.
 (See the legacy installer code)
+
+Fix usernames with spaces breaking modloader install and other os.system() calls.
