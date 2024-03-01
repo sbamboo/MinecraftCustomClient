@@ -141,7 +141,7 @@ def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_stat
             raise Exception(f"Failed to download the file: '{filepath}'! Invalid status code ({response.status_code}) or empty content.")
     return response
 
-def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=False,yeildResp=False):
+def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=False, yieldResp=False):
     '''Function to send a get request to a url, and if a gdrive-virus-scan-warning apprears try to extract the link and send a get request to it instead.'''
     if loadingBar == True: response = get_withProgess_rich(url,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
     else:                  response = get_withInfo(url,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
@@ -171,28 +171,28 @@ def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=F
             if loadingBar == True: response2 = get_withProgess_rich(linkBuild,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
             else:                  response2 = get_withInfo(linkBuild,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
             if response2.status_code == 200:
-                if yeildResp == True:
+                if yieldResp == True:
                     return response2
                 else:
                     return response2.content
             else:
-                if yeildResp == True:
+                if yieldResp == True:
                     return response2
                 else:
                     return None
         else:
-            if yeildResp == True:
+            if yieldResp == True:
                 return response
             else:
                 return response.content
     # non 200 code
     else:
-        if yeildResp == True:
+        if yieldResp == True:
             return response
         else:
             return None
 
-def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=True, encoding="utf-8", onFileExiError="raise", yeildResp=False):
+def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=True, encoding="utf-8", onFileExiError="raise", yieldResp=False):
     """Function to try and download a file, and if a gdrive-virus-scan-warning apprears try to extract the link and download it from there.
     onFileExiError: "raise"/"ignore"/"ignore-with-warn"/"remove"/"remove-with-warn"
     """
@@ -228,12 +228,12 @@ def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, 
             if not os.path.exists(filepath):
                 raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
             else:
-                if yeildResp == True:
+                if yieldResp == True:
                     return response2
-        elif yeildResp == True:
+        elif yieldResp == True:
             return response
     else:
-        if yeildResp == True:
+        if yieldResp == True:
             return response
         else:
             raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
