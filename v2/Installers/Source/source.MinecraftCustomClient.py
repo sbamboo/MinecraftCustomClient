@@ -1490,7 +1490,7 @@ class ChibitConnector():
                 parts.pop(-1)
                 prefixedUrl = ';'.join(parts)
                 prefixedUrl = prefixedUrl.strip(";")
-                data["noBackupUrl"] = prefixedUrl
+                data["noBackupUrl"] = "chibit:"+prefixedUrl
             
             if "@" in prefixedUrl:
                 fileid, hostUrl = prefixedUrl.split("@")
