@@ -10,6 +10,8 @@ import hashlib
 
 # IncludeInline: ./assets/lib_fancyPants.py
 
+# IncludeInline: ./assets/lib_chibit.py
+
 # FlavorFunctions fix missing filesys instance
 try:
     filesys.defaultencoding
@@ -62,7 +64,7 @@ def download_file_and_get_base64(url):
         return None
 
 # [Functionos]
-def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False) -> list:
+def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False,chibitDefaultHost=str) -> list:
     '''Returns if gdrive url was found'''
     sources = listingData.get("sources")
     webinclude = listingData.get("webInclude")
@@ -71,6 +73,14 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
 
     # handle webinclude
     if webinclude != None and skipWebIncl == False:
+        _chibitConnector = ChibitConnector(
+            hostUrl = chibit_default_host,
+            reqType = "fancypants",
+            fancyPantsFuncs = [
+                getUrlContent_HandleGdriveVirWarn,
+                downloadFile_HandleGdriveVirWarn
+            ]
+        )
         for incl in webinclude:
             url = list(incl.keys())[0]
             relpathToDest = list(incl.values())[0]
@@ -85,17 +95,30 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             if "https://drive.google.com/" in url:
                 hasGdrive.append([url,fpath])
             #downUrlFile(url,fpath)
-            downloadFile_HandleGdriveVirWarn(
-                url,
-                filepath=fpath,
-                handleGdriveVirWarn=True,
-                loadingBar=True,
-                title="[cyan]Downloading webinclude...",
-                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
-                encoding=encoding,
-                onFileExiError="ignore-with-warn"
-            )
-    
+            if _chibitConnector.is_chibitPrefixedUrl(url) == True:
+                if os.path.exists(fpath):
+                    os.remove(fpath)
+                _chibitConnector.getRawFile_FromPrefixedUrl(
+                    prefixedUrl = url,
+                    outputFile = fpath,
+                    safe = True,
+                    verbose = True,
+                    check_encoding = encoding,
+                    useTemp = False,
+                    tempDir = None
+                )
+            else:
+                downloadFile_HandleGdriveVirWarn(
+                    url,
+                    filepath=fpath,
+                    handleGdriveVirWarn=True,
+                    loadingBar=True,
+                    title="[cyan]Downloading webinclude...",
+                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
+                    encoding=encoding,
+                    onFileExiError="ignore-with-warn"
+                )
+        
     # ensure mods directory
     modsF = os.path.join(destinationDirPath,"mods")
     if fs.notExist(modsF): fs.createDir(modsF)
@@ -486,7 +509,9 @@ def getLauncherDir(preset=None):
             raise ValueError("Unsupported operating system")
 
 # Function to run installer for a loader
-def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False):
+def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False,qouteJava=False):
+    if qouteJava == True:
+        java_path = f'"{java_path}"'
     if loaderType.lower() == "fabric":
         print(prefix+"Starting fabric install...")
         command = java_path + " -jar " + f'"{loaderFile}"' + " client"

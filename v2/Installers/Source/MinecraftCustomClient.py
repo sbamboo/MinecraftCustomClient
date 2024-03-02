@@ -1,8 +1,8 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.3.4"
-installer_release = "2024-02-17(0)"
+installer_version = "1.3.5"
+installer_release = "2024-03-02(0)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -26,6 +26,8 @@ icon_base64_modded  = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 icon_base64_default = "data:image/png;base64,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"
 
 repo_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/repo.json"
+
+chibit_default_host = "https://sbamboo.github.io/theaxolot77/storage/"
 
 legacySourceFlavorDataFile_default = "flavor.mta"
 
@@ -60,6 +62,7 @@ try:
     _ = autopipImport("urllib3") # Need modname="urllib", pipname="urllib3"?
     _ = autopipImport("bs4")
     _ = autopipImport("rich")
+    _ = autopipImport("zlib","pyzlib")
 except NameError as e:
     print("\033[31mAutoPipImport failed, has the script been run through the include-inline tool?\033[0m")
     print(f"\033[90m{e}\033[0m")
@@ -110,6 +113,7 @@ parser.add_argument('--dontResolveUrlIcons', help="With this the installer won't
 parser.add_argument('--resolveUrlIconMR', help="With this the installer will convert launcherIcon urls to base64 when installing to modrinth.", action="store_true")
 parser.add_argument('--showModLoadingBar', help="Should modfile installations show a loading bar? (Will clutter terminal output but may provide usefull info for some)", action="store_true")
 parser.add_argument('--noWebInclGdriveWarns', help="Hides google-drive webinclude warnings.", action="store_true")
+parser.add_argument('--noQouteJava', help="ADVANCED: Won't qoute java-path when installing loader. (Might break if spaces in path, but might fix compat)", action="store_true")
 parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer", action="store_true")
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")

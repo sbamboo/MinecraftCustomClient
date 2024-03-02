@@ -1,4 +1,4 @@
-# FancyPants/BeautifulPants 1.0 by Simon Kalmi Claesson
+# FancyPants/BeautifulPants 1.1 by Simon Kalmi Claesson
 # Simple python library to download files or fetch get requests, with the possibility of a progress bar.
 
 
@@ -59,7 +59,7 @@ def get_withInfo(*args, prefTxt="", suffTxt="", raise_for_status=False, **kwargs
     if suffTxt not in ["",None]: print(suffTxt)
     return response
 
-def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=True, onFileExiError="raise", **kwargs):
+def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=True, onFileExiError="raise", stream=None, **kwargs):
     """
     Wrapper function for requests.get that includes a visual loading bar made with rich while downloading a file.
     To just wrap requests.get without a file use get_withProgess_rich().
@@ -92,10 +92,15 @@ def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading..
             task = progress.add_task(richTitle, total=total_size, expand=True)
             try:
                 # Download to file
-                with open(filepath, 'wb') as f:
+                if stream == None:
+                    with open(filepath, 'wb') as f:
+                        for data in response.iter_content(block_size):
+                            progress.update(task, advance=len(data))
+                            f.write(data)
+                else:
                     for data in response.iter_content(block_size):
                         progress.update(task, advance=len(data))
-                        f.write(data)
+                        stream.write(data)
                 # Return the response object
                 if postDownTxt not in ["",None]: print(postDownTxt)
                 return response
@@ -112,7 +117,7 @@ def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading..
         else:
             return response
 
-def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_status=True, onFileExiError="raise", **kwargs):
+def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_status=True, onFileExiError="raise", stream=None, **kwargs):
     """
     Wrapper function for requests.get that takes strings to print before and after downloading a file.
     To just wrap requests.get without a file use get_withInfo().
@@ -122,8 +127,11 @@ def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_stat
     response = requests.get(*args, **kwargs)
     if response.status_code == 200 and response.content not in ["",None]:
         if not os.path.exists(filepath):
-            with open(filepath, 'wb') as file:
-                file.write(response.content)
+            if stream == None:
+                with open(filepath, 'wb') as file:
+                    file.write(response.content)
+            else:
+                stream.write(response.content)
             if suffTxt not in ["",None]: print(suffTxt)
         else:
             onFileExiError = onFileExiError.lower()
@@ -192,16 +200,19 @@ def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=F
         else:
             return None
 
-def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=True, encoding="utf-8", onFileExiError="raise", yieldResp=False):
+def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=True, encoding="utf-8", onFileExiError="raise", yieldResp=False, stream=None):
     """Function to try and download a file, and if a gdrive-virus-scan-warning apprears try to extract the link and download it from there.
     onFileExiError: "raise"/"ignore"/"ignore-with-warn"/"remove"/"remove-with-warn"
     """
-    if loadingBar == True: response = getFile_withProgess_rich(url,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
-    else:                  response = getFile_withInfo(url,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
+    if loadingBar == True: response = getFile_withProgess_rich(url,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
+    else:                  response = getFile_withInfo(url,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
     # Get content of the file
     text_content = None
-    if os.path.exists(filepath):
-        text_content = open(filepath, 'r', encoding=encoding, errors='replace').read()
+    if handleGdriveVirWarn == True and os.path.exists(filepath):
+        if stream != None:
+            text_content = stream.read()
+        else:
+            text_content = open(filepath, 'r', encoding=encoding, errors='replace').read()
         if text_content != None and "<!DOCTYPE html>" in text_content and "Google Drive - Virus scan warning" in text_content and handleGdriveVirWarn == True:
             os.remove(filepath) # clean up
             print(handleGdriveVirWarnText)
@@ -223,8 +234,8 @@ def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, 
                         pref = "&"
                     linkBuild += f"{pref}{name}={value}"
             # Download from built link
-            if loadingBar == True: response2 = getFile_withProgess_rich(linkBuild,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
-            else:                  response2 = getFile_withInfo(linkBuild,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
+            if loadingBar == True: response2 = getFile_withProgess_rich(linkBuild,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
+            else:                  response2 = getFile_withInfo(linkBuild,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
             if not os.path.exists(filepath):
                 raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
             else:

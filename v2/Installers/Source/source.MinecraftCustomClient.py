@@ -1,8 +1,8 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.3.4"
-installer_release = "2024-02-17(0)"
+installer_version = "1.3.5"
+installer_release = "2024-03-02(0)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -27,82 +27,61 @@ icon_base64_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 
 repo_url = "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/repo.json"
 
+chibit_default_host = "https://sbamboo.github.io/theaxolot77/storage/"
+
 legacySourceFlavorDataFile_default = "flavor.mta"
 
 #region [IncludeInline: ./assets/lib_crshpiptools.py]
-import subprocess,sys,importlib,os,platform
+import os, json, sys, subprocess, importlib, platform
 
+# Python
 def getExecutingPython() -> str:
     '''CSlib: Returns the path to the python-executable used to start crosshell'''
     return sys.executable
 
-def _check_pip() -> bool:
+def _check_pip(pipOvw=None) -> bool:
     '''CSlib_INTERNAL: Checks if PIP is present'''
+    if pipOvw != None and os.path.exists(pipOvw): pipPath = pipOvw
+    else: pipPath = getExecutingPython()
     try:
         with open(os.devnull, 'w') as devnull:
-            subprocess.check_call([sys.executable, "-m", "pip", "--version"], stdout=devnull, stderr=subprocess.STDOUT)
+            subprocess.check_call([pipPath, "-m", "pip", "--version"], stdout=devnull, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
         return False
     except FileNotFoundError:
         return False
     return True
-def intpip(pip_args=str):
+
+def intpip(pip_args=str,pipOvw=None):
     '''CSlib: Function to use pip from inside python, this function should also install pip if needed (Experimental)
     Returns: bool representing success or not'''
-    if not _check_pip():
+    if pipOvw != None and os.path.exists(pipOvw): pipPath = pipOvw
+    else: pipPath = getExecutingPython()
+    if not _check_pip(pipOvw):
         print("PIP not found. Installing pip...")
         get_pip_script = "https://bootstrap.pypa.io/get-pip.py"
         try:
-            subprocess.check_call([sys.executable, "-m", "ensurepip"])
+            subprocess.check_call([pipPath, "-m", "ensurepip"])
         except subprocess.CalledProcessError:
             print("Failed to install pip using ensurepip. Aborting.")
             return False
         try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+            subprocess.check_call([pipPath, "-m", "pip", "install", "--upgrade", "pip"])
         except subprocess.CalledProcessError:
             print("Failed to upgrade pip. Aborting.")
             return False
         try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", get_pip_script])
+            subprocess.check_call([pipPath, "-m", "pip", "install", get_pip_script])
         except subprocess.CalledProcessError:
             print("Failed to install pip using get-pip.py. Aborting.")
             return False
         print("PIP installed successfully.")
     try:
-        subprocess.check_call([sys.executable, "-m", "pip"] + pip_args.split())
+        subprocess.check_call([pipPath, "-m", "pip"] + pip_args.split())
         return True
     except subprocess.CalledProcessError:
         print(f"Failed to execute pip command: {pip_args}")
         return False
-
-def isPythonRuntime(filepath=str(),cusPip=None):
-    exeFileEnds = [".exe"]
-    if os.path.exists(filepath):
-        try:
-            # [Code]
-            # Non Windows
-            if platform.system() != "Windows":
-                try:
-                    magic = importlib.import_module("magic")
-                except:
-                    command = "install magic"
-                    if cusPip != None:
-                        os.system(f"{cusPip} {command}")
-                    else:
-                        intpip(command)
-                    magic = importlib.import_module("magic")
-                detected = magic.detect_from_filename(filepath)
-                return "application" in str(detected.mime_type)
-            # Windows
-            else:
-                fending = str("." +''.join(filepath.split('.')[-1]))
-                if fending in exeFileEnds:
-                    return True
-                else:
-                    return False
-        except Exception as e: print("\033[31mAn error occurred!\033[0m",e)
-    else:
-        raise Exception(f"File not found: {filepath}")
 
 # Safe import function
 def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,attr=None,relaunch=False,relaunchCmds=None):
@@ -119,7 +98,8 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,att
                 addPipArgsStr = " " + addPipArgsStr
             command += addPipArgsStr
         if cusPip != None:
-            os.system(f"{cusPip} {command}")
+            #os.system(f"{cusPip} {command}")
+            intpip(command,pipOvw=cusPip)
         else:
             intpip(command)
         if relaunch == True and relaunchCmds != None and "--noPipReload" not in relaunchCmds:
@@ -135,6 +115,70 @@ def autopipImport(moduleName=str,pipName=None,addPipArgsStr=None,cusPip=None,att
         return getattr(imported_module, attr)
     else:
         return imported_module
+
+# Function to load a module from path
+def fromPath(path):
+    '''CSlib: Import a module from a path. (Returns <module>)'''
+    path = path.replace("/",os.sep).replace("\\",os.sep)
+    spec = importlib.util.spec_from_file_location("module", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+def fromPathAA(path):
+    '''CSlib: Import a module from a path, to be used as: globals().update(fromPathAA(<path>)) (Returns <module>.__dict__)'''
+    path = path.replace("/",os.sep).replace("\\",os.sep)
+    spec = importlib.util.spec_from_file_location("module", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.__dict__
+
+def installPipDeps(depsFile,encoding="utf-8",tagMapping=dict):
+    '''Note! This takes a json file with a "deps" key, the fd function takes a deps list!'''
+    deps = json.loads(open(depsFile,'r',encoding=encoding).read())["deps"]
+    for dep in deps:
+        for key,val in dep.items():
+            for tag,tagVal in tagMapping.items():
+                dep[key] = val.replace("{"+tag+"}",tagVal)
+            _ = autopipImport(**dep)
+    
+def installPipDeps_fl(deps=list,tagMapping=dict):
+    '''Note! This takes a deps list, the file function takes a json with a "deps" key!'''
+    for dep in deps:
+        for key,val in dep.items():
+            for tag,tagVal in tagMapping.items():
+                dep[key] = val.replace("{"+tag+"}",tagVal)
+            _ = autopipImport(**dep)
+    
+def isPythonRuntime(filepath=str(),cusPip=None):
+    exeFileEnds = [".exe"]
+    if os.path.exists(filepath):
+        try:
+            # [Code]
+            # Non Windows
+            if platform.system() != "Windows":
+                try:
+                    magic = importlib.import_module("magic")
+                except:
+                    command = "install magic"
+                    if cusPip != None:
+                        #os.system(f"{cusPip} {command}")
+                        intpip(command,pipOvw=cusPip)
+                    else:
+                        intpip(command)
+                    magic = importlib.import_module("magic")
+                detected = magic.detect_from_filename(filepath)
+                return "application" in str(detected.mime_type)
+            # Windows
+            else:
+                fending = str("." +''.join(filepath.split('.')[-1]))
+                if fending in exeFileEnds:
+                    return True
+                else:
+                    return False
+        except Exception as e: print("\033[31mAn error occurred!\033[0m",e)
+    else:
+        raise Exception(f"File not found: {filepath}")
 #endregion [IncludeInline: ./assets/lib_crshpiptools.py]
 
 # Handle cusPip
@@ -196,6 +240,7 @@ parser.add_argument('--dontResolveUrlIcons', help="With this the installer won't
 parser.add_argument('--resolveUrlIconMR', help="With this the installer will convert launcherIcon urls to base64 when installing to modrinth.", action="store_true")
 parser.add_argument('--showModLoadingBar', help="Should modfile installations show a loading bar? (Will clutter terminal output but may provide usefull info for some)", action="store_true")
 parser.add_argument('--noWebInclGdriveWarns', help="Hides google-drive webinclude warnings.", action="store_true")
+parser.add_argument('--noQouteJava', help="ADVANCED: Won't qoute java-path when installing loader. (Might break if spaces in path, but might fix compat)", action="store_true")
 parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer", action="store_true")
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
@@ -813,7 +858,7 @@ from datetime import datetime
 import hashlib
 
 #region [IncludeInline: ./assets/lib_fancyPants.py]
-# FancyPants/BeautifulPants 1.0 by Simon Kalmi Claesson
+# FancyPants/BeautifulPants 1.1 by Simon Kalmi Claesson
 # Simple python library to download files or fetch get requests, with the possibility of a progress bar.
 
 
@@ -874,7 +919,7 @@ def get_withInfo(*args, prefTxt="", suffTxt="", raise_for_status=False, **kwargs
     if suffTxt not in ["",None]: print(suffTxt)
     return response
 
-def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=True, onFileExiError="raise", **kwargs):
+def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading...", postDownTxt=None, raise_for_status=True, onFileExiError="raise", stream=None, **kwargs):
     """
     Wrapper function for requests.get that includes a visual loading bar made with rich while downloading a file.
     To just wrap requests.get without a file use get_withProgess_rich().
@@ -907,10 +952,15 @@ def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading..
             task = progress.add_task(richTitle, total=total_size, expand=True)
             try:
                 # Download to file
-                with open(filepath, 'wb') as f:
+                if stream == None:
+                    with open(filepath, 'wb') as f:
+                        for data in response.iter_content(block_size):
+                            progress.update(task, advance=len(data))
+                            f.write(data)
+                else:
                     for data in response.iter_content(block_size):
                         progress.update(task, advance=len(data))
-                        f.write(data)
+                        stream.write(data)
                 # Return the response object
                 if postDownTxt not in ["",None]: print(postDownTxt)
                 return response
@@ -927,7 +977,7 @@ def getFile_withProgess_rich(*args, filepath=str, richTitle="[cyan]Downloading..
         else:
             return response
 
-def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_status=True, onFileExiError="raise", **kwargs):
+def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_status=True, onFileExiError="raise", stream=None, **kwargs):
     """
     Wrapper function for requests.get that takes strings to print before and after downloading a file.
     To just wrap requests.get without a file use get_withInfo().
@@ -937,8 +987,11 @@ def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_stat
     response = requests.get(*args, **kwargs)
     if response.status_code == 200 and response.content not in ["",None]:
         if not os.path.exists(filepath):
-            with open(filepath, 'wb') as file:
-                file.write(response.content)
+            if stream == None:
+                with open(filepath, 'wb') as file:
+                    file.write(response.content)
+            else:
+                stream.write(response.content)
             if suffTxt not in ["",None]: print(suffTxt)
         else:
             onFileExiError = onFileExiError.lower()
@@ -956,7 +1009,7 @@ def getFile_withInfo(*args, filepath=str, prefTxt="", suffTxt="", raise_for_stat
             raise Exception(f"Failed to download the file: '{filepath}'! Invalid status code ({response.status_code}) or empty content.")
     return response
 
-def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=False):
+def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=False, yieldResp=False):
     '''Function to send a get request to a url, and if a gdrive-virus-scan-warning apprears try to extract the link and send a get request to it instead.'''
     if loadingBar == True: response = get_withProgess_rich(url,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
     else:                  response = get_withInfo(url,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
@@ -986,25 +1039,40 @@ def getUrlContent_HandleGdriveVirWarn(url,handleGdriveVirWarn=True, loadingBar=F
             if loadingBar == True: response2 = get_withProgess_rich(linkBuild,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status)
             else:                  response2 = get_withInfo(linkBuild,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status)
             if response2.status_code == 200:
-                return response2.content
+                if yieldResp == True:
+                    return response2
+                else:
+                    return response2.content
             else:
-                return None
+                if yieldResp == True:
+                    return response2
+                else:
+                    return None
         else:
-            return response.content
+            if yieldResp == True:
+                return response
+            else:
+                return response.content
     # non 200 code
     else:
-        return None
+        if yieldResp == True:
+            return response
+        else:
+            return None
 
-def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=True, encoding="utf-8", onFileExiError="raise"):
+def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, loadingBar=False, title="Downloading...", postDownText="", handleGdriveVirWarnText="Found gdrive scan warning, attempting to extract link and download from there...", raise_for_status=True, encoding="utf-8", onFileExiError="raise", yieldResp=False, stream=None):
     """Function to try and download a file, and if a gdrive-virus-scan-warning apprears try to extract the link and download it from there.
     onFileExiError: "raise"/"ignore"/"ignore-with-warn"/"remove"/"remove-with-warn"
     """
-    if loadingBar == True: response = getFile_withProgess_rich(url,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
-    else:                  response = getFile_withInfo(url,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
+    if loadingBar == True: response = getFile_withProgess_rich(url,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
+    else:                  response = getFile_withInfo(url,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
     # Get content of the file
     text_content = None
-    if os.path.exists(filepath):
-        text_content = open(filepath, 'r', encoding=encoding, errors='replace').read()
+    if handleGdriveVirWarn == True and os.path.exists(filepath):
+        if stream != None:
+            text_content = stream.read()
+        else:
+            text_content = open(filepath, 'r', encoding=encoding, errors='replace').read()
         if text_content != None and "<!DOCTYPE html>" in text_content and "Google Drive - Virus scan warning" in text_content and handleGdriveVirWarn == True:
             os.remove(filepath) # clean up
             print(handleGdriveVirWarnText)
@@ -1026,13 +1094,399 @@ def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, 
                         pref = "&"
                     linkBuild += f"{pref}{name}={value}"
             # Download from built link
-            if loadingBar == True: response2 = getFile_withProgess_rich(linkBuild,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
-            else:                  response2 = getFile_withInfo(linkBuild,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError)
+            if loadingBar == True: response2 = getFile_withProgess_rich(linkBuild,filepath=filepath,richTitle=title,postDownTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
+            else:                  response2 = getFile_withInfo(linkBuild,filepath=filepath,prefTxt=title,suffTxt=postDownText,raise_for_status=raise_for_status,onFileExiError=onFileExiError,stream=stream)
             if not os.path.exists(filepath):
                 raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
+            else:
+                if yieldResp == True:
+                    return response2
+        elif yieldResp == True:
+            return response
     else:
-        raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
+        if yieldResp == True:
+            return response
+        else:
+            raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
 #endregion [IncludeInline: ./assets/lib_fancyPants.py]
+
+#region [IncludeInline: ./assets/lib_chibit.py]
+# Chibit Module 1.0 made by Simon Kalmi Claesson
+#
+# Modules for interacting with a chibit-store
+# 
+
+# Imports
+import requests, zlib, os
+
+# Main clas
+class ChibitConnector():
+    def __init__(self, hostUrl, reqType="requests", fancyPantsFuncs=None):
+        """
+        ChibitConnector is a class for interacting with a chibit-store.
+        If 'reqType' is set to 'fancyPants', 'fancyPantsFuncs' must be given with a list of [<forDataFunc>,<forFileFunc>]
+        """
+        if hostUrl[-1] == '/':
+            self.hostUrl = hostUrl[:-1]
+
+        if reqType.lower() not in ["requests","fancypants"]:
+            raise ValueError("reqType must be either 'requests' or 'fancypants'!")
+        reqType = reqType.lower()
+
+        if fancyPantsFuncs != None:
+            valid = True
+            for o in fancyPantsFuncs:
+                if type(o) in [str,list,float,int,tuple,dict]:
+                    valid = False
+            if type(fancyPantsFuncs) != list or valid == False:
+                raise ValueError("Given function instances for fancypants must be a list of objects")
+        
+        if reqType == "fancypants" and fancyPantsFuncs in [ None, [] ]:
+            raise ValueError("For reqType = fancyPants, the fancypants functions must be given in order of [<forDataFunc>,<forFileFunc>].")
+        
+        self.reqType = reqType
+        self.fancyPantsFuncs = fancyPantsFuncs
+
+        self.hostUrl = hostUrl
+
+    def _downloadChunks(self, urlList, verbose=False) -> list:
+        """
+        INTERNAL: Function for downloading chunks from a list of chunk-urls.
+        """
+        chunks = []
+        max = len(urlList)
+        if verbose: print(f"Downloading {max} chunks from urls...")
+        ind = 0
+        for url in urlList:
+            if self.reqType == "requests":
+                response = requests.get(url)
+            else:
+                if verbose: titleTx = f"Downloading {ind+1}/{max}..."
+                else: titleTx = ""
+                response = self.fancyPantsFuncs[0](
+                    url = url,
+                    handleGdriveVirWarn = True,
+                    loadingBar = verbose,
+                    title = titleTx,
+                    postDownText = "",
+                    handleGdriveVirWarnText = "Found gdrive scan warning, attempting to extract link and download from there...",
+                    raise_for_status = False,
+                    yieldResp = True
+                )
+            if response.status_code == 200:
+                chunks.append(response.content)
+                if verbose == True and self.reqType == "requests": print(f"Downloaded chunk {ind+1}/{max}")
+                ind += 1
+            else:
+                raise Exception(f"Failed to download chunk from {url}! Status code: {response.status_code}")
+        return chunks
+
+    def _downloadChunksToTemp(self, fileid, urlList, tempDir, verbose=False, encoding="utf-8") -> list:
+        """
+        INTERNAL: Function for downloading chunks from a list of chunk-urls, using a temp folder.
+        """
+        chunks = []
+        max = len(urlList)
+        if verbose: print(f"Downloading {max} chunks from urls...")
+        ind = 0
+        for url in urlList:
+            filepath = os.path.join(tempDir,f"{fileid}_{ind+1}.chunk")
+            if self.reqType == "requests":
+                response = requests.get(url)
+            else:
+                if verbose:
+                    titleTx = f"Downloading {ind+1}/{max}..."
+                    onFileExiError = "ignore-with-warn"
+                else:
+                    titleTx = ""
+                    onFileExiError = "ignore"
+                response = self.fancyPantsFuncs[1](
+                    url = url,
+                    filepath = filepath,
+                    handleGdriveVirWarn = True,
+                    loadingBar = verbose,
+                    title = titleTx,
+                    postDownText = "",
+                    handleGdriveVirWarnText = "Found gdrive scan warning, attempting to extract link and download from there...",
+                    raise_for_status = False,
+                    encoding = encoding,
+                    onFileExiError = onFileExiError,
+                    yieldResp = True
+                )
+            if response.status_code == 200:
+                chunks.append(filepath)
+                if verbose == True and self.reqType == "requests": print(f"Downloaded chunk {ind+1}/{max}")
+                ind += 1
+            else:
+                raise Exception(f"Failed to download chunk from {url}! Status code: {response.status_code}")
+        return chunks
+
+    def _downloadChunksToJoin(self, fileid, urlList, outputFile, verbose=False, encoding="utf-8"):
+        """
+        INTERNAL: Function for downloading chunks from a list of chunk-urls, appending them all to a final file.
+        """
+        if os.path.exists(outputFile):
+            raise FileExistsError("_downloadChunksToJoin uses appending-IO so opening an existing file will append to it, ensure the file dosen't exist in forehand!")
+        max = len(urlList)
+        if verbose: print(f"Downloading {max} chunks from urls...")
+        with open(outputFile, 'ab') as f:
+            ind = 0
+            for url in urlList:
+                if self.reqType == "requests":
+                    response = requests.get(url)
+                else:
+                    if verbose:
+                        titleTx = f"Downloading {ind+1}/{max}..."
+                        onFileExiError = "ignore-with-warn"
+                    else:
+                        titleTx = ""
+                        onFileExiError = "ignore"
+                    response = self.fancyPantsFuncs[1](
+                        url = url,
+                        filepath = fileid,
+                        handleGdriveVirWarn = False,
+                        loadingBar = verbose,
+                        title = titleTx,
+                        postDownText = "",
+                        handleGdriveVirWarnText = "Found gdrive scan warning, attempting to extract link and download from there...",
+                        raise_for_status = False,
+                        encoding = encoding,
+                        onFileExiError = onFileExiError,
+                        yieldResp = True,
+                        stream = f
+                    )
+                if response.status_code == 200:
+                    if self.reqType == "requests":
+                        f.write(response.content)
+                        if verbose: print(f"Downloaded chunk {ind+1}/{max}")
+                    ind += 1
+                else:
+                    raise Exception(f"Failed to download chunk from {url}! Status code: {response.status_code}")
+
+    def _joinChunksData(self, chunkContents, verbose=False) -> bytes:
+        """
+        INTERNAL: Function for joining together chunkdata to a single byte-string.
+        """
+        joinedContent = b''
+        if verbose: print(f"Joining {len(chunkContents)} chunks...")
+        for chunk in chunkContents:
+            joinedContent += chunk
+        return joinedContent
+
+    def _appendByteFiles(self, firstFile, fileList, verbose=False):
+        """
+        INTERNAL: Function for appending byte-files to a single final file.
+        """
+        try:
+            # Open the first file in append mode
+            with open(firstFile, 'ab') as f:
+                for filePath in fileList:
+                    try:
+                        # Open each file in binary mode
+                        with open(filePath, 'rb') as otherFile:
+                            # Read the byte content of the other file
+                            content = otherFile.read()
+                            # Append the content to the first file
+                            f.write(content)
+                            otherFile.close()
+                    except FileNotFoundError:
+                        if verbose: print(f"File '{filePath}' not found. Skipping...")
+                    except Exception as e:
+                        if verbose: print(f"Error while reading '{filePath}': {e}")
+                f.close()
+        except Exception as e:
+            if verbose: print(f"Error while opening '{firstFile}' for appending: {e}")
+
+    def _joinChunksFile(self, chunkFiles, filepath, verbose=False):
+        """
+        INTERNAL: Function to join together chunk-files to a single file.
+        """
+        if verbose: print(f"Joining {len(chunkFiles)} chunk-files to 1...")
+        self._appendByteFiles(filepath,chunkFiles,verbose)
+
+    def _calculate_crc32(self, data) -> int:
+        """
+        INTERNAL: Calculate the crc32 checksum of a byte-string.
+        """
+        crc32Value = zlib.crc32(data)
+        return crc32Value
+    
+    def _calculate_crc32_file(self, filepath) -> int:
+        """
+        INTERNAL: Calculate the crc32 checksum of a file.
+        """
+        crc32Value = zlib.crc32(open(filepath, "rb").read())
+        return crc32Value
+
+    def getChibit(self, fileid, verbose=False, hostOvv=None) -> dict:
+        """
+        Function to get a chibit for a fileid.
+
+        Returns chibit-data.
+        """
+        if hostOvv != None: _host = hostOvv
+        else: _host = self.hostUrl
+        chibitUrl = f"{_host}/chibits/{fileid}.json"
+
+        if self.reqType == "requests":
+            response = requests.get(chibitUrl)
+        else:
+            if verbose: title = "Fetching chibit..."
+            else: title = ""
+            response = self.fancyPantsFuncs[0](
+                url = chibitUrl,
+                handleGdriveVirWarn = True,
+                loadingBar = verbose,
+                title = title,
+                postDownText = "",
+                handleGdriveVirWarnText = "Found gdrive scan warning, attempting to extract link and download from there...",
+                raise_for_status = False,
+                yieldResp = True
+            )
+        return response.json()
+
+    def getRaw(self, fileid, safe=True, verbose=False, hostOvv=None) -> bytes:
+        """
+        Function to get the raw content of a chibit-stored file, from a fileid.
+        """
+        chibitData = self.getChibit(fileid, verbose, hostOvv=hostOvv)
+
+        chunks = chibitData['chunks']
+
+        chunkContents = self._downloadChunks(chunks,verbose=verbose)
+        joinedContent = self._joinChunksData(chunkContents,verbose=verbose)
+
+        if safe:
+            algor = chibitData["checksum"]["algorithm"]
+            hash_ = chibitData["checksum"]["hash"]
+            if algor == "crc32":
+                calculatedHash = self._calculate_crc32(joinedContent)
+                if calculatedHash != hash_:
+                    print(f"Checksum mismatch for {fileid}")
+                    return None
+                else:
+                    return joinedContent
+        else:
+            return joinedContent
+
+    def getRawFile(self, fileid, outputFile=None, safe=True, verbose=False, check_encoding="utf-8", hostOvv=None) -> str:
+        """
+        Function to get the raw content of a chibit-stored file, from a fileid, outputting to a file. (Works as a download)
+        """
+        chibitData = self.getChibit(fileid, verbose, hostOvv=hostOvv)
+
+        chunks = chibitData['chunks']
+
+        if outputFile == None or outputFile == "" or not os.path.exists(outputFile):
+            outputFile = chibitData["filename"]
+
+        self._downloadChunksToJoin(fileid, chunks, outputFile=outputFile, verbose=verbose, encoding=check_encoding)
+
+        if safe:
+            algor = chibitData["checksum"]["algorithm"]
+            hash_ = chibitData["checksum"]["hash"]
+            if algor == "crc32":
+                calculatedHash = self._calculate_crc32_file(outputFile)
+                if calculatedHash != hash_:
+                    print(f"Checksum mismatch for {fileid}")
+                    return None
+                else:
+                    return outputFile
+        else:
+            return outputFile
+
+    def getRawFileWtemp(self, fileid, outputFile=None, safe=True, verbose=False, tempDir=None, check_encoding="utf-8", hostOvv=None) -> str:
+        """
+        Function to get the raw content of a chibit-stored file, from a fileid, outputting to a file. (Works as a download)
+
+        Uses a temporary folder for chunk-files, before joining them together to the final file.
+        """
+        if tempDir == None: tempDir = os.path.join(os.getcwd(),".chibitTemp")
+        if os.path.exists(tempDir): os.remove(tempDir)
+        os.mkdir(tempDir)
+
+        chibitData = self.getChibit(fileid, verbose, hostOvv=hostOvv)
+
+        chunks = chibitData['chunks']
+
+        if outputFile == None or outputFile == "" or not os.path.exists(outputFile):
+            outputFile = os.path.join(os.getcwd(),chibitData["filename"])
+
+        chunkFiles = self._downloadChunksToTemp(fileid, chunks, tempDir=tempDir, verbose=verbose, encoding=check_encoding)
+        self._joinChunksFile(chunkFiles, outputFile, verbose)
+        if os.path.exists(tempDir): os.remove(tempDir)
+
+        if safe:
+            algor = chibitData["checksum"]["algorithm"]
+            hash_ = chibitData["checksum"]["hash"]
+            if algor == "crc32":
+                calculatedHash = self._calculate_crc32_file(outputFile)
+                if calculatedHash != hash_:
+                    print(f"Checksum mismatch for {fileid}/{chibitData['filename']}")
+                    return None
+                else:
+                    return outputFile
+        else:
+            return outputFile
+
+    def getRaw_FromPrefixedUrl(self, prefixedUrl, safe=True, verbose=False) -> bytes:
+        """
+        Function to get the raw content of a chibit-stored file, from a prefixed url.
+
+        Format: chibit:<fileid>@<hostUrl>
+        """
+        
+        if prefixedUrl.strip().startswith("chibit:"):
+            prefixedUrl = prefixedUrl.strip().replace("chibit:","")
+
+            if "@" in prefixedUrl:
+                fileid, hostUrl = prefixedUrl.split("@")
+                if hostUrl == "":
+                    hostUrl = None
+            else:
+                fileid = prefixedUrl
+                hostUrl = None
+            return self.getRaw(fileid, safe, verbose, hostOvv=hostUrl)
+        else:
+            raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl>)")
+
+    def getRawFile_FromPrefixedUrl(self, prefixedUrl, outputFile=None, safe=True, verbose=False, check_encoding="utf-8", useTemp=False, tempDir=None) -> str:
+        """
+        Function to get the raw content of a chibit-stored file, from a prefixed url.
+
+        Format: chibit:<fileid>@<hostUrl>
+        """
+        
+        if prefixedUrl.strip().startswith("chibit:"):
+            prefixedUrl = prefixedUrl.strip().replace("chibit:","")
+
+            if "@" in prefixedUrl:
+                fileid, hostUrl = prefixedUrl.split("@")
+                if hostUrl == "":
+                    hostUrl = None
+            else:
+                fileid = prefixedUrl
+                hostUrl = None
+            if useTemp == True:
+                if useTemp == True and (tempDir == None or not os.path.exists(tempDir)):
+                    raise ValueError("When using temp, a tempDir must be given and exist!")
+                return self.getRawFileWtemp(fileid, outputFile, safe, verbose, tempDir, check_encoding, hostOvv=hostUrl)
+            else:
+                return self.getRawFile(fileid, outputFile, safe, verbose, check_encoding, hostOvv=hostUrl)
+        else:
+            raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl>)")
+
+    def is_chibitPrefixedUrl(self, prefixedUrl) -> bool:
+        """
+        Function to check if a given url is a chibit-prefixed url.
+
+        Format: chibit:<fileid>@<hostUrl>
+        """
+        if prefixedUrl.strip().startswith("chibit:"):
+            return True
+        else:
+            return False
+#endregion [IncludeInline: ./assets/lib_chibit.py]
 
 # FlavorFunctions fix missing filesys instance
 try:
@@ -1086,7 +1540,7 @@ def download_file_and_get_base64(url):
         return None
 
 # [Functionos]
-def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False) -> list:
+def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False,chibitDefaultHost=str) -> list:
     '''Returns if gdrive url was found'''
     sources = listingData.get("sources")
     webinclude = listingData.get("webInclude")
@@ -1095,6 +1549,14 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
 
     # handle webinclude
     if webinclude != None and skipWebIncl == False:
+        _chibitConnector = ChibitConnector(
+            hostUrl = chibit_default_host,
+            reqType = "fancypants",
+            fancyPantsFuncs = [
+                getUrlContent_HandleGdriveVirWarn,
+                downloadFile_HandleGdriveVirWarn
+            ]
+        )
         for incl in webinclude:
             url = list(incl.keys())[0]
             relpathToDest = list(incl.values())[0]
@@ -1109,17 +1571,30 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             if "https://drive.google.com/" in url:
                 hasGdrive.append([url,fpath])
             #downUrlFile(url,fpath)
-            downloadFile_HandleGdriveVirWarn(
-                url,
-                filepath=fpath,
-                handleGdriveVirWarn=True,
-                loadingBar=True,
-                title="[cyan]Downloading webinclude...",
-                handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
-                encoding=encoding,
-                onFileExiError="ignore-with-warn"
-            )
-    
+            if _chibitConnector.is_chibitPrefixedUrl(url) == True:
+                if os.path.exists(fpath):
+                    os.remove(fpath)
+                _chibitConnector.getRawFile_FromPrefixedUrl(
+                    prefixedUrl = url,
+                    outputFile = fpath,
+                    safe = True,
+                    verbose = True,
+                    check_encoding = encoding,
+                    useTemp = False,
+                    tempDir = None
+                )
+            else:
+                downloadFile_HandleGdriveVirWarn(
+                    url,
+                    filepath=fpath,
+                    handleGdriveVirWarn=True,
+                    loadingBar=True,
+                    title="[cyan]Downloading webinclude...",
+                    handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
+                    encoding=encoding,
+                    onFileExiError="ignore-with-warn"
+                )
+        
     # ensure mods directory
     modsF = os.path.join(destinationDirPath,"mods")
     if fs.notExist(modsF): fs.createDir(modsF)
@@ -1510,7 +1985,9 @@ def getLauncherDir(preset=None):
             raise ValueError("Unsupported operating system")
 
 # Function to run installer for a loader
-def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False):
+def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False,qouteJava=False):
+    if qouteJava == True:
+        java_path = f'"{java_path}"'
     if loaderType.lower() == "fabric":
         print(prefix+"Starting fabric install...")
         command = java_path + " -jar " + f'"{loaderFile}"' + " client"
@@ -2833,7 +3310,9 @@ if action_install == True:
     f_loaderver = ldver
     f_noprofile = args.fabprofile
     try:
-        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True)
+        _qouteJava = True
+        if args.noQouteJava == True: _qouteJava = False
+        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True,qouteJava=_qouteJava)
     except Exception as e:
         print(prefix+"Failed to install loader!",e)
         cleanUp(tempFolder,modpack_path)

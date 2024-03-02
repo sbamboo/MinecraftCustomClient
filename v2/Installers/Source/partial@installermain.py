@@ -269,7 +269,9 @@ if action_install == True:
     f_loaderver = ldver
     f_noprofile = args.fabprofile
     try:
-        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True)
+        _qouteJava = True
+        if args.noQouteJava == True: _qouteJava = False
+        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True,qouteJava=_qouteJava)
     except Exception as e:
         print(prefix+"Failed to install loader!",e)
         cleanUp(tempFolder,modpack_path)
