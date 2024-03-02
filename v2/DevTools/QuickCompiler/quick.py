@@ -78,6 +78,8 @@ if fs.notExist(args.cmpl):
 content = open(args.cmpl,'r',encoding=encoding).read()
 compyml = yaml.safe_load(content)
 
+compyml["name"] = fs.makeWinPathSafe(compyml["name"])
+
 # pull
 if compyml.get('gitsync') == True:
     import subprocess

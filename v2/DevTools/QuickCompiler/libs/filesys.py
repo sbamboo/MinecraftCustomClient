@@ -1,8 +1,10 @@
 # FileSys: Library to work with filesystems.
 # Made by: Simon Kalmi Claesson
+# Version: 1.2
 
 # Imports
 import os
+import re
 import shutil
 import platform
 try:
@@ -59,14 +61,17 @@ class filesys():
         This class contains functions to perform filessytem actions like creating and removing files/directories.
         Functions included are:
           - help: Shows this help message.
-          - errorhandler: Internal function to handle errors. (Taking "action=<str_action>", "path=<str_path>" and "noexist=<bool>"
+          - errorhandler: Internal function to handle errors. (Taking "action=<str_action>", "path=<str_path>" and "noexist=<bool>")
+          - replaceSeps: Function to replace path separators using os.sep (Taking "path=<str>")
           - renameFile: Renames a file. (Taking "filepath=<str>", "newFilepath=<str>")
           - renameDir: Renames a directory. (Taking "folderpath=<str>", "newFolderpath=<str>")
           - doesExist: Checks if a file/directory exists. (Taking "path=<str>")
           - notExist: Checks if a file/directory does not exist. (Taking "path=<str>")
           - isFile: Checks if a object is a file. (Taking "path=<str>")
           - isDir: Checks if a object is a directory. (Taking "path=<str>")
+          - ensureDirPath: Creates a path, folder per folder. DON'T INCLUDE FILES IN THE PATH. (Taking "path=<str>")
           - getFileName: Returns the filename of the given file, excluding file extension. (Taking "path=<str>")
+          - getFileExtension: Gets the fileextension of a file. (Taking "path=<str>")
           - createFile: Creates a file. (Taking "filepath=<str>", "overwrite=<bool>" and "encoding=<encoding>")
           - createDir: Creates a directory. (Taking "folderpath=<str>")
           - deleteFile: Deletes a file. (Taking "filepath=<str>")
@@ -85,6 +90,7 @@ class filesys():
           - isExecutable: Checks if a file is an executable. (Taking "filepath=<str>" and optionally "fileEndings=<list>")
           - getMagicMime: Gets the magic-mime info of a file. (Taking "filepath=<str>")
           - openFolder: Opens a folder in the host's filemanager. (Taking "path=<str>") Might not work on al systems!
+          - makeWinPathSafe: Makes a string safe to be used in a windows path. (Taking "string=<str>")
         For al functions taking encoding, the argument is an overwrite for the default encoding "filesys.defaultencoding" that is set to {filesys.defaultencoding}.
         '''
         if ret != True: print(helpText)
@@ -184,7 +190,7 @@ class filesys():
         else:
             try:
                 os.rename(filepath,newFilepath)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling renameFile!\033[0m",e)
 
     # Function to rename a folder
     def renameDir(folderpath=str(),newFolderpath=str()):
@@ -198,7 +204,7 @@ class filesys():
         else:
             try:
                 shutil.move(folderpath,newFolderpath)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling renameDir!\033[0m",e)
 
     # Function to create file
     def createFile(filepath=str(), overwrite=False, encoding=None):
@@ -212,13 +218,13 @@ class filesys():
                 try:
                     f = open(filepath, "x", encoding=encoding)
                     f.close()
-                except: print("\033[31mAn error occurred!\033[0m")
+                except Exception as e: print("\033[31mAn error occurred calling createFile with existing file!\033[0m",e)
         # Create new file
         else:
             try:
                 f = open(filepath, "w", encoding=encoding)
                 f.close()
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling creatFile!\033[0m",e)
     
     # Function to create directory
     def createDir(folderpath=str()):
@@ -227,7 +233,7 @@ class filesys():
         # Make directory
         if valid == True:
             try: os.mkdir(folderpath)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling createDir!\033[0m",e)
         else:
             print(valid); exit()
     
@@ -238,7 +244,7 @@ class filesys():
         # Delete file
         if valid == True:
             try: os.remove(filepath)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling deleteFile!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -249,7 +255,7 @@ class filesys():
         # Delete directory
         if valid == True:
             try: os.rmdir(folderpath)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling deleteDir!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -260,7 +266,7 @@ class filesys():
         # Delete directory
         if valid == True:
             try: shutil.rmtree(folderpath)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling deleteDirNE!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -279,14 +285,14 @@ class filesys():
                     f = open(filepath, "a", encoding=encoding)
                     f.write(inputs)
                     f.close()
-                except: print("\033[31mAn error occurred!\033[0m")
+                except Exception as e: print("\033[31mAn error occurred calling writeToFile when appending!\033[0m",e)
             # Overwrite existing file
             else:
                 try:
                     f = open(filepath, "w", encoding=encoding)
                     f.write(inputs)
                     f.close()
-                except: print("\033[31mAn error occurred!\033[0m")
+                except Exception as e: print("\033[31mAn error occurred calling writeToFile white overwriting existing file!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -302,7 +308,7 @@ class filesys():
                 content = f.read()
                 f.close()
                 return content
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling readFromFile!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -320,7 +326,7 @@ class filesys():
         if valid == True:
             try:
                 shutil.copy2(sourcefile, destination)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling copyFile!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -330,7 +336,7 @@ class filesys():
         if valid == True:
             try:
                 shutil.copytree(sourceDirectory, destinationDirectory)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling copyFolder!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -396,7 +402,7 @@ class filesys():
         if valid == True:
             try:
                 shutil.make_archive(('.'.join(destination.split(".")[:-1]).strip("'")), format=format, root_dir=sourceDirectory)
-            except:  print("\033[31mAn error occurred!\033[0m")
+            except Exception as e:  print("\033[31mAn error occurred calling archive!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -406,7 +412,7 @@ class filesys():
         if valid == True:
             try:
                 shutil.unpack_archive(archiveFile, destination)
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred unArchive!\033[0m",e)
         else:
             print(valid); exit()
         
@@ -421,7 +427,7 @@ class filesys():
                         yield from filesys.scantree(entry.path)
                     else:
                         yield entry
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling scantree!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -447,7 +453,7 @@ class filesys():
                         return True
                     else:
                         return False
-            except: print("\033[31mAn error occurred!\033[0m")
+            except Exception as e: print("\033[31mAn error occurred calling isExecutable!\033[0m",e)
         else:
             print(valid); exit()
 
@@ -458,7 +464,7 @@ class filesys():
         return detected.mime_type
 
     # Function to open a folder in the host's filemanager
-    def openFolder(path=str()):
+    def openFolder_legacy(path=str()):
         # Local imports:
         try: import distro
         except:
@@ -471,6 +477,41 @@ class filesys():
             #Rassberry pi
             if distro.id() == "raspbian": os.system(f"pcmanfm {path}")
 
+
+    def openFolder(path=str()):
+        # Define a list of known file managers and their commands
+        linux_file_managers = {
+            "nautilus": "nautilus",
+            "nemo": "nemo",
+            "pcmanfm": "pcmanfm",
+            "thunar": "thunar",
+            # Add more file managers and their corresponding commands here
+        }
+
+        # Detect the Linux distribution
+        if altConUtils.IsLinux():
+            # Try to find a suitable file manager
+            for manager, command in linux_file_managers.items():
+                if os.system(f"which {command} > /dev/null 2>&1") == 0:
+                    os.system(f"{command} {path}")
+                    break
+            else:
+                print("No supported file manager found. Please install one.")
+
+        # For Windows and macOS
+        elif altConUtils.IsWindows():
+            os.system(f"explorer {path}")
+        elif altConUtils.IsMacOS():
+            os.system(f"open {path}")
+
+    def makeWinPathSafe(string):
+        # Define a regular expression pattern to match invalid characters in Windows file paths
+        invalid_chars_pattern = r'[<>:"/\\|?*]'
+
+        # Replace invalid characters with underscores
+        safe_str = re.sub(invalid_chars_pattern, '_', string)
+
+        return safe_str
 
 # Class with "powershell-styled" functions
 class pwshStyled():
