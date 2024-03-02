@@ -95,18 +95,37 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             if "https://drive.google.com/" in url:
                 hasGdrive.append([url,fpath])
             #downUrlFile(url,fpath)
-            if _chibitConnector.is_chibitPrefixedUrl(url) == True:
+            components = _chibitConnector.getComponents_FromPrefixedUrl(url)
+            if components["valid"] == True:
+                backupUrl = components["backupUrl"]
+                _url = components["noBackupUrl"]
+                if _url in ["",None]: _url = url
                 if os.path.exists(fpath):
                     os.remove(fpath)
-                _chibitConnector.getRawFile_FromPrefixedUrl(
-                    prefixedUrl = url,
-                    outputFile = fpath,
-                    safe = True,
-                    verbose = True,
-                    check_encoding = encoding,
-                    useTemp = False,
-                    tempDir = None
-                )
+                try:
+                    _chibitConnector.getRawFile_FromPrefixedUrl(
+                        prefixedUrl = _url,
+                        outputFile = fpath,
+                        safe = True,
+                        verbose = True,
+                        check_encoding = encoding,
+                        useTemp = False,
+                        tempDir = None
+                    )
+                except Exception as e:
+                    if backupUrl == None:
+                        raise
+                    else:
+                        downloadFile_HandleGdriveVirWarn(
+                            backupUrl,
+                            filepath=fpath,
+                            handleGdriveVirWarn=True,
+                            loadingBar=True,
+                            title="[cyan]Downloading webinclude...",
+                            handleGdriveVirWarnText="\033[33mFound gdrive scan warning, attempting to extract link and download from there...\033[0m",
+                            encoding=encoding,
+                            onFileExiError="ignore-with-warn"
+                        )
             else:
                 downloadFile_HandleGdriveVirWarn(
                     url,

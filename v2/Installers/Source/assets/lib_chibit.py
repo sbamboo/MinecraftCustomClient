@@ -316,60 +316,93 @@ class ChibitConnector():
         else:
             return outputFile
 
+    def is_chibitPrefixedUrl(self, prefixedUrl) -> bool:
+        """
+        Function to check if a given url is a chibit-prefixed url.
+
+        Format: chibit:<fileid>@<hostUrl>
+        or:     chibit:<fileid>@<hostUrl>;<backupUrl>
+        """
+        if prefixedUrl.strip().startswith("chibit:"):
+            return True
+        else:
+            return False
+
+    def getComponents_FromPrefixedUrl(self, prefixedUrl) -> tuple:
+        """
+        Function to get the components of a chibit-prefixed url.
+
+        Format: chibit:<fileid>@<hostUrl>
+        or:     chibit:<fileid>@<hostUrl>;<backupUrl>
+
+        Returns:
+        {
+            "original": <prefixedUrl>,
+            "valid": <bool>,
+            "fileid": <str>,
+            "hostUrl": <str>,
+            "backupUrl": <str>,
+            "noBackupUrl": <str>
+        }
+        """
+        data = {
+            "original": prefixedUrl,
+            "valid": False,
+            "fileid": None,
+            "hostUrl": None,
+            "backupUrl": None,
+            "noBackupUrl": None
+        }
+        if self.is_chibitPrefixedUrl(prefixedUrl):
+            data["valid"] = True
+            prefixedUrl = prefixedUrl.strip().replace("chibit:","")
+            if ";" in prefixedUrl:
+                parts = prefixedUrl.split(";")
+                data["backupUrl"] = parts[-1]
+                parts.pop(-1)
+                prefixedUrl = ';'.join(parts)
+                prefixedUrl = prefixedUrl.strip(";")
+                data["noBackupUrl"] = prefixedUrl
+            
+            if "@" in prefixedUrl:
+                fileid, hostUrl = prefixedUrl.split("@")
+                if hostUrl == "": hostUrl = None
+                data["fileid"] = fileid
+                data["hostUrl"] = hostUrl
+            
+            return data
+        else:
+            return data
+
     def getRaw_FromPrefixedUrl(self, prefixedUrl, safe=True, verbose=False) -> bytes:
         """
         Function to get the raw content of a chibit-stored file, from a prefixed url.
 
         Format: chibit:<fileid>@<hostUrl>
+        or:     chibit:<fileid>@<hostUrl>;<backupUrl>
         """
         
-        if prefixedUrl.strip().startswith("chibit:"):
-            prefixedUrl = prefixedUrl.strip().replace("chibit:","")
-
-            if "@" in prefixedUrl:
-                fileid, hostUrl = prefixedUrl.split("@")
-                if hostUrl == "":
-                    hostUrl = None
-            else:
-                fileid = prefixedUrl
-                hostUrl = None
-            return self.getRaw(fileid, safe, verbose, hostOvv=hostUrl)
+        components = self.getComponents_FromPrefixedUrl(prefixedUrl)
+        if components["valid"] == True:
+            return self.getRaw(components["fileid"], safe, verbose, hostOvv=components["hostUrl"])
         else:
-            raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl>)")
+            raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl> or chibit:<fileid>@<hostUrl>;<backupUrl>)")
 
     def getRawFile_FromPrefixedUrl(self, prefixedUrl, outputFile=None, safe=True, verbose=False, check_encoding="utf-8", useTemp=False, tempDir=None) -> str:
         """
         Function to get the raw content of a chibit-stored file, from a prefixed url.
 
         Format: chibit:<fileid>@<hostUrl>
+        or:     chibit:<fileid>@<hostUrl>;<backupUrl>
         """
         
-        if prefixedUrl.strip().startswith("chibit:"):
-            prefixedUrl = prefixedUrl.strip().replace("chibit:","")
-
-            if "@" in prefixedUrl:
-                fileid, hostUrl = prefixedUrl.split("@")
-                if hostUrl == "":
-                    hostUrl = None
-            else:
-                fileid = prefixedUrl
-                hostUrl = None
+        components = self.getComponents_FromPrefixedUrl(prefixedUrl)
+        if components["valid"] == True:
             if useTemp == True:
                 if useTemp == True and (tempDir == None or not os.path.exists(tempDir)):
                     raise ValueError("When using temp, a tempDir must be given and exist!")
-                return self.getRawFileWtemp(fileid, outputFile, safe, verbose, tempDir, check_encoding, hostOvv=hostUrl)
+                return self.getRawFileWtemp(components["fileid"], outputFile, safe, verbose, tempDir, check_encoding, hostOvv=components["hostUrl"])
             else:
-                return self.getRawFile(fileid, outputFile, safe, verbose, check_encoding, hostOvv=hostUrl)
+                return self.getRawFile(components["fileid"], outputFile, safe, verbose, check_encoding, hostOvv=components["hostUrl"])
         else:
-            raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl>)")
-
-    def is_chibitPrefixedUrl(self, prefixedUrl) -> bool:
-        """
-        Function to check if a given url is a chibit-prefixed url.
-
-        Format: chibit:<fileid>@<hostUrl>
-        """
-        if prefixedUrl.strip().startswith("chibit:"):
-            return True
-        else:
-            return False
+            raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl> or chibit:<fileid>@<hostUrl>;<backupUrl>)")
