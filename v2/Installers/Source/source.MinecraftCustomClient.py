@@ -1392,7 +1392,7 @@ class ChibitConnector():
 
         chunks = chibitData['chunks']
 
-        if outputFile == None or outputFile == "" or not os.path.exists(outputFile):
+        if outputFile == None or outputFile == "":
             outputFile = chibitData["filename"]
 
         self._downloadChunksToJoin(fileid, chunks, outputFile=outputFile, verbose=verbose, encoding=check_encoding)
@@ -1424,7 +1424,7 @@ class ChibitConnector():
 
         chunks = chibitData['chunks']
 
-        if outputFile == None or outputFile == "" or not os.path.exists(outputFile):
+        if outputFile == None or outputFile == "":
             outputFile = os.path.join(os.getcwd(),chibitData["filename"])
 
         chunkFiles = self._downloadChunksToTemp(fileid, chunks, tempDir=tempDir, verbose=verbose, encoding=check_encoding)
