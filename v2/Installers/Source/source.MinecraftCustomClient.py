@@ -1640,6 +1640,7 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                     if backupUrl == None:
                         raise
                     else:
+                        print(prefix+f"Error downloading chibit-webinclude, attempting to download from backup url... ({e})")
                         downloadFile_HandleGdriveVirWarn(
                             backupUrl,
                             filepath=fpath,
