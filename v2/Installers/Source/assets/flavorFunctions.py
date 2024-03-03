@@ -92,8 +92,6 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
             fpath = fpath.replace("\\",os.sep)
             fpath = fpath.replace("/",os.sep)
             fs.ensureDirPath(os.path.dirname(fpath))
-            if "https://drive.google.com/" in url:
-                hasGdrive.append([url,fpath])
             #downUrlFile(url,fpath)
             components = _chibitConnector.getComponents_FromPrefixedUrl(url)
             if components["valid"] == True:
@@ -116,6 +114,8 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                     if backupUrl == None:
                         raise
                     else:
+                        if "https://drive.google.com/" in url:
+                            hasGdrive.append([url,fpath])
                         print(prefix+f"Error downloading chibit-webinclude, attempting to download from backup url... ({e})")
                         downloadFile_HandleGdriveVirWarn(
                             backupUrl,
@@ -128,6 +128,8 @@ def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefi
                             onFileExiError="ignore-with-warn"
                         )
             else:
+                if "https://drive.google.com/" in url:
+                    hasGdrive.append([url,fpath])
                 downloadFile_HandleGdriveVirWarn(
                     url,
                     filepath=fpath,
