@@ -18,4 +18,7 @@ Add a new option to uninstall old modpacks by looking in the directories:
 And the legacyRepo for names.
 (See the legacy installer code)
 
-Fix usernames with spaces breaking modloader install and other os.system() calls.
+Make main installer have a mainLoop so menus can have a "back" action instead of "exit", and error handling can return to lastMenu.
+
+Wrapp in try-catch with switch for errorType, and if permError show msg to start as elevated with examples for lnx "sudo <python> <path-to-file>"
+or win "..."
