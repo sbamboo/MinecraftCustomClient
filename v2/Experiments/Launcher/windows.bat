@@ -17,6 +17,8 @@ $pythonWingetId = "Python.Python.3.12"
 $pythonInstallerUrl = "https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe"
 $pythonScript = "source.MinecraftCustomClient.py"
 
+# Make it reload path so it won't fallback to failed manual-install even after successfull install.
+
 function getPython() {
     $pythonExecutable = $null
     if (Test-Path "$((Get-Command py.exe -ErrorAction SilentlyContinue).Path)") {
@@ -34,7 +36,7 @@ $pythonExecutable = getPython
 $wingetValid = $False
 if ($pythonExecutable -eq $null) {
     # Check if winget exists
-    if (Test-Path "$((Get-Command wing.exe -ErrorAction SilentlyContinue).Path)") {
+    if (Test-Path "$((Get-Command winget.exe -ErrorAction SilentlyContinue).Path)") {
         Write-Host "$prefix Installing Python via winget..."
         # Install Python using winget
         winget install $pythonWingetId -e
