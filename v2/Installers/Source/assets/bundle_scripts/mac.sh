@@ -3,6 +3,7 @@
 # Define variables
 installerPyScript="./source.MinecraftCustomClient.py"
 tempFolder="./mac_runtime_temp"
+prefix="Runtime_mac_V1.0:"
 
 # Remove the temp folder if it already exists
 if [ -d "$tempFolder" ]; then
@@ -16,7 +17,7 @@ mkdir -p "$tempFolder"
 if command -v python3 &> /dev/null; then
     python="python3"
 else
-    echo "Python not found. Installing Python..."
+    echo "$prefix Python not found. Installing Python..."
 
     # Download and run the prebuilt Python installer for macOS
     curl -L https://www.python.org/ftp/python/latest/python3.x.x-macosx10.x.pkg -o "$tempFolder/python_installer.pkg"
@@ -27,9 +28,9 @@ else
 fi
 
 # Run the installerPyScript using the python command
-"$python" "$installerPyScript"
+"$python" "$installerPyScript" "$@"
 
 # Remove the temp folder
 rm -rf "$tempFolder"
 
-echo "Script completed."
+echo "$prefix Script completed."

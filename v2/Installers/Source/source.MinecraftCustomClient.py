@@ -2412,6 +2412,7 @@ def display_items(selected_index, items, selkey, selTitle="Select an option:", s
     # print suffix msg
     if selSuffix != None:
         print(selSuffix)
+    print("\x1b[0m",end="")
 
 # Function to get a single keypress
 def get_keypress():

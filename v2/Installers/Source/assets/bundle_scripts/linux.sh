@@ -3,6 +3,7 @@
 # Define variables
 installerPyScript="./source.MinecraftCustomClient.py"
 tempFolder="./linux_runtime_temp"
+prefix="Runtime_linux_V1.0:"
 
 # Remove the temp folder if it already exists
 if [ -d "$tempFolder" ]; then
@@ -16,7 +17,7 @@ mkdir -p "$tempFolder"
 if command -v python3 &> /dev/null; then
     python="python3"
 else
-    echo "Python not found. Installing Python..."
+    echo "$prefix Python not found. Installing Python..."
 
     # Check the distribution package manager (apt, yum, etc.) and install Python
     if command -v apt-get &> /dev/null; then
@@ -25,7 +26,7 @@ else
     elif command -v yum &> /dev/null; then
         sudo yum install -y python3
     else
-        echo "Unsupported distribution. Please install Python manually."
+        echo "$prefix Unsupported distribution. Please install Python manually."
         exit 1
     fi
 
@@ -34,9 +35,9 @@ else
 fi
 
 # Run the installerPyScript using the python command
-"$python" "$installerPyScript"
+"$python" "$installerPyScript" "$@"
 
 # Remove the temp folder
 rm -rf "$tempFolder"
 
-echo "Script completed."
+echo "$prefix Script completed."
