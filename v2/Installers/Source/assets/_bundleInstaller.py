@@ -96,6 +96,7 @@ with zipfile.ZipFile(args.destzip, 'w') as zipf:
         scriptFolder = os.path.join(parent,"bundle_scripts")
         zipf.write(os.path.join(scriptFolder,"linux.sh"), arcname="linux.sh")
         zipf.write(os.path.join(scriptFolder,"mac.sh"), arcname="mac.sh")
+        zipf.write(os.path.join(scriptFolder,"windows.bat"), arcname="windows.bat")
 
     # Add build script
     if args.prepbuild:
