@@ -63,7 +63,7 @@ if ($wingetValid -eq $True) {} else {
         Start-Process -FilePath $pythonInstallerPath -ArgumentList "/quiet", "/passive", "/norestart" -Wait
 
         # Update $pythonExecutable after installation
-        $pythonExecutable = getPython
+        $pythonExecutable = getPython # make this work even after successful install
         if ($pythonExecutable -eq $null) {
             throw "Failed"
         }
