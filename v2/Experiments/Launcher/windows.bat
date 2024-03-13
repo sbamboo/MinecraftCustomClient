@@ -21,12 +21,15 @@ $pythonScript = "source.MinecraftCustomClient.py"
 
 function getPython() {
     $pythonExecutable = $null
-    if (Test-Path "$((Get-Command py.exe -ErrorAction SilentlyContinue).Path)") {
+    $pyc = Get-Command py.exe -ErrorAction SilentlyContinue
+    $pythonc = Get-Command python -ErrorAction SilentlyContinue
+    $python3c = Get-Command python3 -ErrorAction SilentlyContinue
+    if ($pyc -and (Test-Path $pyc.Path)) {
         $pythonExecutable = "py.exe"
-    } elseif (Test-Path "$((Get-Command python -ErrorAction SilentlyContinue).Path)") {
-        $pythonExecutable = "python"
-    } elseif (Test-Path "$((Get-Command python3 -ErrorAction SilentlyContinue).Path)") {
+    } elseif ($python3c -and (Test-Path $python3c.Path)) {
         $pythonExecutable = "python3"
+    } elseif ($pythonc -and (Test-Path $pythonc.Path)) {
+        $pythonExecutable = "python"
     }
     return $pythonExecutable
 }
