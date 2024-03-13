@@ -22,3 +22,5 @@ Make main installer have a mainLoop so menus can have a "back" action instead of
 
 Wrapp in try-catch with switch for errorType, and if permError show msg to start as elevated with examples for lnx "sudo <python> <path-to-file>"
 or win "..."
+
+fix in build that json,subprocess&getpass is getting pip:ed wrongly should be tex pyjson
