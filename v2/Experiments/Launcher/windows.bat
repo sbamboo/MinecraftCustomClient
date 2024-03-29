@@ -104,7 +104,7 @@ if ($pythonExecutable -eq $null) {
     if ($wingetc -and (Test-Path $wingetc.Path)) {
         Write-Host "$prefix Installing Python via winget..."
         # Install Python using winget
-        winget install $pythonWingetId -e
+        winget install $pythonWingetId -e --accept-package-agreements --accept-source-agreements
         # Reload the environment to reflect changes in the PATH variable
         $machinePath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
         $userPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
@@ -167,7 +167,8 @@ if ($wingetValid -eq $True) {} else {
 }
 
 # Execute the command
-#$pythonScript = $MyInvocation.MyCommand -replace "\[System\.IO\.File\]::ReadAllText\(\'", "" -replace "\'\) \| Out-string \| Invoke-Expression",""
+$parent = Split-Path -Path ($MyInvocation.MyCommand -replace "\[System\.IO\.File\]::ReadAllText\(\'", "" -replace "\'\) \| Out-string \| Invoke-Expression","") -Parent
+$pythonScript = Join-Path -Path $parent -ChildPath $pythonScript
 $command = "$pythonExecutable $pythonScript $arguments"
 Write-Host "$prefix Starting application...`n  Python: $pythonExecutable`n  Script: $pythonScript`n  Args: $arguments`n  Command: $command"
 Invoke-Expression $command
