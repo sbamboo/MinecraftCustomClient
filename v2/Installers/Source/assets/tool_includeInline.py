@@ -1,8 +1,15 @@
 # Smal tool to include content of script in file
 
-import argparse,os
+import argparse,os,importlib
 
-from lib_filesys import filesys as fs
+parent = os.path.dirname(__file__)
+def fromPath(path):
+    spec = importlib.util.spec_from_file_location("module", path.replace("/",os.sep).replace("\\",os.sep))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+filesys = fromPath(os.path.join(parent,"lib_filesys.py"))
+fs = filesys.filesys
 
 # Create an ArgumentParser object
 encoding = "utf-8"
