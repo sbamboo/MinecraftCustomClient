@@ -9,7 +9,7 @@ fs.ensureDirPath(destfolder)
 bundleFile = os.path.join(destfolder,"bundle.zip")
 bundleScript = os.path.join(parent,"assets","_bundleInstaller.py")
 # create bundle
-os.system(f'{sys.executable} {bundleScript} -destzip "{bundleFile}" --inclScripts')
+os.system(f'{sys.executable} {bundleScript} -destzip "{bundleFile}" --inclScripts --skipExcludes')
 print("Done!")
 
 # Build src
@@ -48,5 +48,5 @@ print("Continuing...")
 try:
     shutil.rmtree(buildenv)
 except:
-    print(f"Failed to remove build enviroment, please manually remove: '{buildenv}'")
+    print(f"Failed to remove build enviroment, please manually remove: '{os.path.abspath(buildenv)}'")
 print("Done!")

@@ -273,7 +273,7 @@ if gitsp != None:
             bundleFile = os.path.join(destfolder,"bundle.zip")
             bundleScript = os.path.join(parent,"_bundleQuick.py")
             # create bundle
-            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}"')
+            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}" --inclScripts --skipExcludes')
             print("Done!")
         # build
         if compyml.get("build") != None and compyml.get("build") != False:
@@ -312,5 +312,5 @@ if gitsp != None:
                 try:
                     shutil.rmtree(buildenv)
                 except:
-                    print(f"Failed to remove build enviroment, please manually remove: '{buildenv}'")
+                    print(f"Failed to remove build enviroment, please manually remove: '{os.path.abspath(buildenv)}'")
                 print("Done!")

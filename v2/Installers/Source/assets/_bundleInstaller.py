@@ -5,6 +5,7 @@ parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstall
 parser.add_argument('-destzip', type=str, help='The final zip to bundle to')
 parser.add_argument('--prepbuild', help='Should the bundler prep the script for build?', action="store_true")
 parser.add_argument('--inclScripts', help='Add scripts?', action="store_true")
+parser.add_argument('--skipExcludes', help='Skip excluded sections', action="store_true")
 args = parser.parse_args()
 
 parent = os.path.dirname(__file__)
@@ -34,20 +35,21 @@ if args.prepbuild:
     excludes = []
     toExclude = []
     # exclude
-    for i,line in enumerate(lines):
-        # if no sti is found check for sti
-        if sti == None:
-            if "BuildPrep: ST-excl" in line:
-                sti = i
-                toExclude.append(i)
-        # if sti found check for excludes and eni
-        else:
-            if "BuildPrep: END-excl" in line:
-                sti = None
-                toExclude.append(i)
+    if args.skipExcludes != True:
+        for i,line in enumerate(lines):
+            # if no sti is found check for sti
+            if sti == None:
+                if "BuildPrep: ST-excl" in line:
+                    sti = i
+                    toExclude.append(i)
+            # if sti found check for excludes and eni
             else:
-                excludes.append(line)
-                toExclude.append(i)
+                if "BuildPrep: END-excl" in line:
+                    sti = None
+                    toExclude.append(i)
+                else:
+                    excludes.append(line)
+                    toExclude.append(i)
     # check for sp (save-pkg)
     for line in excludes:
         # Extract pip name from autopipImport calls
