@@ -12,7 +12,7 @@ exit /b %errorlevel%
 
 # Check if either "python" or "python3" is available in the PATH
 
-$prefix = "Runtime_windows_V1.0:"
+$prefix = "Runtime_windows_V1.1:"
 $pythonWingetId = "Python.Python.3.12"
 $pythonInstallerUrl = "https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe"
 $pythonScript = "source.MinecraftCustomClient.py"
@@ -111,7 +111,8 @@ if ($pythonExecutable -eq $null) {
         $combinedPath = $machinePath + ";" + $userPath
         $env:PATH = $combinedPath
         # Check if installation was successful
-        if (getPython -eq $null) {} else {
+        $pythonExecutable = getPython
+        if ($pythonExecutable -eq $null) {} else {
             $wingetValid = $True
         }
     }
