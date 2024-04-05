@@ -50,6 +50,9 @@ if cusPip != None:
 # BuildPrep: ST-excl
 # [Imports]
 try:
+    import platform
+    if platform.system() != "Windows":
+        _ = autopipImport("magic","file-magic")
     _ = autopipImport("argparse")
     _ = autopipImport("scandir",relaunch=True,relaunchCmds=sys.argv)
     _ = autopipImport("requests")

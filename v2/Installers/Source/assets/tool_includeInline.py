@@ -68,9 +68,10 @@ if args.enc:
     encoding = args.enc
 
 if args.path:
+    args.path = os.path.abspath(args.path)
     if fs.doesExist(args.path):
         # get content
         content = open(args.path,'r',encoding=encoding).read()
         content = includeInline(content)
         # set content
-        open(args.path,'w',encoding=encoding).write(content)
+        open(args.path,'w',encoding=encoding, newline='\n').write(content)
