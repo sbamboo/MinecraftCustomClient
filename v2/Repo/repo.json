@@ -9,6 +9,7 @@
         "name": "1.20.4_Community-Client_Lite U3",
         "desc": "Lite version, not done :)",
         "author": "SimonKC",
+        "icon": "mcc:normal",
         "id": "5ed771f4-d636-4ee5-9c85-637c6099a7f9",
         "hidden": false,
         "supported": true,
