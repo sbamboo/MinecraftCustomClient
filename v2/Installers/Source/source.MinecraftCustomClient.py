@@ -245,6 +245,7 @@ parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer"
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
+parser.add_argument('--debugLoaderCmd', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc
@@ -2055,23 +2056,26 @@ def getLauncherDir(preset=None):
             raise ValueError("Unsupported operating system")
 
 # Function to run installer for a loader
-def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False,qouteJava=False):
+def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f_snapshot=False,f_dir=None,f_mcversion=None,f_loaderver=None,f_noprofile=False,qouteJava=False,debugLoaderCommand=False):
     if qouteJava == True:
-        java_path = f'"{java_path}"'
+        java_path = f"{java_path}"
     if loaderType.lower() == "fabric":
         print(prefix+"Starting fabric install...")
-        command = java_path + " -jar " + f'"{loaderFile}"' + " client"
+        commandParts = [java_path, "-jar", loaderFile, "client"]
         if f_snapshot == True:
-            command += " -snapshot"
+            commandParts.append("-snapshot")
         if f_dir != None:
-            command += f' -dir "{f_dir}"'
+            commandParts.extend(["-dir",f_dir])
         if f_mcversion != None:
-            command += f' -mcversion "{f_mcversion}"'
+            commandParts.extend(["-mcversion",f_mcversion])
         if f_loaderver != None:
-            command += f' -loader "{f_loaderver}"'
+            commandParts.extend(["-loader",f_loaderver])
         if f_noprofile == True:
-            command += " -noprofile"
-        os.system(command)
+            commandParts.append("-noprofile")
+        if debugLoaderCommand == True:
+            print("[DEBUG]: LoaderCmd.Fabric = "+' '.join(commandParts))
+            _ = input("[DEBUG]: Press any key to continue...")
+        subprocess.run(commandParts, shell=True)
         print(prefix+"Continuing...")
     elif loaderType.lower() == "forge":
         print(prefix+"Starting forge install...")
@@ -2080,7 +2084,11 @@ def installLoader(prefix=str,java_path=str,loaderType="fabric",loaderFile=None,f
         olddir = os.getcwd()
         os.chdir(os.path.dirname(loaderFile))
         # run
-        os.system(f'{java_path} -jar "{loaderFile}"')
+        command = [java_path, "-jar", loaderFile]
+        if debugLoaderCommand == True:
+            print("[DEBUG]: LoaderCmd.Fabric = "+' '.join(command))
+            _ = input("[DEBUG]: Press any key to continue...")
+        subprocess.run(command, shell=True)
         # move back to the prv dir
         os.chdir(olddir)
         #_ = input(prefix+"Once the installer is done, press any key to continue...")
@@ -3383,7 +3391,7 @@ if action_install == True:
     try:
         _qouteJava = True
         if args.noQouteJava == True: _qouteJava = False
-        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True,qouteJava=_qouteJava)
+        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True,qouteJava=_qouteJava,debugLoaderCommand=args.debugLoaderCmd)
     except Exception as e:
         print(prefix+"Failed to install loader!",e)
         cleanUp(tempFolder,modpack_path)
@@ -3576,7 +3584,7 @@ if action_uninstall == True:
     installs = modpacks.get("Installs")
     namedModpacks = {}
     if installs != None and installs != [] and type(installs) == list:
-        for iter_modpack in modpacks["Installs"]:
+        for iter_modpack in installs:
             # add to lists
             name = safeNone(iter_modpack.get('name'))
             if "-quickcompile." in name:

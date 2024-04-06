@@ -30,6 +30,7 @@ chibit_default_host = "https://sbamboo.github.io/theaxolot77/storage/"
 legacySourceFlavorDataFile_default = "flavor.mta"
 
 modpack = "<replaceble:modpack_relative_path_to_parent>"
+modpack_id = "<replaceble:modpack_id>"
 
 # BuildPrep: ST-excl
 # IncludeInline: ./assets/lib_crshpiptools.py
@@ -116,6 +117,7 @@ parser.add_argument('--noQouteJava', help="ADVANCED: Won't qoute java-path when 
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
+parser.add_argument('--debugLoaderCmd', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc

@@ -121,6 +121,7 @@ parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer"
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")
 parser.add_argument('--skipWebIncl', help='DEBUG', action="store_true")
+parser.add_argument('--debugLoaderCmd', help='DEBUG', action="store_true")
 args = parser.parse_args()
 if args.enc:
     encoding = args.enc

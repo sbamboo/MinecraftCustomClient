@@ -271,7 +271,7 @@ if action_install == True:
     try:
         _qouteJava = True
         if args.noQouteJava == True: _qouteJava = False
-        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True,qouteJava=_qouteJava)
+        installLoader(prefix,javapath,modld,loaderFp,f_snapshot,f_dir,f_mcversion,f_loaderver,True,qouteJava=_qouteJava,debugLoaderCommand=args.debugLoaderCmd)
     except Exception as e:
         print(prefix+"Failed to install loader!",e)
         cleanUp(tempFolder,modpack_path)

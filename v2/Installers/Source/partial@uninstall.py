@@ -28,7 +28,7 @@ if action_uninstall == True:
     installs = modpacks.get("Installs")
     namedModpacks = {}
     if installs != None and installs != [] and type(installs) == list:
-        for iter_modpack in modpacks["Installs"]:
+        for iter_modpack in installs:
             # add to lists
             name = safeNone(iter_modpack.get('name'))
             if "-quickcompile." in name:

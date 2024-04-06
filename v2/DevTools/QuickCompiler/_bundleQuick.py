@@ -4,6 +4,7 @@ from libs.filesys import filesys as fs
 parser = argparse.ArgumentParser(description='MinecraftCustomClient QuickInstaller')
 parser.add_argument('-modpack', type=str, help='The modpack to bundle')
 parser.add_argument('-destzip', type=str, help='The final zip to bundle to')
+parser.add_argument('-uuid', type=str, help="uuid-str to write")
 parser.add_argument('--prepbuild', help='Should the bundler prep the script for build?', action="store_true")
 args = parser.parse_args()
 
@@ -18,6 +19,11 @@ pkgs = os.path.join(os.path.dirname(nquick),"packages.txt")
 buildScript = os.path.join(parent,"_bundle_buildscript.py")
 
 inln = os.path.abspath(os.path.join(assets,"assets","tool_includeInline.py"))
+
+# uuid
+usable_UUID = "<uuid>"
+if args.uuid:
+    usable_UUID = args.uuid
 
 # copy
 fs.copyFile(quick,nquick)
@@ -79,6 +85,7 @@ if args.prepbuild:
 
 # handle replace
 c = c.replace("<replaceble:modpack_relative_path_to_parent>",os.path.basename(args.modpack))
+c = c.replace("<replaceble:modpack_id>",usable_UUID)
 
 # save content
 open(nquick,'w',encoding="utf-8").write(c)

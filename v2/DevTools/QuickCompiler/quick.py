@@ -49,6 +49,8 @@ parser.add_argument('--prioCF', dest="prio_curseforge", help='If given the scrip
 parser.add_argument('--skipProjId', dest="curseforge_skip_project_id", help="If given the script will not include curseforge projectId's.", action='store_true')
 args = parser.parse_args()
 
+usable_UUID = generate_uuid()
+
 # Handle enc
 if args.enc:
     encoding = args.enc
@@ -240,7 +242,7 @@ if gitsp != None:
             except:
                 listurl = ""
             # get id
-            listuuid = generate_uuid() 
+            listuuid = usable_UUID
             # make entry
             entryWa = {
                 "name": compyml['name'],
@@ -273,7 +275,7 @@ if gitsp != None:
             bundleFile = os.path.join(destfolder,"bundle.zip")
             bundleScript = os.path.join(parent,"_bundleQuick.py")
             # create bundle
-            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}" --inclScripts --skipExcludes')
+            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}" --inclScripts --skipExcludes -uuid "{str(usable_UUID)}"')
             print("Done!")
         # build
         if compyml.get("build") != None and compyml.get("build") != False:
@@ -283,7 +285,7 @@ if gitsp != None:
             bundleFile = os.path.join(destfolder,"build_source.zip")
             bundleScript = os.path.join(parent,"_bundleQuick.py")
             # create bundle for build-env
-            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}" --prepbuild')
+            os.system(f'{sys.executable} {bundleScript} -modpack "{destfile}" -destzip "{bundleFile}" --prepbuild -uuid "{str(usable_UUID)}"')
             print("Done!")
             # build
             if compyml["build"].get("autobuildwin") == True:
