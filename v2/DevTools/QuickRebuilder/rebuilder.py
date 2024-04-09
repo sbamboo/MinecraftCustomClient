@@ -70,6 +70,7 @@ if args.epacks:
         if p in found.keys():
             toIncl.remove(p)
 
+# Make temp folder
 # Make new soure.QuickInstaller.py file
 # Iterate over the toIncl packs, backup their build (for win,lnx,mac if found) and their old-build-source,
 # Unpack the old build-source into the enviroment, swap the source.QuickInstaller.py files and remember to change the <replacable:> tags
@@ -77,5 +78,6 @@ if args.epacks:
 # Build with the new enviroment
 # ^ If succeeds remove old build-file and copy over new one, also update repo-entry.
 # ^ If fails remove enviroment, new-build-source and replace with the backups, then remove the backups.
+# Remove temp folder
 
 # DURING ABOVE BE VERBOSE WITH COLORS
