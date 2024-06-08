@@ -1,4 +1,7 @@
+#exclude ST
 import base64, re
+import urllib.parse
+#exclude END
 
 # Validators
 def typeval(val,typeV,nm=None,allowNone=False):
@@ -67,3 +70,9 @@ def is_valid_url(url:str) -> bool:
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     return re.match(url_pattern, url) is not None
+
+def get_filename_from_url(url):
+    parsed_url = urllib.parse.urlparse(url)
+    path = parsed_url.path
+    filename = urllib.parse.unquote(path.split('/')[-1])
+    return filename
