@@ -4,11 +4,11 @@ RepositoryConnector:object
 Repository:object
 #exclude END
 
-#include ./»deps-setup.py
-
 #include ./libs/importa.py
 
-#include ./»generalfuncs.py
+#include ./»deps-setup.py
+
+#include MX@./»generalfuncs.py
 #include MX@./»networking.py
 #include MX@./»services.py
 #include MX@./»repo.py

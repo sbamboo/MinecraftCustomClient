@@ -37,34 +37,40 @@ class Services():
                 typeval(macUrl,str,"macUrl")
                 self.platformUrl = macUrl
         def ensureDir(self):
-            os.makedirs(self.parentPath)
-        @staticmethod
-        def getPossibleJDKBinInFolder(folderPath:str) -> str|None:
+            if not os.path.exists(self.parentPath):
+                os.makedirs(self.parentPath)
+        def getPossibleJDKBinInFolder(self,folderPath:str) -> str|None:
             typeval(folderPath,str,"folderPath")
             java_binary = os.path.join(folderPath, "java")
-            if platform.system().lower() == "windows":
+            if self.platform == "windows":
                 java_binary += ".exe"
             if os.path.exists(java_binary):
                 return java_binary
             else:
                 return None
-        @staticmethod
-        def findJavaInFolder(folderPath:str) -> str:
+        def findJavaInFolder(self,folderPath:str) -> str:
             typeval(folderPath,str,"folderPath")
             # Check in root folder
-            jvb = getPossibleJDKBinInFolder(folderPath)
+            jvb = self.getPossibleJDKBinInFolder(folderPath)
             if jvb != None: return jvb
             # Else check other folders in the root folder
             for elem in os.listdir(folderPath):
                 elem = os.path.join(folderPath,elem)
                 if os.path.isdir(elem):
-                    jvb = getPossibleJDKBinInFolder(elem)
+                    # Check in the dir
+                    jvb = self.getPossibleJDKBinInFolder(elem)
                     if jvb != None: return jvb
+                    # Check its children
+                    for elem2 in os.listdir(elem):
+                        elem2 = os.path.join(elem,elem2)
+                        if os.path.isdir(elem2):
+                            jvb = self.getPossibleJDKBinInFolder(elem2)
+                            if jvb != None: return jvb
 
         def downloadJava(self,silent=False,textEncoding="utf-8") -> str:
             typeval(silent,bool,"silent")
             typeval(textEncoding,str,"textEncoding")
-            if os.path.exists(self.parentPath):
+            if not os.path.exists(self.parentPath):
                 raise FileNotFoundError("Error on Java-JDK download, destination dosen't exist, run ensureDir() first!")
             filename = get_filename_from_url(self.platformUrl)
             filepath = os.path.join(self.parentPath,filename)
@@ -103,7 +109,7 @@ class Services():
             else:
                 raise NotImplementedError("Unsupported archive format!")
             # Find the binary from the extracted archive
-            java_binary = findJavaInFolder(self.parentPath)
+            java_binary = self.findJavaInFolder(self.parentPath)
             if not java_binary:
                 raise RuntimeError("Java binary not found in the extracted folder")
             # Mark the binary as executable on macOS and Linux
@@ -151,4 +157,5 @@ class Services():
                 return currentJava
             else:
                 # Ensure java
+                local_JDK_Manager.ensureDir()
                 return local_JDK_Manager.downloadJava(silentEnsure,encoding)
