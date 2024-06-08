@@ -51,9 +51,14 @@
         "output": {
             "destdir": "../Merged/latest",
             "suffix": "_merged",
-            "name": "{pyfile_name}{s}.{pyfile_ext}"
+            // {+} is any string added by the pyiil -resnameadd param.
+            "name": "{pyfile_name}{s}{+}.{pyfile_ext}"
         },
         // The prefix to use for multi, not recomended to change
-        "apply-multi-prefix": "MX@"
+        "apply-multi-prefix": "MX@",
+        // Replace ops to apply to comment lines
+        "comment-lines-replacers": {
+            "»": ""
+        }
     }
 }

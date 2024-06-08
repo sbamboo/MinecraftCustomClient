@@ -63,7 +63,7 @@ def download_file_and_get_base64(url):
         print(f"Error downloading and encoding file: {e}")
         return None
 
-# [Functionos]
+# [Functions]
 def installListing(listingData=str,destinationDirPath=str,encoding="utf-8",prefix="",skipWebIncl=False,modsHaveLoadingBar=False,chibitDefaultHost=str) -> list:
     '''Returns if gdrive url was found'''
     sources = listingData.get("sources")

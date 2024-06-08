@@ -1,7 +1,6 @@
 # FancyPants/BeautifulPants 1.1 by Simon Kalmi Claesson
 # Simple python library to download files or fetch get requests, with the possibility of a progress bar.
 
-
 from bs4 import BeautifulSoup
 import requests,os
 

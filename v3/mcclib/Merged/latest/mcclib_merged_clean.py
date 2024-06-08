@@ -3,12 +3,9 @@
 # 
 
 
-#region [IncludeInline: ./deps-setup.py]
 import json
 import platform
-#endregion [IncludeInline: ./deps-setup.py]
 
-#region [IncludeInline: ./libs/importa.py]
 import os, json, sys, subprocess, platform
 
 # Ensure importlib.util
@@ -183,9 +180,7 @@ def isPythonRuntime(filepath=str(),cusPip=None):
         except Exception as e: print("\033[31mAn error occurred!\033[0m",e)
     else:
         raise Exception(f"File not found: {filepath}")
-#endregion [IncludeInline: ./libs/importa.py]
 
-#region [IncludeInline: ./generalfuncs.py]
 import base64, re
 
 # Validators
@@ -255,9 +250,6 @@ def is_valid_url(url:str) -> bool:
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     return re.match(url_pattern, url) is not None
-#endregion [IncludeInline: ./generalfuncs.py]
-#region [IncludeInline: ./networking.py]
-#region [IncludeInline: ./libs/fancyPants.py]
 # FancyPants/BeautifulPants 1.1 by Simon Kalmi Claesson
 # Simple python library to download files or fetch get requests, with the possibility of a progress bar.
 
@@ -508,8 +500,6 @@ def downloadFile_HandleGdriveVirWarn(url,filepath=str,handleGdriveVirWarn=True, 
         else:
             raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
 
-#endregion [IncludeInline: ./libs/fancyPants.py]
-#region [IncludeInline: ./libs/chibit.py]
 # Chibit Module 1.0 made by Simon Kalmi Claesson
 #
 # Modules for interacting with a chibit-store
@@ -919,7 +909,6 @@ class ChibitConnector():
         else:
             raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl> or chibit:<fileid>@<hostUrl>;<backupUrl>)")
 
-#endregion [IncludeInline: ./libs/chibit.py]
 
 
 class Networking():
@@ -1042,8 +1031,6 @@ class Networking():
             stream = stream
         )
 
-#endregion [IncludeInline: ./networking.py]
-#region [IncludeInline: ./services.py]
 
 class Services():
 
@@ -1064,8 +1051,6 @@ class Services():
 
         def ensureJavaExistance(self,local_JVM_Manager):
             pass
-#endregion [IncludeInline: ./services.py]
-#region [IncludeInline: ./repo.py]
 
 class RepositoryConnector():
     def __init__(self,repofileUrl:str=str,NetworkingClass=None):
@@ -1124,11 +1109,8 @@ class RepositoryConnector():
 
 class Repository():
     pass
-#endregion [IncludeInline: ./repo.py]
 
 class mcclib():
-    #region [IncludeInline: ./networking.py]
-    #region [IncludeInline: ./libs/fancyPants.py]
     # FancyPants/BeautifulPants 1.1 by Simon Kalmi Claesson
     # Simple python library to download files or fetch get requests, with the possibility of a progress bar.
     
@@ -1379,8 +1361,6 @@ class mcclib():
             else:
                 raise Exception(f"Download of '{filepath}' seems to have failed! File does not exist.")
     
-    #endregion [IncludeInline: ./libs/fancyPants.py]
-    #region [IncludeInline: ./libs/chibit.py]
     # Chibit Module 1.0 made by Simon Kalmi Claesson
     #
     # Modules for interacting with a chibit-store
@@ -1790,7 +1770,6 @@ class mcclib():
             else:
                 raise ValueError("Inputed url did not contain the 'chibit:' prefix! (Format: chibit:<fileid>@<hostUrl> or chibit:<fileid>@<hostUrl>;<backupUrl>)")
     
-    #endregion [IncludeInline: ./libs/chibit.py]
     
     
     class Networking():
@@ -1913,8 +1892,6 @@ class mcclib():
                 stream = stream
             )
     
-    #endregion [IncludeInline: ./networking.py]
-    #region [IncludeInline: ./services.py]
     
     class Services():
     
@@ -1935,8 +1912,6 @@ class mcclib():
     
             def ensureJavaExistance(self,local_JVM_Manager):
                 pass
-    #endregion [IncludeInline: ./services.py]
-    #region [IncludeInline: ./repo.py]
     
     class RepositoryConnector():
         def __init__(self,repofileUrl:str=str,NetworkingClass=None):
@@ -1995,5 +1970,3 @@ class mcclib():
     
     class Repository():
         pass
-    #endregion [IncludeInline: ./repo.py]
-
