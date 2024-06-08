@@ -1,0 +1,51 @@
+{
+    // PyIIL options to use for this repository
+    "pyiil": { "version": "1.0+" },
+
+    // General information about this repository
+    "meta": {
+        "name": "example",
+        "version": "1.0",
+        "desc": "Example PyIIL config file.",
+        "friendly-name": "Example Project"
+    },
+
+    // Information to add at the top of the file, as a list of lines. Meta info avaliable with curly-tags.
+    "included-heading": [
+        "# {friendly-name}, Version: {version}",
+        "# {desc}",
+        "# ",
+        ""
+    ],
+
+    // Information to add at the bottom of the file, as a list of lines. Meta info avaliable with curly-tags.
+    "included-footer": [],
+
+    // Config for the accuall inclusion work
+    "config": {
+        "include-file-comments": true,
+        // Custom resolvers can be used instead of the default request.get implementation.
+        // Contains enabled, a path to the py module, and the attribute to call as a function.
+        "custom-fetch-resolver": {
+            "enabled": true,
+            "path": "./resolver.py",
+            "attr": "customResolver"
+        },
+        // Config for heading/footer
+        "padd-heading": {
+            "leading": false,
+            "trailing": true
+        },
+        "padd-footer": {
+            "leading": false,
+            "trailing": false
+        },
+        // Settings for the output file
+        "output": {
+            "suffix": "_merged",
+            "name": "{pyfile_name}{s}.{pyfile_ext}"
+        },
+        // The prefix to use for multi, not recomended to change
+        "apply-multi-prefix": "MX@"
+    }
+}
