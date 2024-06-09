@@ -119,7 +119,11 @@ class Services():
             return java_binary
 
     class JDK_Manager():
-        def __init__(self,customJdkBin:str=None):
+        def __init__(self,local_JDK_Manager,customJdkBin:str=None):
+            local_JDK_Manager_checker = mcclib.Services.local_JDK_Manager
+            local_JDK_Manager_checker = Services.local_JDK_Manager #excludeThis
+            instval(local_JDK_Manager,local_JDK_Manager_checker,"local_JDK_Manager",False,"mcclib.Services.local_JDK_Manager",False)
+            self.local_JDK_Manager = local_JDK_Manager
             typeval(customJdkBin,str,"customJdkBin",True)
             self.platform = platform.system().lower()
             self.localJdkCliCmd = "java"
@@ -148,14 +152,11 @@ class Services():
                 else:
                     return None
 
-        def ensureJavaExistance(self,local_JDK_Manager,silentEnsure=False,encoding="utf-8") -> str:
-            Networking_checker = mcclib.Services.local_JDK_Manager
-            Networking_checker = Services.local_JDK_Manager #excludeThis
-            instval(local_JDK_Manager,Networking_checker,"local_JDK_Manager",False,"mcclib.Services.local_JDK_Manager",False)
+        def ensureJavaExistance(self,silentEnsure=False,encoding="utf-8") -> str:
             currentJava = self.getJavaPath()
             if currentJava != None:
                 return currentJava
             else:
                 # Ensure java
-                local_JDK_Manager.ensureDir()
-                return local_JDK_Manager.downloadJava(silentEnsure,encoding)
+                self.local_JDK_Manager.ensureDir()
+                return self.local_JDK_Manager.downloadJava(silentEnsure,encoding)

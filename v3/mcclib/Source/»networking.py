@@ -5,14 +5,15 @@
 from typing import Callable
 from libs.fancyPants import *
 from libs.chibit import ChibitConnector
-def typeval(val,typeV,nm=None,allowNone=False):
+from typing import Optional,Union
+def typeval(val,typeV,nm:Optional[str]=None,allowNone=False) -> None:
     """Raises if type of 'val' does not match 'typeV'!"""
     if type(val) != typeV and (val is not None or not allowNone):
         try: typeN = typeV.__name__
         except: typeN = str(typeV)
         if nm == None: raise Exception(f"Invalid type for parameter, must be '{typeN}'!")
         else: raise Exception(f"Invalid type for parameter '{nm}', must be '{typeN}'!")
-def instval(val,instV,nm=None,allowNone=False,instN=None,checkEq=False):
+def instval(val,instV,nm:Optional[str]=None,allowNone=False,instN:Optional[str]=None,checkEq=False) -> None:
     """Raises if type of 'val' is not instance of 'instV'!"""
     if not isinstance(val, instV) and (val is not None and (checkEq and val != instV) or (not checkEq) or (val is None and not allowNone)) and (val is not None or not allowNone):
         try: typeN = instN if instN != None else instV.__name__
@@ -24,7 +25,7 @@ def instval(val,instV,nm=None,allowNone=False,instN=None,checkEq=False):
 class Networking():
 
     class ChibitConn(ChibitConnector):
-        def __init__(self,chibitHostUrl:str):
+        def __init__(self,chibitHostUrl:str) -> None:
             typeval(chibitHostUrl,str,"chibitHostUrl")
             super().__init__(
                 hostUrl = chibitHostUrl,
@@ -36,7 +37,7 @@ class Networking():
             )
 
     @staticmethod
-    def testConnection(override_url:str=None):
+    def testConnection(override_url:Optional[str]=None) -> bool:
         typeval(override_url,str,"override_url",True)
         # If no url is given, default to google.
         if override_url == None or override_url == "":

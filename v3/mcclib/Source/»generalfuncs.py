@@ -1,17 +1,18 @@
 #exclude ST
 import base64, re
 import urllib.parse
+from typing import Optional,Union
 #exclude END
 
 # Validators
-def typeval(val,typeV,nm=None,allowNone=False):
+def typeval(val,typeV,nm:Optional[str]=None,allowNone=False) -> None:
     """Raises if type of 'val' does not match 'typeV'!"""
     if type(val) != typeV and (val is not None or not allowNone):
         try: typeN = typeV.__name__
         except: typeN = str(typeV)
         if nm == None: raise Exception(f"Invalid type for parameter, must be '{typeN}'!")
         else: raise Exception(f"Invalid type for parameter '{nm}', must be '{typeN}'!")
-def instval(val,instV,nm=None,allowNone=False,instN=None,checkEq=False):
+def instval(val,instV,nm:Optional[str]=None,allowNone=False,instN:Optional[str]=None,checkEq=False) -> None:
     """Raises if type of 'val' is not instance of 'instV'!"""
     if not isinstance(val, instV) and (val is not None and (checkEq and val != instV) or (not checkEq) or (val is None and not allowNone)) and (val is not None or not allowNone):
         try: typeN = instN if instN != None else instV.__name__
@@ -71,7 +72,8 @@ def is_valid_url(url:str) -> bool:
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     return re.match(url_pattern, url) is not None
 
-def get_filename_from_url(url):
+def get_filename_from_url(url:str) -> str:
+    typeval(url,str,"url")
     parsed_url = urllib.parse.urlparse(url)
     path = parsed_url.path
     filename = urllib.parse.unquote(path.split('/')[-1])

@@ -14,8 +14,7 @@ localJDKMan = mcclib.Services.local_JDK_Manager(
     macUrl = "https://aka.ms/download-jdk/microsoft-jdk-17.0.8.1-macOS-x64.tar.gz",
     NetworkingClass=mcclib.Networking
 )
-javaBin = mcclib.Services.JDK_Manager().ensureJavaExistance(
-    local_JDK_Manager = localJDKMan,
+javaBin = mcclib.Services.JDK_Manager( localJDKMan ).ensureJavaExistance(
     silentEnsure = False,
     encoding = "utf-8"
 )
