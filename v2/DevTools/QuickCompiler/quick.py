@@ -142,7 +142,7 @@ if "<ManualUrlWaitingToBeFilledIn>" in content and compyml["lister"].get("prompt
         print("Lovely, opening in configTUI... (Creds: https://github.com/Prudhvi-pln/ConfigTUI)")
         configTui_WrapperMain(listing)
     else:
-        print("Okay, remember to change on install :D")
+        print("Okay, remember to change on install :P")
 
 # Include webinclude
 wincl = compyml.get("webInclude")
@@ -232,7 +232,7 @@ if gitsp != None:
         # repofile
         poss = f"{gitsp}{os.sep}repo.json"
         if fs.doesExist(poss):
-            print(f"Attempting to create repostitory instance in: ({gitsp})")
+            print(f"Attempting to create repostitory instance in: ({os.path.abspath(gitsp)})")
             # get content
             raw = open(poss,'r',encoding=encoding).read()
             dRepo = json.loads(raw)

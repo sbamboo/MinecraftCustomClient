@@ -6,8 +6,6 @@
 
 - Update the data-copy tool to be more usefull migration tool and/or data-copy
 
-- modrinth profile.json file support in compiler
-
 - Support for adding "mod" info like source-link and icon-link through compile.yml, this for future website support for showing a mods list.
   ofc, source-link can be retrived from listing for non-base64 entries, but this fills in the gap.
   icons can be auto-retrived from source based on listing-entry-type but once-agai fill-in and backup.

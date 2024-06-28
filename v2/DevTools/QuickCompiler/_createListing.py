@@ -42,7 +42,8 @@ argus = cparser.parse_args()
 # [Setup]
 modpack  = argus.modpack
 mods     = os.path.join(modpack,"mods")
-manifest = os.path.join(modpack,f"minecraftinstance.json")
+manifest = os.path.join(modpack,f"minecraftinstance.json") #Curseforge Manifest
+profile  = os.path.join(modpack,"profile.json") #Modrinth profile
 
 urls = []
 lookedAtFiles = []
@@ -116,11 +117,10 @@ d = debugOut(debugEnabled, debugPrefix)
 # Retrive URLS
 d.pr(f"\033[33mScanning mods directory of: '{modpack.split(os.sep)[-1]}'")
 pathObjects = scantree(mods)
-possProfile = os.path.join(modpack,"profile.json")
-profileData = {}
+profileData = None
 filename_to_slug = {}
-if os.path.exists(possProfile):
-    profileData = json.loads(open(possProfile,'r',encoding="utf-8").read())
+if os.path.exists(profile):
+    profileData = json.loads(open(profile,'r',encoding="utf-8").read())
     projs = profileData.get("projects")
     if projs != None:
         for key,value in projs.items():
@@ -145,7 +145,39 @@ for _path in entries:
         # Prio curseforge?
         if argus.prio_curseforge == True:
             lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles,curseforgeAskProjId=argus.curseforge_ask_project_id)
-        # From modrinth
+        # From modrinth profile.json
+        if profileData != None and type(profileData) == dict and _name not in lookedAtFiles:
+            projs = profileData.get("projects")
+            if projs != None:
+                for projSubPath,projData in projs.items():
+                    # match
+                    if projData.get("file_name") == _name:
+                        # check for url
+                        if type(projData["metadata"]["version"]) == dict: # can be str if non-modrinth hosted
+                            projFiles = projData["metadata"]["version"].get("files")
+                            if projFiles != None and len(projFiles) > 0:
+                                _selectedProjFile = None
+                                if len(projFiles) > 1:
+                                    # iterate for primary
+                                    for projFile in projFiles:
+                                        if projFile.get("primary") == True:
+                                            _selectedProjFile = projFile
+                                            break
+                                    # fall back to first
+                                    if _selectedProjFile == None:
+                                        _selectedProjFile = projFiles[0]
+                                # if only one select it
+                                else:
+                                    _selectedProjFile = projFiles[0]
+                                
+                                # check for url
+                                if _selectedProjFile.get("url") != None:
+                                    lookedAtFiles.append(_name)
+                                    urls.append({"type":"modrinth","url":_selectedProjFile.get("url"),"filename":_name,"modrinthType":"profile"})
+                                    prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
+                                    d.pr(f"{prog}\033[32mFound url in profile \033[90m: \033[32m{_selectedProjFile.get('url')}")
+
+        # From modrinth web
         if has_connection() == True and _name not in lookedAtFiles:
             modrinth = MJRL("sbamboo/MinecraftCustomClient")
             name = _name
@@ -164,9 +196,9 @@ for _path in entries:
                 if len(retrivedUrls) > 0:
                     lookedAtFiles.append(_name)
                     for url in retrivedUrls:
-                        urls.append({"type":"modrinth","url":url,"filename":_name})
+                        urls.append({"type":"modrinth","url":url,"filename":_name,"modrinthType":"api"})
                         prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
-                        d.pr(f"{prog}\033[32mFound url on modrinth \033[90m: \033[32m{url}")
+                        d.pr(f"{prog}\033[32mFound url on modrinth api \033[90m: \033[32m{url}")
             else:
                 # check slugs
                 try:
@@ -176,9 +208,10 @@ for _path in entries:
                 if len(retrivedUrls) > 0:
                     lookedAtFiles.append(_name)
                     for url in retrivedUrls:
-                        urls.append({"type":"modrinth","url":url,"filename":_name})
+                        urls.append({"type":"modrinth","url":url,"filename":_name,"modrinthType":"api/slug"})
                         prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
-                        d.pr(f"{prog}\033[32mFound url on modrinth \033[90m: \033[32m{url}")
+                        d.pr(f"{prog}\033[32mFound url on modrinth api with slug \033[90m: \033[32m{url}")
+                        
         # From curseforgeManifest (no prio)
         if argus.prio_curseforge != True:
             lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles,curseforgeAskProjId=argus.curseforge_ask_project_id)
