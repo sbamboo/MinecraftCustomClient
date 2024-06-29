@@ -36,6 +36,7 @@ cparser.add_argument('-archiveActionStr', dest="archiveActionStr", help='An acti
 cparser.add_argument('--silent', dest="silent", help='If given the script will only prompt the user and not print anything else.', action='store_true')
 cparser.add_argument('--prioCF', dest="prio_curseforge", help='If given the script will prioritize looking at curseforge.', action='store_true')
 cparser.add_argument('--addProjId', dest="curseforge_ask_project_id", help="If given the script will include curseforge projectId's.", action='store_true')
+cparser.add_argument('--skipModrinthIcon', dest="skip_modrinth_icon", help="If given the script will not include icons from modrinth profiles.", action='store_true')
 # Create main arguments object
 argus = cparser.parse_args()
 
@@ -175,13 +176,14 @@ for _path in entries:
                                     lookedAtFiles.append(_name)
                                     urlData = {"type":"modrinth","url":_selectedProjFile.get("url"),"filename":_name,"modrinthType":"profile"}
                                     # icon?
-                                    if projData.get("project") != None:
-                                        if projData["project"].get("icon_url") != None:
-                                            if len(projData["project"]["icon_url"]) > 90:
-                                                if projData["project"].get("id") != None:
-                                                    urlData["modrinthIcon"] = "proj:" + str(projData["project"]["id"])
-                                            else:
-                                                urlData["modrinthIcon"] = projData["project"]["icon_url"]
+                                    if argus.skip_modrinth_icon != True:
+                                        if projData["metadata"].get("project") != None:
+                                            if projData["metadata"]["project"].get("icon_url") != None:
+                                                if len(projData["metadata"]["project"]["icon_url"]) > 90:
+                                                    if projData["metadata"]["project"].get("id") != None:
+                                                        urlData["modrinthIcon"] = "proj:" + str(projData["metadata"]["project"]["id"])
+                                                else:
+                                                    urlData["modrinthIcon"] = projData["metadata"]["project"]["icon_url"]
                                     # Append
                                     urls.append(urlData)
                                     prog,scannedFiles = getProgStr(amntFiles,scannedFiles)

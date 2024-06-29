@@ -47,6 +47,7 @@ parser.add_argument('-cmpl', type=str, help='The compile.yml file')
 parser.add_argument('-enc', type=str, help='The file encoding to use')
 parser.add_argument('--prioCF', dest="prio_curseforge", help='If given the script will prioritize looking at curseforge.', action='store_true')
 parser.add_argument('--skipProjId', dest="curseforge_skip_project_id", help="If given the script will not include curseforge projectId's.", action='store_true')
+parser.add_argument('--skipModrinthIcon', dest="skip_modrinth_icon", help="If given the script will not include icons from modrinth profiles. (overwritable by compile file)", action='store_true')
 args = parser.parse_args()
 
 usable_UUID = generate_uuid()
@@ -128,6 +129,14 @@ if args.prio_curseforge == True:
     command += " --prioCF"
 if args.curseforge_skip_project_id != True:
     command += " --addProjId"
+_skipModrinthIcon = False
+if compyml.get("skipModrinthIcon") != None and type(compyml.get("skipModrinthIcon")) == bool:
+    _skipModrinthIcon = compyml.get("skipModrinthIcon")
+else:
+    _skipModrinthIcon = args.skip_modrinth_icon
+if _skipModrinthIcon == True:
+    command += " --skipModrinthIcon"
+
 
 os.system(f"python3 {lister} {command}")
 print("")
