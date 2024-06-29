@@ -173,7 +173,17 @@ for _path in entries:
                                 # check for url
                                 if _selectedProjFile.get("url") != None:
                                     lookedAtFiles.append(_name)
-                                    urls.append({"type":"modrinth","url":_selectedProjFile.get("url"),"filename":_name,"modrinthType":"profile"})
+                                    urlData = {"type":"modrinth","url":_selectedProjFile.get("url"),"filename":_name,"modrinthType":"profile"}
+                                    # icon?
+                                    if projData.get("project") != None:
+                                        if projData["project"].get("icon_url") != None:
+                                            if len(projData["project"]["icon_url"]) > 90:
+                                                if projData["project"].get("id") != None:
+                                                    urlData["modrinthIcon"] = "proj:" + str(projData["project"]["id"])
+                                            else:
+                                                urlData["modrinthIcon"] = projData["project"]["icon_url"]
+                                    # Append
+                                    urls.append(urlData)
                                     prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
                                     d.pr(f"{prog}\033[32mFound url in profile \033[90m: \033[32m{_selectedProjFile.get('url')}")
 

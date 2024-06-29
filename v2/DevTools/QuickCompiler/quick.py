@@ -254,6 +254,13 @@ if gitsp != None:
                 "sourceType": reptype,
                 "source": listurl
             }
+            # add icon?
+            if compyml.get("includeFullIcon") == True:
+                entryWa["icon"] = iconTx
+                print("Added the full icon to the listing.")
+            elif compyml.get("separateRepoIcon") != None and compyml.get("separateRepoIcon") != "":
+                entryWa["icon"] = compyml.get("separateRepoIcon")
+                print("Added a sepparate repo icon to the listing.")
             # add entry if not exist with same id
             exists = False
             for entry in dRepo.get("flavors"):
