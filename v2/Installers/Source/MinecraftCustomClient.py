@@ -64,7 +64,7 @@ try:
     _ = autopipImport("readchar")
     _ = autopipImport("urllib3") # Need modname="urllib", pipname="urllib3"?
     _ = autopipImport("bs4")
-    _ = autopipImport("rich")
+    _ = autopipImport("rich",relaunch=True,relaunchCmds=sys.argv)
     _ = autopipImport("zlib","pyzlib")
 except NameError as e:
     print("\033[31mAutoPipImport failed, has the script been run through the include-inline tool?\033[0m")
