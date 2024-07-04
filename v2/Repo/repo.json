@@ -588,21 +588,21 @@
         "name": "1.21 Mooare U1 BETA1 E",
         "desc": "A client with some more stuff. (EssentialsMod)",
         "author": "SimonKC",
-        "id": "b3978b26-6f7a-4872-b7a7-3c411a94bd5f",
+        "id": "6205e4e3-8921-43a4-9acf-efc6ee3bcea6",
         "hidden": false,
         "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21-Mooare-U1-BETA1-E_2024-07-05_00-31-37-quickcompile.mListing",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21-Mooare-U1-BETA1-E_2024-07-05_01-28-12-quickcompile.mListing",
         "icon": "skc:community_E"
     }, {
         "name": "1.21 Mooare U1 BETA1 C",
         "desc": "A client with some more stuff. (e4mc mod)",
         "author": "SimonKC",
-        "id": "83063ae0-6663-4112-9224-6f574d4a97d5",
+        "id": "9d5dbe76-7c76-4a8d-9e31-b89040515849",
         "hidden": false,
         "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21-Mooare-U1-BETA1-C_2024-07-05_00-33-47-quickcompile.mListing",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21-Mooare-U1-BETA1-C_2024-07-05_01-30-37-quickcompile.mListing",
         "icon": "skc:community_C"
     }]
 }
