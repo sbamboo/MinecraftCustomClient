@@ -60,8 +60,8 @@
         "author": "SimonKC",
         "icon": "mcc:normal",
         "id": "782a98ae-a80f-4953-b6c9-ee3a6c999932",
-        "hidden": false,
-        "supported": true,
+        "hidden": true,
+        "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U2_2024-02-13_14-53-05-quickcompile.mListing"
     }, {
@@ -70,7 +70,7 @@
         "author": "SimonKC",
         "id": "b4f91c1c-affa-4c43-b4fe-cacb8b0b989a",
         "hidden": true,
-        "supported": true,
+        "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U1_2024-02-11_18-07-53-quickcompile.mListing"
     }, {
@@ -79,7 +79,7 @@
         "author": "SimonKC",
         "id": "5e2b0d27-212c-444c-ae11-bce94cc51ab9",
         "hidden": true,
-        "supported": true,
+        "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite_2024-02-02_05-26-09-quickcompile.mListing"
     }, {
@@ -581,7 +581,7 @@
         "author": "SimonKC",
         "id": "82514dbb-d58e-4de2-815c-06572aa0df54",
         "hidden": true,
-        "supported": true,
+        "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/chibit-test_-1.20.4_Community-Client_Lite-U2_2024-03-02_22-27-17-quickcompile.mListing"
     }, {
