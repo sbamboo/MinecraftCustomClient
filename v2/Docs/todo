@@ -24,3 +24,5 @@
   or win "..."
 
  fix in build that json,subprocess&getpass is getting pip:ed wrongly should be tex pyjson
+
+- Add a "configured" field in compile.yml that can be shown in the modviewer.
