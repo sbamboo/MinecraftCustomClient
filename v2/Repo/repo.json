@@ -13,7 +13,9 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21_Community-Client-U3-BETA2-E_2024-07-04_22-39-04-quickcompile.mListing",
-        "icon": "skc:community_E"
+        "icon": "skc:community_E",
+        "group": "Community-Client",
+        "mcver": "1.21"
     }, {
         "name": "1.21_Community-Client U3 BETA2 C",
         "desc": "Lite version, not done :) (e4mc Mod)",
@@ -23,7 +25,9 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21_Community-Client-U3-BETA2-C_2024-07-04_22-41-21-quickcompile.mListing",
-        "icon": "skc:community_C"
+        "icon": "skc:community_C",
+        "group": "Community-Client",
+        "mcver": "1.21"
     }, {
         "name": "1.21_Community-Client U3 BETA1 E",
         "desc": "Lite version, not done :) (EssentialsMod)",
@@ -33,7 +37,9 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21_Community-Client-U3-BETA1-E_2024-06-29_03-42-34-quickcompile.mListing",
-        "icon": "skc:community_E"
+        "icon": "skc:community_E",
+        "group": "Community-Client",
+        "mcver": "1.21"
     }, {
         "name": "1.21_Community-Client U3 BETA1 C",
         "desc": "Lite version, not done :) (e4mc Mod)",
@@ -43,7 +49,9 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21_Community-Client-U3-BETA1-C_2024-06-29_03-44-26-quickcompile.mListing",
-        "icon": "skc:community_C"
+        "icon": "skc:community_C",
+        "group": "Community-Client",
+        "mcver": "1.21"
     }, {
         "name": "1.20.4_Community-Client_Lite U3",
         "desc": "Lite version, not done :)",
@@ -53,7 +61,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U3_2024-04-06_04-41-49-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U3_2024-04-06_04-41-49-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.20.4"
     }, {
         "name": "1.20.4_Community-Client_Lite U2",
         "desc": "Lite version, not done :)",
@@ -63,7 +73,9 @@
         "hidden": true,
         "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U2_2024-02-13_14-53-05-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U2_2024-02-13_14-53-05-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.20.4"
     }, {
         "name": "1.20.4_Community-Client_Lite U1",
         "desc": "Lite version, not done :)",
@@ -72,7 +84,9 @@
         "hidden": true,
         "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U1_2024-02-11_18-07-53-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite-U1_2024-02-11_18-07-53-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.20.4"
     }, {
         "name": "1.20.4_Community-Client_Lite",
         "desc": "Lite version, not done :)",
@@ -81,7 +95,9 @@
         "hidden": true,
         "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite_2024-02-02_05-26-09-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.4_Community-Client_Lite_2024-02-02_05-26-09-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.20.4"
     }, {
         "name": "1.20_Community-Client_Lite_Vicy",
         "desc": "Lite version, not done :)",
@@ -91,7 +107,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20_Community-Client_Lite_Vicy_2023-10-02_15-31-25-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20_Community-Client_Lite_Vicy_2023-10-02_15-31-25-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.20"
     }, {
         "name": "1.20.2_Community-Client_Lite",
         "desc": "In development version, things may be wonky but should work :)",
@@ -100,7 +118,9 @@
         "hidden": true,
         "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.2_Community-Client_Lite_2023-10-03_20-35-39-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.20.2_Community-Client_Lite_2023-10-03_20-35-39-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.20.2"
     }, {
         "name": "TrainsAndChains+ (1.19) Update2",
         "desc": "A new expanded version of my TrainsAndChains modpack! (U2)",
@@ -109,7 +129,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update2_2023-11-24_18-17-36-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update2_2023-11-24_18-17-36-quickcompile.mListing",
+        "group": "TrainsAndChains",
+        "mcver": "1.19"
     }, {
         "name": "TrainsAndChains+ (1.19) Update1",
         "desc": "A new expanded version of my TrainsAndChains modpack!",
@@ -118,7 +140,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update1_2023-10-31_21-20-51-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/TrainsAndChains+-(1.19)-Update1_2023-10-31_21-20-51-quickcompile.mListing",
+        "group": "TrainsAndChains",
+        "mcver": "1.19"
     }, {
         "name": "1.19.2_Community-client_4_Beta2",
         "desc": "My larger version of my community client (containing litematica and more)",
@@ -139,7 +163,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.19.2"
     }, {
         "name": "1.19.2_Community-client_Lite_4_Beta2",
         "desc": "The light version of my community client (just the basics)",
@@ -160,7 +186,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.19.2"
     }, {
         "name": "1.19.1_Community-client_4_Beta2",
         "desc": "My larger version of my community client (containing litematica and more)",
@@ -181,7 +209,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.19.1"
     }, {
         "name": "1.19.1_Community-client_Lite_4_Beta2",
         "desc": "The light version of my community client (just the basics)",
@@ -202,7 +232,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.19.1"
     }, {
         "name": "1.19_Community-Client_4_Beta2",
         "desc": "My larger version of my community client (containing litematica and more)",
@@ -223,7 +255,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.19"
     }, {
         "name": "legacy_1.18.2_Community-Client_4",
         "desc": "Legacy client, not fully supported.",
@@ -244,7 +278,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.18.2"
     }, {
         "name": "legacy_1.18.1_Community-Client_3",
         "desc": "Legacy client, not fully supported.",
@@ -265,7 +301,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.18.1"
     }, {
         "name": "legacy_1.17.1_Community-Lite_2_ES_Patch1",
         "desc": "Legacy client, not fully supported.",
@@ -286,7 +324,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Community-Client",
+        "mcver": "1.17.1"
     }, {
         "name": "legacy_1.17.1_SimpleVoice",
         "desc": "Legacy client, not fully supported.",
@@ -307,7 +347,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Legacy-Modpack",
+        "mcver": "1.17.1"
     }, {
         "name": "legacy_1.17.1_AlotOfMods-Client_4.0",
         "desc": "Legacy client, not fully supported.",
@@ -328,7 +370,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Legacy-Modpack",
+        "mcver": "1.17.1"
     }, {
         "name": "legacy_1.17.1_OptiAlt_1.0",
         "desc": "Legacy client, not fully supported.",
@@ -349,7 +393,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Legacy-Modpack",
+        "mcver": "1.17.1"
     }, {
         "name": "legacy_1.18.1_Release4_Beta1",
         "desc": "Legacy client, not fully supported.",
@@ -370,7 +416,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Legacy-Modpack",
+        "mcver": "1.17.1"
     }, {
         "name": "legacy_1.17.1_Survival_And_Sodium",
         "desc": "Legacy client, not fully supported.",
@@ -391,7 +439,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Legacy-Modpack",
+        "mcver": "1.17.1"
     }, {
         "name": "legacy_1.17.1_MashedBundle",
         "desc": "Legacy client, not fully supported.",
@@ -412,7 +462,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": false
             }
-        }
+        },
+        "group": "Legacy-Modpack",
+        "mcver": "1.17.1"
     }, {
         "name": "LegacyTestClient",
         "desc": "Lite version, not done :)",
@@ -433,7 +485,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "TEST",
+        "mcver": "1.19"
     }, {
         "name": "TestingPkg_urlListing",
         "desc": "Internal test pgk for urlListing sourceType.",
@@ -442,7 +496,9 @@
         "hidden": true,
         "supported": false,
         "sourceType": "urlListing",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/listingPkg.mlisting"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Experiments/TestingPkg/listingPkg.mlisting",
+        "group": "TEST",
+        "mcver": "1.20.4"
     }, {
         "name": "TestingPkg_included",
         "desc": "Internal test pgk for included sourceType.",
@@ -492,7 +548,9 @@
                 "base64": "UEsDBBQAAAAIAJRsTFgEK7mGNwAAADgAAAALAAAAaXN2YWxpZC50eHTzSM3JyVcozy/KSVHk5VJW8ExTKMnILFZIy8xJVQDSRamJKYlJQHZJRmqeQmZJsUJZYk5mih4AUEsBAhQAFAAAAAgAlGxMWAQruYY3AAAAOAAAAAsAAAAAAAAAAQAgAAAAAAAAAGlzdmFsaWQudHh0UEsFBgAAAAABAAEAOQAAAGAAAAAAAA=="
             }],
             "sourceLength": 7
-        }
+        },
+        "group": "TEST",
+        "mcver": "1.20.4"
     }, {
         "name": "TestingPkg_legacy",
         "desc": "Internal test pgk for legacy sourceType.",
@@ -513,7 +571,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "TEST",
+        "mcver": "1.20.4"
     }, {
         "name": "TestingPkg_legacyB64",
         "desc": "Internal test pgk for legacyB64 sourceType.",
@@ -534,7 +594,9 @@
                 "installLocation": "installs/minecraft-custom-client/custom",
                 "allowCopy": true
             }
-        }
+        },
+        "group": "TEST",
+        "mcver": "1.20.4"
     }, {
         "name": "Super Mozzarella (Optimized By Cheddarn)",
         "desc": "My optimized verison of the official Super Mozzarella modpack.",
@@ -544,7 +606,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Optimized-By-Cheddarn)_2024-02-18_22-44-14-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Optimized-By-Cheddarn)_2024-02-18_22-44-14-quickcompile.mListing",
+        "group": "Super Mozzarella",
+        "mcver": "1.18.2"
     }, {
         "name": "Super Mozzarella (Optimized)",
         "desc": "An optimized verison of the official Super Mozzarella modpack.",
@@ -554,7 +618,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Optimized)_2024-02-18_23-09-47-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Optimized)_2024-02-18_23-09-47-quickcompile.mListing",
+        "group": "Super Mozzarella",
+        "mcver": "1.18.2"
     }, {
         "name": "Super Mozzarella (Cheddar Flavour)",
         "desc": "My custom edition of the official Super Mozzarella modpack.",
@@ -564,7 +630,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Cheddar-Flavour)_2024-02-18_23-20-56-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Cheddar-Flavour)_2024-02-18_23-20-56-quickcompile.mListing",
+        "group": "Super Mozzarella",
+        "mcver": "1.18.2"
     }, {
         "name": "Super Mozzarella (Cheddar Flavour) - ValkyrianSkies",
         "desc": "My custom edition of the official Super Mozzarella modpack, with VK.",
@@ -574,7 +642,9 @@
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Cheddar-Flavour)---ValkyrianSkies_2024-02-18_23-34-38-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/Super-Mozzarella-(Cheddar-Flavour)---ValkyrianSkies_2024-02-18_23-34-38-quickcompile.mListing",
+        "group": "Super Mozzarella",
+        "mcver": "1.18.2"
     }, {
         "name": "chibit-test_ 1.20.4_Community-Client_Lite U2",
         "desc": "Lite version, not done :)",
@@ -583,7 +653,9 @@
         "hidden": true,
         "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/chibit-test_-1.20.4_Community-Client_Lite-U2_2024-03-02_22-27-17-quickcompile.mListing"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/chibit-test_-1.20.4_Community-Client_Lite-U2_2024-03-02_22-27-17-quickcompile.mListing",
+        "group": "TEST",
+        "mcver": "1.20.4"
     }, {
         "name": "1.21 Mooare U1 BETA1 E",
         "desc": "A client with some more stuff. (EssentialsMod)",
@@ -593,7 +665,9 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21-Mooare-U1-BETA1-E_2024-07-05_01-28-12-quickcompile.mListing",
-        "icon": "skc:community_E"
+        "icon": "skc:community_E",
+        "group": "Mooare",
+        "mcver": "1.21"
     }, {
         "name": "1.21 Mooare U1 BETA1 C",
         "desc": "A client with some more stuff. (e4mc mod)",
@@ -603,7 +677,9 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21-Mooare-U1-BETA1-C_2024-07-05_01-30-37-quickcompile.mListing",
-        "icon": "skc:community_C"
+        "icon": "skc:community_C",
+        "group": "Mooare",
+        "mcver": "1.21"
     }, {
         "name": "1.21.1_Community-Client U3 BETA1 C",
         "desc": "Lite version, not done :) (e4mc Mod)",
@@ -613,7 +689,9 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.1_Community-Client-U3-BETA1-C_2024-08-14_16-19-04-quickcompile.mListing",
-        "icon": "skc:community_C"
+        "icon": "skc:community_C",
+        "group": "Mooare",
+        "mcver": "1.21.1"
     }, {
         "name": "1.21.1_Community-Client U3 BETA1 E",
         "desc": "Lite version, not done :) (EssentialsMod)",
@@ -623,6 +701,8 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.1_Community-Client-U3-BETA1-E_2024-08-14_16-22-57-quickcompile.mListing",
-        "icon": "skc:community_E"
+        "icon": "skc:community_E",
+        "group": "Mooare",
+        "mcver": "1.21.1"
     }]
 }

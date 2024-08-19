@@ -252,6 +252,11 @@ if gitsp != None:
                 listurl = ""
             # get id
             listuuid = usable_UUID
+            # check group
+            entry_group = "UNGROUPED"
+            if compyml.get("group") != None:
+                if compyml["group"].get("id") != None:
+                    entry_group = compyml["group"]["id"]
             # make entry
             entryWa = {
                 "name": compyml['name'],
@@ -261,7 +266,9 @@ if gitsp != None:
                 "hidden": autoBool(compyml['hidden']),
                 "supported": True,
                 "sourceType": reptype,
-                "source": listurl
+                "source": listurl,
+                "group": entry_group,
+                "mcver": compyml["minecraftVer"]
             }
             # add icon?
             if compyml.get("includeFullIcon") == True:
