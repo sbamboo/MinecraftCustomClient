@@ -14,6 +14,12 @@ class MJRL():
         '''Name: id or slug'''
         Url = self.BaseApiUrl + f"project/{Name}"
         return self.req.get(Url, headers=self.Headers)
+    def GetProject(self,Name):
+        '''Name: id or slug'''
+        Response = self.GetProjectRaw(Name)
+        Content  = Response.content.decode()
+        Data     = json.loads(Content)
+        return Data
     def GetProjectVersionsRaw(self,Name):
         '''Name: id or slug'''
         Url = self.BaseApiUrl + f"project/{Name}/version"
@@ -21,6 +27,16 @@ class MJRL():
     def GetProjectVersions(self,Name):
         '''Name: id or slug'''
         Response = self.GetProjectVersionsRaw(Name)
+        Content  = Response.content.decode()
+        Data     = json.loads(Content)
+        return Data
+    def GetProjectForVersionRaw(self,Name,Version):
+        '''Name: id or slug'''
+        Url = self.BaseApiUrl + f"project/{Name}/version/{Version}"
+        return self.req.get(Url, headers=self.Headers)
+    def GetProjectForVersion(self,Name,Version):
+        '''Name: id or slug'''
+        Response = self.GetProjectForVersionRaw(Name,Version)
         Content  = Response.content.decode()
         Data     = json.loads(Content)
         return Data

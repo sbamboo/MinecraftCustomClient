@@ -11,6 +11,7 @@ except ImportError:
     from scandir import scandir
 import argparse
 from datetime import datetime
+import urllib.parse
 
 # [Settings]
 debugPrefix = "\033[90m[\033[35mDevList\033[90m]\033[0m "
@@ -37,6 +38,8 @@ cparser.add_argument('--silent', dest="silent", help='If given the script will o
 cparser.add_argument('--prioCF', dest="prio_curseforge", help='If given the script will prioritize looking at curseforge.', action='store_true')
 cparser.add_argument('--addProjId', dest="curseforge_ask_project_id", help="If given the script will include curseforge projectId's.", action='store_true')
 cparser.add_argument('--skipModrinthIcon', dest="skip_modrinth_icon", help="If given the script will not include icons from modrinth profiles.", action='store_true')
+cparser.add_argument('--skipModrinthIndexIcon', dest="skip_modrinth_index_icon", help="If given the script will not use the information in modrinth-export-index files to fetch for icons.", action='store_true')
+cparser.add_argument('--matchModrinthIndexDownloads', dest="match_modrinth_index_downloads", help="If given the script will only use a modrinth-export-index file download if it has a matching filename.", action='store_true')
 # Create main arguments object
 argus = cparser.parse_args()
 
@@ -45,6 +48,7 @@ modpack  = argus.modpack
 mods     = os.path.join(modpack,"mods")
 manifest = os.path.join(modpack,f"minecraftinstance.json") #Curseforge Manifest
 profile  = os.path.join(modpack,"profile.json") #Modrinth profile
+mdrindex = os.path.join(modpack,"modrinth.index.json") #Modrinth Export Index
 
 urls = []
 lookedAtFiles = []
@@ -119,6 +123,7 @@ d = debugOut(debugEnabled, debugPrefix)
 d.pr(f"\033[33mScanning mods directory of: '{modpack.split(os.sep)[-1]}'")
 pathObjects = scantree(mods)
 profileData = None
+mdrindexData = None
 filename_to_slug = {}
 if os.path.exists(profile):
     profileData = json.loads(open(profile,'r',encoding="utf-8").read())
@@ -130,6 +135,9 @@ if os.path.exists(profile):
                 if value["metadata"].get("project") != None:
                     if value["metadata"]["project"].get("slug") != None:
                         filename_to_slug[fn] = value["metadata"]["project"]["slug"]
+if os.path.exists(mdrindex):
+    mdrindexData = json.loads(open(mdrindex,'r',encoding="utf-8").read())
+    
 # get list of al jarfiles
 entries = []
 for obj in pathObjects:
@@ -140,6 +148,10 @@ d.pr(f"\033[34mFound {amntFiles} files.")
 scannedFiles = 0
 
 # retrive links
+if has_connection():
+    modrinth = MJRL("sbamboo/MinecraftCustomClient")
+else:
+    modrinth = None
 for _path in entries:
     _name = os.path.basename(_path)
     if _name.endswith(".jar"):
@@ -189,9 +201,53 @@ for _path in entries:
                                     prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
                                     d.pr(f"{prog}\033[32mFound url in profile \033[90m: \033[32m{_selectedProjFile.get('url')}")
 
+        # From modrinth export index
+        if mdrindexData != None and type(mdrindexData) == dict and _name not in lookedAtFiles:
+            indexFiles = mdrindexData.get("files")
+            if indexFiles != None:
+                if len(indexFiles) > 0:
+                    for indexFile in indexFiles:
+                        if indexFile.get("path") != None:
+                            # match
+                            if indexFile["path"].endswith(_name):
+                                indexDownloadUrl = None
+                                # Get download link
+                                if argus.match_modrinth_index_downloads:
+                                    for x in indexFile.get("downloads"):
+                                        # Try exact
+                                        if x.endswith(_name):
+                                            indexDownloadUrl = x
+                                        # Try HTML encoded
+                                        elif x.endswith(urllib.parse.quote(_name)):
+                                            indexDownloadUrl = x
+                                else:
+                                    if len(indexFile.get("downloads")) > 0:
+                                        indexDownloadUrl = indexFile.get("downloads")[0]
+                                # Set
+                                if indexDownloadUrl != None:
+                                    lookedAtFiles.append(_name)
+                                    urlData = {"type":"modrinth","url":indexDownloadUrl,"filename":_name,"modrinthType":"export-index"}
+                                    # Icon?
+                                    if indexDownloadUrl.startswith("https://cdn.modrinth.com/data/"):
+                                        possibleId = indexDownloadUrl.replace("https://cdn.modrinth.com/data/","",1).split("/")[0]
+                                        if argus.skip_modrinth_index_icon != True and modrinth != None:
+                                            meta = modrinth.GetProject(possibleId)
+                                            if type(meta) == dict:
+                                                if meta.get("icon_url") != None and meta.get("icon_url") != "":
+                                                    if len(meta.get("icon_url")) > 90:
+                                                        urlData["modrinthIcon"] = f"proj:{possibleId}"
+                                                    else:
+                                                        urlData["modrinthIcon"] = meta.get("icon_url")
+                                        else:
+                                            urlData["modrinthIcon"] = f"proj:{possibleId}"
+
+                                    # Append
+                                    urls.append(urlData)
+                                    prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
+                                    d.pr(f"{prog}\033[32mFound url in exindex \033[90m: \033[32m{indexDownloadUrl}")
+
         # From modrinth web
-        if has_connection() == True and _name not in lookedAtFiles:
-            modrinth = MJRL("sbamboo/MinecraftCustomClient")
+        if modrinth != None and _name not in lookedAtFiles:
             name = _name
             name = name.replace("-", " ")
             name = name.replace("_", " ")
