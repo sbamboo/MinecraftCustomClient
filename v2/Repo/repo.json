@@ -32,26 +32,26 @@
         "name": "1.21.1_Community-Client-Lite U3.B2.E",
         "desc": "Lite version, not done :) (EssentialsMod)",
         "author": "SimonKC",
-        "id": "0b836f45-4936-485e-ad1c-0e23036580c3",
+        "id": "d6506aa4-e630-4322-bee6-064e60658deb",
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.1_Community-Client-Lite-U3.B2.E_2024-09-12_16-36-45-quickcompile.mListing",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.1_Community-Client-Lite-U3.B2.E_2024-09-12_17-05-00-quickcompile.mListing",
         "group": "UNGROUPED",
         "mcver": "1.21.1",
-        "icon": "skc:community_E"
+        "icon": "skc:community_lite_E"
     }, {
         "name": "1.21.1_Community-Client-Lite U3.B2.C",
         "desc": "Lite version, not done :) (e4mc Mod)",
         "author": "SimonKC",
-        "id": "a2287609-fb28-40d1-8201-7c8e9032e870",
+        "id": "ab4a3a35-90e2-4a4c-bb1f-1beeae4b8ed6",
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.1_Community-Client-Lite-U3.B2.C_2024-09-12_16-38-20-quickcompile.mListing",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.1_Community-Client-Lite-U3.B2.C_2024-09-12_17-06-36-quickcompile.mListing",
         "group": "UNGROUPED",
         "mcver": "1.21.1",
-        "icon": "skc:community_C"
+        "icon": "skc:community_lite_C"
     }, {
         "name": "1.21_Community-Client U3 BETA2 E",
         "desc": "Lite version, not done :) (EssentialsMod)",
