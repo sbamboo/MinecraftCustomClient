@@ -11,7 +11,7 @@
         "author": "SimonKC",
         "id": "278364a7-3fb1-4e76-99e9-3d883ab2b3c0",
         "hidden": false,
-        "supported": true,
+        "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.4_Community-Client-Lite-U3.B1.E_2024-12-19_16-35-05-quickcompile.mListing",
         "group": "Community-Client",
