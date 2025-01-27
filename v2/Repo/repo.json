@@ -812,5 +812,29 @@
         "icon": "skc:community_E",
         "group": "Community-Client",
         "mcver": "1.21.1"
+    }, {
+        "name": "1.21.4 Mooare U1 BETA1 E",
+        "desc": "A client with some more stuff. (Essentials Mod)",
+        "author": "SimonKC",
+        "id": "2d5f01c1-cb4f-48c1-bc7a-a257f3e83ddc",
+        "hidden": false,
+        "supported": false,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.4-Mooare-U1-BETA1-E_2025-01-27_09-31-18-quickcompile.mListing",
+        "group": "Mooare",
+        "mcver": "1.21.4",
+        "icon": "skc:community_lite_E"
+    }, {
+        "name": "1.21.4 Mooare U1 BETA1 C",
+        "desc": "A client with some more stuff. (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "534f26b7-cc56-4a4f-aabc-1c6d6aa2abd1",
+        "hidden": false,
+        "supported": false,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.4-Mooare-U1-BETA1-C_2025-01-27_09-28-25-quickcompile.mListing",
+        "group": "Mooare",
+        "mcver": "1.21.4",
+        "icon": "skc:community_lite_C"
     }]
 }
