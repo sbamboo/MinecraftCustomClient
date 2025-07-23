@@ -34,7 +34,14 @@ if action_install == True:
         if args.modpack:
             key = args.modpack
         else:
-            key = showDictSel(flavorsDict,selTitle=selTitle,selSuffix=selSuffix)
+            if args.show_hidden == True:
+                toDisplay = flavorsDict.copy()
+                toDisplay.update(notShowFlavors)
+                del toDisplay["[Exit]"]
+                toDisplay["[Exit]"] = {"desc": "ncb:"}
+                key = showDictSel(toDisplay,selTitle=selTitle,selSuffix=selSuffix)
+            else:
+                key = showDictSel(flavorsDict,selTitle=selTitle,selSuffix=selSuffix)
         validKeys = list(flavorsDict.keys())
         validKeys.extend( list(notShowFlavors.keys()) )
         if key == None or key not in validKeys or key == "[Exit]":

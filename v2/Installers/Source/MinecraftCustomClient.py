@@ -1,8 +1,8 @@
 # This is the big installer who shows and installes from repositories
 
 # [Settings]
-installer_version = "1.3.5"
-installer_release = "2024-03-02(0)"
+installer_version = "1.3.6"
+installer_release = "2025-07-23(0)"
 prefix    = "\033[90m[\033[35mInstaller\033[90m]\033[0m "
 prefix_dl = "\033[90m[\033[34mDown-List\033[90m]\033[0m "
 prefix_jv = "\033[90m[\033[33mJava-Inst\033[90m]\033[0m "
@@ -117,6 +117,7 @@ parser.add_argument('--resolveUrlIconMR', help="With this the installer will con
 parser.add_argument('--showModLoadingBar', help="Should modfile installations show a loading bar? (Will clutter terminal output but may provide usefull info for some)", action="store_true")
 parser.add_argument('--noWebInclGdriveWarns', help="Hides google-drive webinclude warnings.", action="store_true")
 parser.add_argument('--noQouteJava', help="ADVANCED: Won't qoute java-path when installing loader. (Might break if spaces in path, but might fix compat)", action="store_true")
+parser.add_argument('--showHidden', dest="show_hidden", help='EXPERIMENTAL: Shows all entries from the repository. (Might break UI)', action="store_true")
 parser.add_argument('--update', help="EXPERIMENTAL: Attepts to update installer", action="store_true")
 parser.add_argument('--noPipReload', help="INTERNAL", action="store_true")
 parser.add_argument('--skipPreRelWait', help='DEBUG', action="store_true")

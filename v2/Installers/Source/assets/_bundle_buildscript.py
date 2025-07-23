@@ -24,6 +24,9 @@ if os.path.exists(packagesF):
     # ensure pkgs in build envir
     for package in packages.split(","):
         os.system(f"{sys.executable} -m pip install {package}")
+        # Handle --copy-metadata for specific packages
+        if package in ["readchar"]:
+            pkgs_str += f" --copy-metadata {package}"
 
 mainfile = os.path.join(parent,"source.MinecraftCustomClient.py")
 logo = os.path.join(parent,"logo.ico")
