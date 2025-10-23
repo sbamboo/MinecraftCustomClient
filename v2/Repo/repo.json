@@ -13,7 +13,7 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.10_Community-Client_U3.B2.E_2025-10-23_11-52-45-quickcompile.mListing",
-        "group": "UNGROUPED",
+        "group": "WIP PreRelease",
         "mcver": "1.21.10",
         "icon": "skc:community_lite_E"
     }, {
@@ -929,7 +929,7 @@
         "supported": false,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.10_Mooare_U1.B1.E_2025-10-23_13-40-31-quickcompile.mListing",
-        "group": "UNGROUPED",
+        "group": "WIP PreRelease",
         "mcver": "1.21.10",
         "icon": "skc:community_lite_E"
     }, {
