@@ -3,8 +3,20 @@
     "author": "MinecraftCustomClient / SimonKC",
     "version": "1.0",
     "created": "2023-09-22",
-    "lastUpdated": "2025-07-23",
+    "lastUpdated": "2025-10-23",
     "flavors": [{
+        "name": "1.21.10_Community-Client_U3.B2.E",
+        "desc": "NEEDS-TESTING (EssentialsMod)",
+        "author": "SimonKC",
+        "id": "d6667e75-75b4-4ee2-ba3c-c4c946f17a2a",
+        "hidden": false,
+        "supported": false,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.10_Community-Client_U3.B2.E_2025-10-23_11-52-45-quickcompile.mListing",
+        "group": "UNGROUPED",
+        "mcver": "1.21.10",
+        "icon": "skc:community_lite_E"
+    }, {
         "name": "1.21.7_Community-Client_U3.B2.E",
         "desc": "Not done :) (EssentialsMod)",
         "author": "SimonKC",
@@ -909,17 +921,17 @@
         "group": "Community-Client",
         "mcver": "1.21.1"
     }, {
-        "name": "1.21.7_Mooare_U1.B1.C",
-        "desc": "Not done :) (e4mc Mod)",
+        "name": "1.21.10_Mooare_U1.B1.E",
+        "desc": "NEEDS-TESTING (EssentialsMod)",
         "author": "SimonKC",
-        "id": "56eb5d2a-2927-4485-abb1-cbe975998498",
+        "id": "085491a4-8dee-4f9c-a2f9-828417745ab9",
         "hidden": false,
-        "supported": true,
+        "supported": false,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.7_Mooare_U1.B1.C_2025-07-23_00-57-17-quickcompile.mListing",
-        "group": "Mooare",
-        "mcver": "1.21.7",
-        "icon": "skc:community_lite_C"
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.10_Mooare_U1.B1.E_2025-10-23_13-40-31-quickcompile.mListing",
+        "group": "UNGROUPED",
+        "mcver": "1.21.10",
+        "icon": "skc:community_lite_E"
     }, {
         "name": "1.21.7_Mooare_U1.B1.E",
         "desc": "Not done :) (EssentialsMod)",
@@ -932,6 +944,18 @@
         "group": "Mooare",
         "mcver": "1.21.7",
         "icon": "skc:community_lite_E"
+    }, {
+        "name": "1.21.7_Mooare_U1.B1.C",
+        "desc": "Not done :) (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "56eb5d2a-2927-4485-abb1-cbe975998498",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.7_Mooare_U1.B1.C_2025-07-23_00-57-17-quickcompile.mListing",
+        "group": "Mooare",
+        "mcver": "1.21.7",
+        "icon": "skc:community_lite_C"
     }, {
         "name": "1.21.5 Mooare U1 BETA1 E",
         "desc": "A client with some more stuff. (Essentials Mod)",
