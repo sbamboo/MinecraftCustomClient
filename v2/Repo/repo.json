@@ -1,13 +1,13 @@
 {
     "format": 1,
-    "author": "MinecraftCustomClient / SimonKC",
+    "author": "MinecraftCustomClient / Axo",
     "version": "1.0",
     "created": "2023-09-22",
     "lastUpdated": "2025-10-25",
     "flavors": [{
         "name": "1.21.10_Community-Client_U3.B2.E_PR",
         "desc": "Pre-Release :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "86ffc766-78d4-4975-9771-3e36f075e075",
         "hidden": false,
         "supported": false,
@@ -19,7 +19,7 @@
     }, {
         "name": "1.21.7_Community-Client_U3.B2.E",
         "desc": "Not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "8fa71428-522b-460e-b70a-64d904ab1d70",
         "hidden": false,
         "supported": true,
@@ -31,7 +31,7 @@
     }, {
         "name": "1.21.7_Community-Client_U3.B2.C",
         "desc": "Not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "4688d100-f03d-448f-9d30-a04566579a11",
         "hidden": false,
         "supported": true,
@@ -43,7 +43,7 @@
     }, {
         "name": "1.21.7_Community-Client-Lite_U3.B2.E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "d0924a46-02e3-4dd1-b527-dd8f384fe960",
         "hidden": false,
         "supported": true,
@@ -55,7 +55,7 @@
     }, {
         "name": "1.21.7_Community-Client-Lite_U3.B2.C",
         "desc": "Lite version, not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "aebacf9f-eeb9-42f1-ad20-606d03fce4f8",
         "hidden": false,
         "supported": true,
@@ -67,7 +67,7 @@
     }, {
         "name": "1.21.5_Community-Client U3.B2.E",
         "desc": "Not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "a8ceb32c-5b21-4346-8e38-4e056e9e79f9",
         "hidden": false,
         "supported": true,
@@ -79,7 +79,7 @@
     }, {
         "name": "1.21.5_Community-Client U3.B2.C",
         "desc": "Not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "be698ba6-04f2-42ec-bd72-1668d2895495",
         "hidden": false,
         "supported": true,
@@ -91,7 +91,7 @@
     }, {
         "name": "1.21.5_Community-Client-Lite U3.B2.E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "c0ac8efd-25c2-4f1a-8a1a-ddb1f2c3936c",
         "hidden": false,
         "supported": true,
@@ -103,7 +103,7 @@
     }, {
         "name": "1.21.5_Community-Client-Lite U3.B2.C",
         "desc": "Lite version, not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "e3a8be48-a8a7-42f0-8865-94246dfd4fb5",
         "hidden": false,
         "supported": true,
@@ -115,7 +115,7 @@
     }, {
         "name": "1.21.4_Community-Client U3.B2.E",
         "desc": "Not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "1af3edb9-4db6-446d-952a-873f2b3448ce",
         "hidden": true,
         "supported": false,
@@ -127,7 +127,7 @@
     }, {
         "name": "1.21.4_Community-Client U3.B2.C",
         "desc": "Not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "d2329a02-8e36-4ec0-93d0-f53638998111",
         "hidden": true,
         "supported": false,
@@ -139,7 +139,7 @@
     }, {
         "name": "1.21.4_Community-Client-Lite U3.B2.E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "09dd788f-bb27-4076-aadf-ec6a449e4d56",
         "hidden": true,
         "supported": true,
@@ -151,7 +151,7 @@
     }, {
         "name": "1.21.4_Community-Client-Lite U3.B2.C",
         "desc": "Lite version, not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "ed59b1bd-c8c9-4e4d-ba2d-02206cc02f4c",
         "hidden": true,
         "supported": true,
@@ -163,7 +163,7 @@
     }, {
         "name": "1.21.4_Community-Client-Lite U3.B1.E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "278364a7-3fb1-4e76-99e9-3d883ab2b3c0",
         "hidden": true,
         "supported": false,
@@ -175,7 +175,7 @@
     }, {
         "name": "1.21.1_Community-Client U3.B2.E",
         "desc": "Not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "142a7bc6-9596-46c3-8bca-6576c95eb48e",
         "hidden": true,
         "supported": true,
@@ -187,7 +187,7 @@
     }, {
         "name": "1.21.1_Community-Client U3.B2.C",
         "desc": "Not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "8cba9886-8a25-4e16-a548-153fe4a9e189",
         "hidden": true,
         "supported": true,
@@ -199,7 +199,7 @@
     }, {
         "name": "1.21.1_Community-Client-Lite U3.B2.E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "0d169874-0f08-43de-a16a-7280271db8fb",
         "hidden": true,
         "supported": true,
@@ -211,7 +211,7 @@
     }, {
         "name": "1.21.1_Community-Client-Lite U3.B2.C",
         "desc": "Lite version, not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "157212a0-ab2c-4acb-96d9-5456be9bc930",
         "hidden": true,
         "supported": true,
@@ -223,7 +223,7 @@
     }, {
         "name": "1.21_Community-Client U3 BETA2 E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "e24bc36a-b3e2-4836-bfc4-8edbd47ffa78",
         "hidden": true,
         "supported": true,
@@ -235,7 +235,7 @@
     }, {
         "name": "1.21_Community-Client U3 BETA2 C",
         "desc": "Lite version, not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "0f6d58f9-2208-4a32-b1af-25c2b59c14c7",
         "hidden": true,
         "supported": true,
@@ -247,7 +247,7 @@
     }, {
         "name": "1.21_Community-Client U3 BETA1 E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "261c4ad9-d160-4d9e-9ec6-d23b1b36cb88",
         "hidden": true,
         "supported": false,
@@ -259,7 +259,7 @@
     }, {
         "name": "1.21_Community-Client U3 BETA1 C",
         "desc": "Lite version, not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "ce53efd7-8b24-471e-9417-4dbfc87008c7",
         "hidden": true,
         "supported": false,
@@ -271,7 +271,7 @@
     }, {
         "name": "1.20.4_Community-Client_Lite U3",
         "desc": "Lite version, not done :)",
-        "author": "SimonKC",
+        "author": "Axo",
         "icon": "mcc:normal",
         "id": "5ed771f4-d636-4ee5-9c85-637c6099a7f9",
         "hidden": false,
@@ -283,7 +283,7 @@
     }, {
         "name": "1.20.4_Community-Client_Lite U2",
         "desc": "Lite version, not done :)",
-        "author": "SimonKC",
+        "author": "Axo",
         "icon": "mcc:normal",
         "id": "782a98ae-a80f-4953-b6c9-ee3a6c999932",
         "hidden": true,
@@ -295,7 +295,7 @@
     }, {
         "name": "1.20.4_Community-Client_Lite U1",
         "desc": "Lite version, not done :)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "b4f91c1c-affa-4c43-b4fe-cacb8b0b989a",
         "hidden": true,
         "supported": false,
@@ -306,7 +306,7 @@
     }, {
         "name": "1.20.4_Community-Client_Lite",
         "desc": "Lite version, not done :)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "5e2b0d27-212c-444c-ae11-bce94cc51ab9",
         "hidden": true,
         "supported": false,
@@ -318,7 +318,7 @@
         "name": "1.20_Community-Client_Lite_Vicy",
         "desc": "Lite version, not done :)",
         "id": "9cfc0c63-3b3c-4397-bf06-b214c245f12e",
-        "author": "SimonKC",
+        "author": "Axo",
         "icon": "mcc:normal",
         "hidden": false,
         "supported": true,
@@ -329,7 +329,7 @@
     }, {
         "name": "1.20.2_Community-Client_Lite",
         "desc": "In development version, things may be wonky but should work :)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "3c395c8a-1565-4a38-9b69-08c3194e2660",
         "hidden": true,
         "supported": false,
@@ -340,7 +340,7 @@
     }, {
         "name": "TrainsAndChains+ (1.19) Update2",
         "desc": "A new expanded version of my TrainsAndChains modpack! (U2)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "1ce77005-f1ff-463b-a343-f83afdf0389c",
         "hidden": false,
         "supported": true,
@@ -351,7 +351,7 @@
     }, {
         "name": "TrainsAndChains+ (1.19) Update1",
         "desc": "A new expanded version of my TrainsAndChains modpack!",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "03e2c914-c0cb-4592-93ca-7ce2c98c2f1d",
         "hidden": false,
         "supported": true,
@@ -816,7 +816,7 @@
     }, {
         "name": "Super Mozzarella (Optimized By Cheddarn)",
         "desc": "My optimized verison of the official Super Mozzarella modpack.",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "38d1160d-86f4-4fe1-9eb2-0561235d49fc",
         "icon": "skc:supmozz_opt",
         "hidden": false,
@@ -828,7 +828,7 @@
     }, {
         "name": "Super Mozzarella (Optimized)",
         "desc": "An optimized verison of the official Super Mozzarella modpack.",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "9e780288-1575-45d4-b5de-d32ec65efadd",
         "icon": "skc:supmozz_opt",
         "hidden": false,
@@ -840,7 +840,7 @@
     }, {
         "name": "Super Mozzarella (Cheddar Flavour)",
         "desc": "My custom edition of the official Super Mozzarella modpack.",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "fb51eaf3-b42f-4c6a-aa17-576cabc08be9",
         "icon": "skc:supmozz_opt",
         "hidden": false,
@@ -852,7 +852,7 @@
     }, {
         "name": "Super Mozzarella (Cheddar Flavour) - ValkyrianSkies",
         "desc": "My custom edition of the official Super Mozzarella modpack, with VK.",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "6297a152-7e31-4a68-9c12-305b1c06578e",
         "icon": "skc:supmozz_opt_vk",
         "hidden": false,
@@ -864,7 +864,7 @@
     }, {
         "name": "chibit-test_ 1.20.4_Community-Client_Lite U2",
         "desc": "Lite version, not done :)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "82514dbb-d58e-4de2-815c-06572aa0df54",
         "hidden": true,
         "supported": false,
@@ -875,7 +875,7 @@
     }, {
         "name": "1.21 Mooare U1 BETA1 E",
         "desc": "A client with some more stuff. (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "6205e4e3-8921-43a4-9acf-efc6ee3bcea6",
         "hidden": true,
         "supported": false,
@@ -887,7 +887,7 @@
     }, {
         "name": "1.21 Mooare U1 BETA1 C",
         "desc": "A client with some more stuff. (e4mc mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "9d5dbe76-7c76-4a8d-9e31-b89040515849",
         "hidden": true,
         "supported": false,
@@ -899,7 +899,7 @@
     }, {
         "name": "1.21.1_Community-Client U3 BETA1 C",
         "desc": "Lite version, not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "8a0d72b9-2a8d-4cf7-9908-d846edd26dff",
         "hidden": true,
         "supported": false,
@@ -911,7 +911,7 @@
     }, {
         "name": "1.21.1_Community-Client U3 BETA1 E",
         "desc": "Lite version, not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "4a496a6a-3485-40b5-8b79-43cfb1335104",
         "hidden": true,
         "supported": false,
@@ -923,7 +923,7 @@
     }, {
         "name": "1.21.10_Mooare_U1.B1.E_PR",
         "desc": "Pre-Release :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "885316f3-6d0a-4e41-841f-67a39f067599",
         "hidden": false,
         "supported": false,
@@ -935,7 +935,7 @@
     }, {
         "name": "1.21.7_Mooare_U1.B1.E",
         "desc": "Not done :) (EssentialsMod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "6c491301-cbc7-44db-b017-8fd098407bd2",
         "hidden": false,
         "supported": true,
@@ -947,7 +947,7 @@
     }, {
         "name": "1.21.7_Mooare_U1.B1.C",
         "desc": "Not done :) (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "56eb5d2a-2927-4485-abb1-cbe975998498",
         "hidden": false,
         "supported": true,
@@ -959,7 +959,7 @@
     }, {
         "name": "1.21.5 Mooare U1 BETA1 E",
         "desc": "A client with some more stuff. (Essentials Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "3d358af4-a013-4bca-920d-864bd814dad4",
         "hidden": false,
         "supported": true,
@@ -971,7 +971,7 @@
     }, {
         "name": "1.21.5 Mooare U1 BETA1 C",
         "desc": "A client with some more stuff. (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "2ab7a0c2-3104-40a8-8188-abf51b4050fc",
         "hidden": false,
         "supported": true,
@@ -983,7 +983,7 @@
     }, {
         "name": "1.21.4 Mooare U1 BETA1 E",
         "desc": "A client with some more stuff. (Essentials Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "2d5f01c1-cb4f-48c1-bc7a-a257f3e83ddc",
         "hidden": true,
         "supported": false,
@@ -995,7 +995,7 @@
     }, {
         "name": "1.21.4 Mooare U1 BETA1 C",
         "desc": "A client with some more stuff. (e4mc Mod)",
-        "author": "SimonKC",
+        "author": "Axo",
         "id": "534f26b7-cc56-4a4f-aabc-1c6d6aa2abd1",
         "hidden": true,
         "supported": false,
@@ -1007,7 +1007,7 @@
     }, {
         "name": "1.21.1 Frodomon 2025-05-29",
         "desc": "Thirdparty hosted version of Frodomon's 1.21.1 Drim Summer modpack.",
-        "author": "SimonKC x Frodomon/LukasFossmo",
+        "author": "Axo x Frodomon/LukasFossmo",
         "id": "346077a2-5c90-485e-9b00-df85359148fd",
         "hidden": true,
         "supported": true,
