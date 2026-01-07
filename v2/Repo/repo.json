@@ -5,18 +5,6 @@
     "created": "2023-09-22",
     "lastUpdated": "2026-01-07",
     "flavors": [{
-        "name": "1.21.11_Community-Client_U3.B2.C",
-        "desc": "Not done :) (e4mc Mod)",
-        "author": "SimonKC",
-        "id": "ddf8c62e-93a1-4fe7-8c78-901343aabead",
-        "hidden": false,
-        "supported": true,
-        "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client_U3.B2.C_2026-01-07_21-06-46-quickcompile.mListing",
-        "group": "Community-Client",
-        "mcver": "1.21.11",
-        "icon": "skc:community_lite_C"
-    }, {
         "name": "1.21.11_Community-Client_U3.B2.E",
         "desc": "Not done :) (EssentialsMod)",
         "author": "SimonKC",
@@ -29,14 +17,14 @@
         "mcver": "1.21.11",
         "icon": "skc:community_lite_E"
     }, {
-        "name": "1.21.11_Community-Client-Lite_U3.B2.C",
-        "desc": "Lite version, not done :) (e4mc Mod)",
+        "name": "1.21.11_Community-Client_U3.B2.C",
+        "desc": "Not done :) (e4mc Mod)",
         "author": "SimonKC",
-        "id": "b16a1bee-8e2c-4c6c-8dad-17b7c1a3f255",
+        "id": "ddf8c62e-93a1-4fe7-8c78-901343aabead",
         "hidden": false,
         "supported": true,
         "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client-Lite_U3.B2.C_2026-01-07_21-03-31-quickcompile.mListing",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client_U3.B2.C_2026-01-07_21-06-46-quickcompile.mListing",
         "group": "Community-Client",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_C"
@@ -52,6 +40,18 @@
         "group": "Community-Client",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_E"
+    }, {
+        "name": "1.21.11_Community-Client-Lite_U3.B2.C",
+        "desc": "Lite version, not done :) (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "b16a1bee-8e2c-4c6c-8dad-17b7c1a3f255",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client-Lite_U3.B2.C_2026-01-07_21-03-31-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.21.11",
+        "icon": "skc:community_lite_C"
     }, {
         "name": "1.21.10_Community-Client_U3.B2.E_PR",
         "desc": "Pre-Release :) (EssentialsMod)",
@@ -969,18 +969,6 @@
         "group": "Community-Client",
         "mcver": "1.21.1"
     }, {
-        "name": "1.21.11_Mooare_U1.B1.C",
-        "desc": "A client with some more stuff. (e4mc Mod)",
-        "author": "SimonKC",
-        "id": "1b9aed5c-401b-476a-acf0-d06a0eb6000c",
-        "hidden": false,
-        "supported": true,
-        "sourceType": "mlisting",
-        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Mooare_U1.B1.C_2026-01-07_21-10-55-quickcompile.mListing",
-        "group": "Mooare",
-        "mcver": "1.21.11",
-        "icon": "skc:community_lite_C"
-    }, {
         "name": "1.21.11_Mooare_U1.B1.E",
         "desc": "A client with some more stuff. (EssentialsMod)",
         "author": "SimonKC",
@@ -992,6 +980,18 @@
         "group": "Mooare",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_E"
+    }, {
+        "name": "1.21.11_Mooare_U1.B1.C",
+        "desc": "A client with some more stuff. (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "1b9aed5c-401b-476a-acf0-d06a0eb6000c",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Mooare_U1.B1.C_2026-01-07_21-10-55-quickcompile.mListing",
+        "group": "Mooare",
+        "mcver": "1.21.11",
+        "icon": "skc:community_lite_C"
     }, {
         "name": "1.21.10_Mooare_U1.B1.E_PR",
         "desc": "Pre-Release :) (EssentialsMod)",
