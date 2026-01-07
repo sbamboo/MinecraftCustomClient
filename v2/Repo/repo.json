@@ -977,7 +977,7 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Mooare_U1.B1.C_2026-01-07_21-10-55-quickcompile.mListing",
-        "group": "Community-Client",
+        "group": "Mooare",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_C"
     }, {
@@ -989,7 +989,7 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Mooare_U1.B1.E_2026-01-07_21-12-42-quickcompile.mListing",
-        "group": "Community-Client",
+        "group": "Mooare",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_E"
     }, {
