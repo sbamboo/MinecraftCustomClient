@@ -13,7 +13,7 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client_U3.B2.C_2026-01-07_21-06-46-quickcompile.mListing",
-        "group": "UNGROUPED",
+        "group": "Community-Client",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_C"
     }, {
@@ -25,7 +25,31 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client_U3.B2.E_2026-01-07_21-08-03-quickcompile.mListing",
-        "group": "UNGROUPED",
+        "group": "Community-Client",
+        "mcver": "1.21.11",
+        "icon": "skc:community_lite_E"
+    }, {
+        "name": "1.21.11_Community-Client-Lite_U3.B2.C",
+        "desc": "Lite version, not done :) (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "b16a1bee-8e2c-4c6c-8dad-17b7c1a3f255",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client-Lite_U3.B2.C_2026-01-07_21-03-31-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "1.21.11",
+        "icon": "skc:community_lite_C"
+    }, {
+        "name": "1.21.11_Community-Client-Lite_U3.B2.E",
+        "desc": "Lite version, not done :) (EssentialsMod)",
+        "author": "SimonKC",
+        "id": "b162669f-7a22-476b-a3d4-ec3bbfb82e25",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Community-Client-Lite_U3.B2.E_2026-01-07_21-05-27-quickcompile.mListing",
+        "group": "Community-Client",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_E"
     }, {
@@ -953,7 +977,7 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Mooare_U1.B1.C_2026-01-07_21-10-55-quickcompile.mListing",
-        "group": "UNGROUPED",
+        "group": "Community-Client",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_C"
     }, {
@@ -965,7 +989,7 @@
         "supported": true,
         "sourceType": "mlisting",
         "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/1.21.11_Mooare_U1.B1.E_2026-01-07_21-12-42-quickcompile.mListing",
-        "group": "UNGROUPED",
+        "group": "Community-Client",
         "mcver": "1.21.11",
         "icon": "skc:community_lite_E"
     }, {
