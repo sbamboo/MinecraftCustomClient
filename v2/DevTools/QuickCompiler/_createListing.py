@@ -145,7 +145,10 @@ if os.path.exists(mdrindex):
 entries = []
 for obj in pathObjects:
     if os.path.isfile(obj.path):
-        entries.append(obj.path)
+        # Exclude mods/.index folder files
+        checkPath = obj.path.replace(mods,"",1)
+        if not (checkPath.startswith(".index") or checkPath.startswith("/.index") or checkPath.startswith("\\.index")):
+            entries.append(obj.path)
 amntFiles = len(entries)
 d.pr(f"\033[34mFound {amntFiles} files.")
 scannedFiles = 0
