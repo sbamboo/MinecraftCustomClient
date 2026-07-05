@@ -152,7 +152,7 @@ scannedFiles = 0
 
 # Prism .index check
 prismModIndex = {}
-if not os.path.exists(mods):
+if os.path.exists(mods):
     if os.path.exists(prismindex) and argus.skip_prism_index != True:
         # Get all files in .index
         prismIndexFiles = os.listdir(prismindex)
@@ -184,10 +184,11 @@ for _path in entries:
         # From PrismMC .index folder
         if prismModIndex.get(_name) != None and _name not in lookedAtFiles:
             lookedAtFiles.append(_name)
-            urlData = {"type":"prismIndex","url":prismModIndex.get(_name),"filename":_name}
+            prismIndexData = prismModIndex.get(_name)
+            urlData = {"type":"prismIndex","url":prismIndexData.get("url"),"filename":_name}
             urls.append(urlData)
-            prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
-            d.pr(f"{prog}\033[32mFound url in prism index \033[90m: \033[32m{prismModIndex.get(_name)}")
+            proj,scannedFiles = getProgStr(amntFiles,scannedFiles)
+            d.pr(f"{prog}\033[32mFound url in prism index \033[90m: \033[32m{prismIndexData.get('url')}")
 
         # From modrinth profile.json
         if profileData != None and type(profileData) == dict and _name not in lookedAtFiles:
