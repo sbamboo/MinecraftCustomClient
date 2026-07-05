@@ -12,6 +12,7 @@ except ImportError:
 import argparse
 from datetime import datetime
 import urllib.parse
+import tomllib
 
 # [Settings]
 debugPrefix = "\033[90m[\033[35mDevList\033[90m]\033[0m "
@@ -40,6 +41,7 @@ cparser.add_argument('--addProjId', dest="curseforge_ask_project_id", help="If g
 cparser.add_argument('--skipModrinthIcon', dest="skip_modrinth_icon", help="If given the script will not include icons from modrinth profiles.", action='store_true')
 cparser.add_argument('--skipModrinthIndexIcon', dest="skip_modrinth_index_icon", help="If given the script will not use the information in modrinth-export-index files to fetch for icons.", action='store_true')
 cparser.add_argument('--matchModrinthIndexDownloads', dest="match_modrinth_index_downloads", help="If given the script will only use a modrinth-export-index file download if it has a matching filename.", action='store_true')
+cparser.add_argument('--skipPrismIndex', dest="skip_prism_index", help="If given the script will not find & parse /mods/.index/ folder for mod links.", action='store_true')
 # Create main arguments object
 argus = cparser.parse_args()
 
@@ -49,6 +51,7 @@ mods     = os.path.join(modpack,"mods")
 manifest = os.path.join(modpack,f"minecraftinstance.json") #Curseforge Manifest
 profile  = os.path.join(modpack,"profile.json") #Modrinth profile
 mdrindex = os.path.join(modpack,"modrinth.index.json") #Modrinth Export Index
+prismindex = os.path.join(modpack,"mods",".index") #PrismMC mods/.index
 
 urls = []
 lookedAtFiles = []
@@ -147,6 +150,25 @@ amntFiles = len(entries)
 d.pr(f"\033[34mFound {amntFiles} files.")
 scannedFiles = 0
 
+# Prism .index check
+prismModIndex = {}
+if not os.path.exists(mods):
+    if os.path.exists(prismindex) and argus.skip_prism_index != True:
+        # Get all files in .index
+        prismIndexFiles = os.listdir(prismindex)
+        for prismIndexFile in prismIndexFiles:
+            # Parse the .toml file then make a map of "filename" field as key, and "download" field as value
+            if prismIndexFile.endswith(".toml"):
+                prismIndexFilePath = os.path.join(prismindex,prismIndexFile)
+                # Parse TOML using tomllib
+                with open(prismIndexFilePath, 'rb') as f:
+                    prismIndexData = tomllib.load(f)
+                # Get the "filename" and "download" fields
+                filename = prismIndexData.get("filename")
+                download = prismIndexData.get("download")
+                if filename != None and download != None:
+                    prismModIndex[filename] = download
+
 # retrive links
 if has_connection():
     modrinth = MJRL("sbamboo/MinecraftCustomClient")
@@ -158,6 +180,15 @@ for _path in entries:
         # Prio curseforge?
         if argus.prio_curseforge == True:
             lookedAtFiles,urls,scannedFiles = checkmanifest(manifest,_name,lookedAtFiles,urls,amntFiles,scannedFiles,curseforgeAskProjId=argus.curseforge_ask_project_id)
+
+        # From PrismMC .index folder
+        if prismModIndex.get(_name) != None and _name not in lookedAtFiles:
+            lookedAtFiles.append(_name)
+            urlData = {"type":"prismIndex","url":prismModIndex.get(_name),"filename":_name}
+            urls.append(urlData)
+            prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
+            d.pr(f"{prog}\033[32mFound url in prism index \033[90m: \033[32m{prismModIndex.get(_name)}")
+
         # From modrinth profile.json
         if profileData != None and type(profileData) == dict and _name not in lookedAtFiles:
             projs = profileData.get("projects")
