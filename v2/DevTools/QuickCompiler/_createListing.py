@@ -171,6 +171,12 @@ if os.path.exists(mods):
                 download = prismIndexData.get("download")
                 if filename != None and download != None:
                     prismModIndex[filename] = download
+                ## Is there a `[update.modrinth]` part, include it
+                updateMdr = prismIndexData.get("update",{}).get("modrinth")
+                if updateMdr != None and type(updateMdr) == dict:
+                    # save under prismModIndex[filename]["mdr_update"]
+                    if prismModIndex.get(filename) == None:
+                        prismModIndex[filename]["mdr_update"] = updateMdr
 
 # retrive links
 if has_connection():
@@ -188,7 +194,14 @@ for _path in entries:
         if prismModIndex.get(_name) != None and _name not in lookedAtFiles:
             lookedAtFiles.append(_name)
             prismIndexData = prismModIndex.get(_name)
-            urlData = {"type":"prismIndex","url":prismIndexData.get("url"),"filename":_name}
+            urlData = {"type":"prismIndex","url":prismIndexData.get("url"),"filename":_name,"indexType":"prism"}
+            
+            # icon?
+            ## check if mdr_update and if it has field "mod-id" if so do `urlData["modrinthIcon"] = "proj:" + str(projData["metadata"]["project"]["id"])`
+            if prismIndexData.get("mdr_update") != None:
+                if prismIndexData.get("mdr_update").get("mod-id") != None:
+                    urlData["modrinthIcon"] = "proj:" + str(prismIndexData.get("mdr_update").get("mod-id"))
+
             urls.append(urlData)
             prog,scannedFiles = getProgStr(amntFiles,scannedFiles)
             d.pr(f"{prog}\033[32mFound url in prism index \033[90m: \033[32m{prismIndexData.get('url')}")
