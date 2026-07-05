@@ -194,7 +194,7 @@ for _path in entries:
         if prismModIndex.get(_name) != None and _name not in lookedAtFiles:
             lookedAtFiles.append(_name)
             prismIndexData = prismModIndex.get(_name)
-            urlData = {"type":"prismIndex","url":prismIndexData.get("url"),"filename":_name,"indexType":"prism"}
+            urlData = {"type":"modrinth","url":prismIndexData.get("url"),"filename":_name,"modrinthType":"prism.index"}
             
             # icon?
             ## check if mdr_update and if it has field "mod-id" if so do `urlData["modrinthIcon"] = "proj:" + str(projData["metadata"]["project"]["id"])`
