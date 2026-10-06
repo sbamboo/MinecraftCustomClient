@@ -3,8 +3,56 @@
     "author": "MinecraftCustomClient / Axo",
     "version": "1.0",
     "created": "2023-09-22",
-    "lastUpdated": "2026-08-02",
+    "lastUpdated": "2026-10-06",
     "flavors": [{
+        "name": "26.3_Community-Client_U3.B3.E",
+        "desc": "Not done :) (EssentialsMod)",
+        "author": "SimonKC",
+        "id": "24f5fd02-d96e-49b4-bf9f-28dabab80977",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/26.3_Community-Client_U3.B3.E_2026-10-06_23-21-38-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "26.3",
+        "icon": "skc:community_lite_E"
+    }, {
+        "name": "26.3_Community-Client_U3.B3.C",
+        "desc": "Not done :) (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "0dede516-fa35-4d19-b48a-9f0bd417a0a1",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/26.3_Community-Client_U3.B3.C_2026-10-06_23-20-29-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "26.3",
+        "icon": "skc:community_lite_C"
+    }, {
+        "name": "26.3_Community-Client-Lite_U3.B3.E",
+        "desc": "Lite version, not done :) (EssentialsMod)",
+        "author": "SimonKC",
+        "id": "3ac366aa-8a9c-4833-a3f9-b35a3844745a",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/26.3_Community-Client-Lite_U3.B3.E_2026-10-06_23-19-03-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "26.3",
+        "icon": "skc:community_lite_E"
+    }, {
+        "name": "26.3_Community-Client-Lite_U3.B3.C",
+        "desc": "Lite version, not done :) (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "9378697a-736d-4bf1-ba02-1a6109e91a3a",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/26.3_Community-Client-Lite_U3.B3.C_2026-10-06_23-16-46-quickcompile.mListing",
+        "group": "Community-Client",
+        "mcver": "26.3",
+        "icon": "skc:community_lite_C"
+    }, {
         "name": "26.2_Community-Client_U3.B3.E",
         "desc": "Not done :) (EssentialsMod)",
         "author": "SimonKC",
@@ -1112,6 +1160,30 @@
         "icon": "skc:community_E",
         "group": "Community-Client",
         "mcver": "1.21.1"
+    }, {
+        "name": "26.3_Mooare_U1.B3.E",
+        "desc": "Not done :) (EssentialsMod)",
+        "author": "SimonKC",
+        "id": "64e98cfc-5c16-42f7-86f6-544eb7a547c2",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/26.3_Mooare_U1.B3.E_2026-10-06_23-25-27-quickcompile.mListing",
+        "group": "Mooare",
+        "mcver": "26.3",
+        "icon": "skc:community_lite_E"
+    }, {
+        "name": "26.3_Mooare_U1.B3.C",
+        "desc": "Not done :) (e4mc Mod)",
+        "author": "SimonKC",
+        "id": "b8fa1dbc-103c-405b-8c08-416ef819d7cc",
+        "hidden": false,
+        "supported": true,
+        "sourceType": "mlisting",
+        "source": "https://raw.githubusercontent.com/sbamboo/MinecraftCustomClient/main/v2/Repo/Packages/26.3_Mooare_U1.B3.C_2026-10-06_23-24-18-quickcompile.mListing",
+        "group": "Mooare",
+        "mcver": "26.3",
+        "icon": "skc:community_lite_C"
     }, {
         "name": "26.2_Mooare_U1.B3.E",
         "desc": "Not done :) (EssentialsMod)",
